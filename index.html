@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Kalendar BPS</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Gaya CSS Khas (Tema Khas Sudut Bulat & Cetakan) -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Tahoma&display=swap');
+    
+    body { margin: 0; font-family: 'Tahoma', 'Trebuchet MS', sans-serif; }
+    .xp-desktop { background-color: #3A6EA5; min-height: 100vh; }
+    
+    .xp-window { 
+      background-color: #ECE9D8; 
+      border: 1px solid #003C74; 
+      border-radius: 12px; 
+      box-shadow: 2px 2px 12px rgba(0,0,0,0.4); 
+    }
+    
+    .xp-titlebar { 
+      background: linear-gradient(to bottom, #0058E6 0%, #3A93FF 8%, #288EFF 40%, #127DFF 88%, #036BFF 100%); 
+      color: white; 
+      padding: 6px 14px; 
+      border-top-left-radius: 11px; 
+      border-top-right-radius: 11px; 
+      border-bottom: 1px solid #003C74; 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      font-weight: bold; 
+      text-shadow: 1px 1px #0F1089; 
+      letter-spacing: 0.5px; 
+    }
+    
+    .xp-button { 
+      background-color: #ECE9D8; 
+      border-top: 2px solid #FFFFFF; 
+      border-left: 2px solid #FFFFFF; 
+      border-right: 2px solid #716F64; 
+      border-bottom: 2px solid #716F64; 
+      border-radius: 6px;
+      padding: 4px 12px; 
+      font-size: 11px; 
+      color: #000; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 6px; 
+      cursor: pointer; 
+      font-family: 'Tahoma', sans-serif;
+      transition: all 0.1s ease;
+    }
+    .xp-button:active { 
+      border-top: 2px solid #716F64; 
+      border-left: 2px solid #716F64; 
+      border-right: 2px solid #FFFFFF; 
+      border-bottom: 2px solid #FFFFFF; 
+      padding: 5px 11px 3px 13px; 
+    }
+    
+    .xp-button-mini { 
+      background-color: #ECE9D8; 
+      border-top: 1px solid #FFFFFF; 
+      border-left: 1px solid #FFFFFF; 
+      border-right: 1px solid #716F64; 
+      border-bottom: 1px solid #716F64; 
+      border-radius: 4px;
+    }
+    .xp-button-mini:active { 
+      border-top: 1px solid #716F64; 
+      border-left: 1px solid #716F64; 
+      border-right: 1px solid #FFFFFF; 
+      border-bottom: 1px solid #FFFFFF; 
+    }
+    
+    .xp-panel { 
+      border-top: 2px solid #716F64; 
+      border-left: 2px solid #716F64; 
+      border-right: 2px solid #FFFFFF; 
+      border-bottom: 2px solid #FFFFFF; 
+      border-radius: 10px;
+      background-color: #ECE9D8; 
+    }
+    
+    .xp-input { 
+      border-top: 2px solid #716F64; 
+      border-left: 2px solid #716F64; 
+      border-right: 2px solid #FFFFFF; 
+      border-bottom: 2px solid #FFFFFF; 
+      border-radius: 6px;
+      padding: 4px 8px; 
+      font-family: 'Tahoma', sans-serif; 
+      outline: none; 
+    }
+    .xp-input:focus { background-color: #ffffe1; }
+    .xp-input:disabled { background-color: #e2e8f0; color: #94a3b8; }
+    
+    .monthly-print-only { display: none; }
+    
+    .tab-btn {
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      border-top: 2px solid #ece9d8;
+      border-left: 2px solid #ece9d8;
+      border-right: 2px solid #ece9d8;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+      background-color: white;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #fff;
+      border-bottom: 0;
+      box-shadow: 1px -1px 3px rgba(0,0,0,0.1);
+      margin-bottom: -15px;
+      padding-bottom: 14px;
+    }
+    .tab-btn:not(.active) {
+      background-color: #ece9d8;
+      border-color: #ece9d8;
+    }
+    .tab-btn:not(.active):hover {
+      background-color: #dfdbcf;
+    }
+
+    .profile-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .profile-card:hover {
+      transform: scale(1.08);
+    }
+    .profile-card:hover .profile-img {
+      border-color: #fff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .toast-anim {
+      animation: slideIn 0.3s ease-out forwards;
+    }
+
+    .sa-table th { background-color: #d2cbbb; border: 1px solid #716f64; padding: 8px; text-align: left; }
+    .sa-table td { border: 1px solid #a9a9a9; padding: 8px; background-color: white; }
+
+    .icon-picker-btn {
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .icon-picker-btn.selected {
+      border-color: #0058e6;
+      background-color: #e6f0ff;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      body { background-color: white; }
+      .xp-desktop { background-color: white; padding: 0; }
+      .xp-window { border: none; box-shadow: none; background: white; }
+      .xp-panel { border: none; background: white; }
+      
+      body:not(.printing-monthly) #print-area, body:not(.printing-monthly) #print-area * { visibility: visible; }
+      body:not(.printing-monthly) #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
+      
+      body.printing-monthly .hide-on-monthly-print { display: none !important; }
+      body.printing-monthly .monthly-print-only { display: block !important; position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
+      body.printing-monthly .monthly-print-only * { visibility: visible; }
+      
+      .no-print { display: none !important; }
+      .print-table th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
+      
+      tr.bg-gradient-to-r.from-\\[\\#e2e8f0\\] { background-color: #e2e8f0 !important; background-image: none !important; -webkit-print-color-adjust: exact; }
+      tr.bg-gradient-to-r.from-white { background-color: #ffffff !important; background-image: none !important; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body class="xp-desktop p-4 flex justify-center items-start">
+
+  <!-- Toast Notifikasi -->
+  <div id="toast" class="fixed top-4 right-4 z-50 bg-[#008000] text-white px-4 py-3 rounded-lg border-2 border-white shadow-lg flex items-center font-bold text-sm no-print hidden toast-anim">
+    <i data-lucide="check-circle-2" class="w-5 h-5 mr-2"></i>
+    <span id="toast-msg">Mesej Berjaya</span>
+  </div>
+
+  <!-- SKRIN LOG MASUK -->
+  <div id="login-screen" class="w-full flex flex-col items-center justify-center min-h-[80vh]">
+    <div class="text-center mb-10">
+      <h1 class="text-3xl md:text-4xl font-bold text-white mb-3" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">Pengurusan Kalendar Aktiviti Bahagian</h1>
+      <h2 class="text-xl md:text-2xl text-slate-200 font-medium" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Pilih Profil Akses</h2>
+    </div>
+
+    <div id="profile-grid" class="flex flex-wrap justify-center gap-8 md:gap-12 max-w-5xl px-4">
+      <!-- Dijana oleh JS -->
+    </div>
+  </div>
+
+  <!-- MODAL SUB-MENU LOGIN -->
+  <div id="profile-auth-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="xp-window w-full max-w-sm flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.8)] relative animate-[slideIn_0.2s_ease-out]">
+      <button onclick="closeProfileMenu()" class="absolute top-2 right-2 text-white hover:text-red-200 z-10 transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="xp-titlebar">
+        <span class="text-sm flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Pengesahan Akses</span>
+      </div>
+
+      <div class="p-6 bg-[#ece9d8] rounded-b-[12px] flex flex-col items-center">
+        <div class="w-16 h-16 rounded-xl border-2 border-[#003C74] bg-white flex items-center justify-center mb-3 shadow-sm" id="auth-profile-icon-container">
+           <i data-lucide="user" class="w-8 h-8 text-[#000080]" id="auth-profile-icon"></i>
+        </div>
+        <h3 class="text-lg font-bold text-[#000080] text-center" id="auth-profile-name">Nama Profil</h3>
+        <p class="text-xs text-[#555] mb-5 text-center" id="auth-profile-dept">Bahagian Profil</p>
+
+        <div id="login-error" class="w-full bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-3 py-2 rounded text-xs font-bold flex items-center gap-2 hidden mb-4">
+          <span class="w-4 h-4 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-[10px] flex-shrink-0">!</span>
+          <span id="login-error-msg"></span>
+        </div>
+
+        <div class="w-full" id="auth-pelawat-section">
+          <button onclick="executeLogin('viewer')" class="xp-button w-full justify-center font-bold text-[#000080] py-3 text-sm shadow-sm">
+            <i data-lucide="eye" class="w-4 h-4"></i> Masuk sebagai Pelawat
+          </button>
+          
+          <div class="flex items-center gap-3 my-4">
+            <div class="h-px bg-[#a9a9a9] flex-1"></div>
+            <span class="text-[10px] font-bold text-[#777] uppercase">Kawasan Admin / Setiausaha</span>
+            <div class="h-px bg-[#a9a9a9] flex-1"></div>
+          </div>
+        </div>
+
+        <div class="w-full flex flex-col gap-2">
+          <label class="text-xs font-bold text-black" id="auth-password-label">Kata Laluan <span class="text-[#888] font-normal">(Bypass dibenarkan)</span>:</label>
+          <input type="password" id="auth-pass" placeholder="Taip kata laluan..." class="xp-input w-full py-2.5 text-center" onkeypress="if(event.key === 'Enter') executeLogin('admin')" />
+          <button onclick="executeLogin('admin')" class="xp-button w-full justify-center font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] py-2.5 mt-1 shadow-sm">
+            <i data-lucide="unlock" class="w-4 h-4"></i> Log Masuk Admin
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TETINGKAP UTAMA APLIKASI -->
+  <div class="xp-window w-full max-w-6xl flex flex-col hide-on-monthly-print hidden" id="main-app-window">
+    
+    <div class="xp-titlebar">
+      <div class="flex items-center gap-2">
+        <i data-lucide="calendar" class="w-4 h-4 text-white drop-shadow"></i>
+        <span class="text-sm tracking-wide" id="app-title-text">Pengurusan Kalendar Aktiviti</span>
+      </div>
+      <!-- Tarikh Semasa Tambahan Di Kanan Bar -->
+      <div class="text-xs font-medium text-white drop-shadow ml-auto" id="current-date-display"></div>
+    </div>
+
+    <div class="p-4 bg-[#ece9d8] flex-1">
+      
+      <div id="top-nav-controls" class="flex flex-col sm:flex-row justify-between items-center pb-4 border-b border-[#a9a9a9] mb-4 gap-4 no-print">
+        
+        <div class="flex gap-1 flex-wrap" id="tabs-container">
+          <button onclick="changeView('weekly')" id="tab-weekly" class="tab-btn active text-[#0058e6]">
+            <i data-lucide="layout-grid" class="w-4 h-4"></i> Jadual Mingguan
+          </button>
+          <button onclick="changeView('matrix')" id="tab-matrix" class="tab-btn text-[#008000]">
+            <i data-lucide="file-text" class="w-4 h-4"></i> Laporan Matriks
+          </button>
+          <button onclick="changeView('settings')" id="tab-settings" class="tab-btn text-[#555]">
+            <i data-lucide="settings" class="w-4 h-4"></i> Tetapan
+          </button>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 xp-panel p-1 bg-white" id="week-controls">
+            <button onclick="handlePrevWeek()" class="xp-button h-8 w-10 flex items-center justify-center p-0" title="Minggu Lepas">
+              <i data-lucide="chevron-left" class="w-4 h-4 text-[#000080]"></i>
+            </button>
+            <button onclick="handleCurrentWeek()" class="xp-button h-8 px-5 font-bold text-[#000080] text-[10px] flex items-center justify-center">
+              MINGGU SEMASA
+            </button>
+            <button onclick="handleNextWeek()" class="xp-button h-8 w-10 flex items-center justify-center p-0" title="Minggu Depan">
+              <i data-lucide="chevron-right" class="w-4 h-4 text-[#000080]"></i>
+            </button>
+          </div>
+          <button onclick="openModal()" id="btn-add-activity" class="xp-button h-8 px-4 font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] flex items-center justify-center">
+            <i data-lucide="plus" class="w-4 h-4 text-white"></i> Tambah Aktiviti
+          </button>
+        </div>
+      </div>
+
+      <div id="superadmin-nav" class="hidden pb-4 border-b border-[#a9a9a9] mb-4 no-print">
+        <div class="flex justify-between items-center">
+          <h2 class="font-bold text-lg text-[#000080] flex items-center gap-2">
+            <i data-lucide="shield" class="w-5 h-5 text-red-600"></i> Panel Super-Admin: Pengurusan Profil Sistem
+          </h2>
+          <button onclick="handleLogout()" class="xp-button h-8 font-bold text-white bg-[#e53935] border-[#b71c1c] hover:bg-red-700">
+            <i data-lucide="log-out" class="w-4 h-4"></i> Log Keluar
+          </button>
+        </div>
+      </div>
+
+      <!-- Bekas Utama View -->
+      <div id="view-container" class="bg-white xp-panel p-2">
+      </div>
+    </div>
+
+    <!-- Status bar bawah -->
+    <div class="bg-[#ece9d8] border-t border-[#a9a9a9] p-1.5 flex justify-between items-center text-[10px] font-medium text-[#333] shadow-inner rounded-b-[12px] no-print">
+      <div class="flex items-center gap-2 pl-2">
+        <span class="text-[#0058e6] font-bold">Akses:</span> <span id="status-role-text" class="uppercase font-bold"></span>
+      </div>
+      <div class="pr-2 flex items-center gap-3">
+        Status: Sedia
+        <button onclick="handleLogout()" id="footer-logout-btn" class="ml-2 bg-[#e53935] text-white px-2 py-0.5 rounded flex items-center gap-1 hover:bg-red-600 transition-colors border border-red-800">
+          <i data-lucide="log-out" class="w-3 h-3"></i> Log Keluar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEKAS CETAKAN BULANAN -->
+  <div id="monthly-print-container" class="monthly-print-only w-full max-w-6xl"></div>
+
+  <!-- MODAL BORANG AKTIVITI -->
+  <div id="modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print hidden">
+    <div class="xp-window w-full max-w-xl flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
+      <div class="xp-titlebar">
+        <span class="text-sm flex items-center gap-2" id="modal-title"></span>
+      </div>
+      <div class="p-5 bg-[#ece9d8]">
+        <div id="conflict-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-3 py-2 rounded text-xs font-bold mb-3 flex items-center gap-2 hidden">
+          <span class="w-4 h-4 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-[10px]">!</span>
+          <span id="conflict-error-msg"></span>
+        </div>
+        <form id="activityForm" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-bold text-black flex justify-between">
+                Tarikh:
+                <label class="flex items-center gap-1 font-normal text-[10px] cursor-pointer text-[#000080]">
+                  <input type="checkbox" id="form-isAllDay" onchange="toggleTimeFields()" class="rounded" /> Sepanjang Hari
+                </label>
+              </label>
+              <input type="date" id="form-date" required class="xp-input text-xs w-full py-1.5" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-bold text-black">Masa Mula:</label>
+              <input type="time" id="form-startTime" class="xp-input text-xs w-full py-1.5" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-bold text-black">Masa Tamat:</label>
+              <input type="time" id="form-endTime" class="xp-input text-xs w-full py-1.5" />
+            </div>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-black">Mesyuarat / Program:</label>
+            <input type="text" id="form-program" required class="xp-input text-xs w-full py-1.5" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-black">Tempat:</label>
+            <input type="text" id="form-location" required class="xp-input text-xs w-full py-1.5" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-black">Pegawai:</label>
+            <textarea id="form-officers" rows="3" required class="xp-input text-xs w-full resize-none py-1.5"></textarea>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-black">Catatan:</label>
+            <textarea id="form-notes" rows="2" class="xp-input text-xs w-full resize-none py-1.5"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between items-center">
+        <div>
+          <button type="button" id="btn-delete" onclick="handleDelete()" class="xp-button font-bold text-[#e53935] hidden h-8 px-4">
+            <i data-lucide="trash-2" class="w-4 h-4"></i> Padam
+          </button>
+        </div>
+        <div class="flex gap-3">
+          <button type="button" onclick="closeModal()" class="xp-button h-8 w-24 justify-center">Batal</button>
+          <button type="button" onclick="saveActivity()" class="xp-button h-8 font-bold w-24 justify-center text-white bg-[#0058e6] border-[#003C74] hover:bg-[#0040cc]">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PENGURUSAN PROFIL SUPER ADMIN -->
+  <div id="sa-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print hidden">
+    <div class="xp-window w-full max-w-md flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
+      <div class="xp-titlebar">
+        <span class="text-sm flex items-center gap-2" id="sa-modal-title">Urus Profil Setiausaha</span>
+      </div>
+      <div class="p-5 bg-[#ece9d8]">
+        <div id="sa-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-3 py-2 rounded text-xs font-bold mb-3 flex items-center gap-2 hidden">
+          <span class="w-4 h-4 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-[10px]">!</span>
+          <span id="sa-error-msg"></span>
+        </div>
+        <form id="saForm" class="space-y-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-black">Nama Profil / Username:</label>
+            <input type="text" id="sa-username" required class="xp-input w-full py-1.5" placeholder="Cth: Setiausaha BPS" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-black">Nama Bahagian / Unit:</label>
+            <input type="text" id="sa-department" required class="xp-input w-full py-1.5" placeholder="Nama penuh bahagian" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-black">Kata Laluan (Biarkan kosong untuk lalai):</label>
+            <input type="text" id="sa-password" class="xp-input w-full py-1.5" placeholder="Kata laluan" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-black">Pilih Ikon Profil:</label>
+            <div id="sa-icon-grid" class="flex gap-2 flex-wrap bg-white p-2 rounded border border-[#a9a9a9] shadow-inner">
+               <!-- JS Injects Icons here -->
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-end gap-3">
+        <button type="button" onclick="closeSAModal()" class="xp-button h-8 w-24 justify-center">Batal</button>
+        <button type="button" onclick="saveSAUser()" class="xp-button h-8 font-bold w-24 justify-center text-white bg-[#008000] border-[#005000] hover:bg-[#006000]">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PENGESAHAN PADAM -->
+  <div id="confirm-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print hidden">
+    <div class="xp-window w-full max-w-sm flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
+      <div class="xp-titlebar">
+        <span class="text-sm flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-yellow-300"></i> Pengesahan Padam</span>
+      </div>
+      <div class="p-5 bg-[#ece9d8] text-center font-bold text-sm text-black">
+        <p id="confirm-modal-msg" class="mb-2">Adakah anda pasti?</p>
+        <p class="text-[10px] text-red-600 font-normal">Amaran: Semua rekod aktiviti bagi profil ini juga akan dipadam secara kekal.</p>
+      </div>
+      <div class="p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-center gap-3">
+        <button type="button" onclick="cancelDelete()" class="xp-button h-8 w-24 justify-center">Batal</button>
+        <button type="button" onclick="executeDelete()" class="xp-button h-8 font-bold w-24 justify-center text-white bg-[#e53935] border-[#b71c1c] hover:bg-red-700">Ya, Padam</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIREBASE INITIALIZATION -->
+  <script type="module">
+    // Import from Firebase CDN for vanilla HTML usage
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB8XX20lI2qvK4vcmTFR8Idk_YYr7c3VqA",
+      authDomain: "pengurusan-kalendar-aktiviti.firebaseapp.com",
+      projectId: "pengurusan-kalendar-aktiviti",
+      storageBucket: "pengurusan-kalendar-aktiviti.firebasestorage.app",
+      messagingSenderId: "562353215762",
+      appId: "1:562353215762:web:39c7b7d9e10c2a3847bbcb",
+      measurementId: "G-JGRLJDRFEK"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    // Dedahkan (expose) konfigurasi ke global untuk kegunaan pengkalan data kelak
+    window.firebaseApp = app;
+    console.log("Firebase App Initialized Successfully");
+  </script>
+
+  <script>
+    const availableIcons = ['user', 'users', 'briefcase', 'folder', 'monitor', 'hard-drive', 'building', 'clipboard-list', 'award'];
+
+    let users = [
+      { id: 'u1', username: 'Setiausaha BPS', departmentName: 'Bahagian Perancangan Strategik', password: '', isActive: true, icon: 'briefcase' },
+      { id: 'u2', username: 'Setiausaha BTM', departmentName: 'Bahagian Teknologi Maklumat', password: '', isActive: true, icon: 'monitor' },
+      { id: 'u3', username: 'Setiausaha HR', departmentName: 'Bahagian Sumber Manusia', password: '', isActive: false, icon: 'users' }
+    ];
+
+    let activities = [
+      { id: '1', userId: 'u1', date: '2024-12-23', day: 'Isnin', startTime: '09:30', endTime: '12:00', isAllDay: false, program: 'Perbincangan Bersama Pegawai', location: 'Bilik Pengarah PS', officers: 'En Nizam\nPn Normazmin\nPn Azora', notes: '' },
+      { id: '2', userId: 'u1', date: '2024-12-23', day: 'Isnin', startTime: '14:30', endTime: '16:30', isAllDay: false, program: 'Mesyuarat Panel Peperiksaan Bil.2/2024', location: 'Bilik Mesyuarat Kembang Semangkuk', officers: 'En Nizam', notes: 'Pengerusi: YBrs. Encik Mohd Amin Bin Kadir\nUrusetia: Seksyen Pengurusan Sumber Manusia' },
+      { id: '3', userId: 'u1', date: '2024-12-24', day: 'Selasa', startTime: '09:30', endTime: '12:00', isAllDay: false, program: 'Perbincangan Bersama Unit Penerbitan', location: 'Bilik Pengarah PS', officers: 'En Nizam\nPn Rahilah', notes: '' },
+      { id: '4', userId: 'u2', date: '2024-12-24', day: 'Selasa', startTime: '14:30', endTime: '16:30', isAllDay: false, program: 'Taklimat Infrastruktur IT Terkini', location: 'Bilik Server', officers: 'En Hakim\nPn Siti', notes: 'Hanya staf teknikal' }
+    ];
+
+    let currentUserRole = null; 
+    let currentUserId = null; 
+    let viewMode = 'weekly';
+    let baseDate = new Date('2024-12-23');
+    let printMonth = '2024-12';
+    
+    let editingId = null;
+    let editingSAUserId = null;
+    let selectedIconTemp = 'user';
+    let tempAuthUserId = null; 
+    
+    // Status flag jika Super-Admin sedang melihat profil (impersonate)
+    let impersonatingFromSA = false;
+
+    const dayNamesList = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+    const monthNamesList = ['JAN', 'FEB', 'MAC', 'APR', 'MEI', 'JUN', 'JUL', 'OGO', 'SEP', 'OKT', 'NOV', 'DIS'];
+
+    window.onload = () => {
+      updateCurrentDateDisplay();
+      renderProfileGrid();
+      lucide.createIcons();
+    };
+
+    function updateCurrentDateDisplay() {
+      const d = new Date();
+      const dayStr = dayNamesList[d.getDay()];
+      const dateStr = d.getDate();
+      const monthStr = ['JAN', 'FEB', 'MAC', 'APR', 'MEI', 'JUN', 'JUL', 'OGO', 'SEP', 'OKT', 'NOV', 'DIS'][d.getMonth()];
+      const yearStr = d.getFullYear();
+      const display = `${dayStr.toUpperCase()}, ${dateStr} ${monthStr} ${yearStr}`;
+      
+      const el = document.getElementById('current-date-display');
+      if (el) el.innerText = display;
+    }
+
+    function renderProfileGrid() {
+      const grid = document.getElementById('profile-grid');
+      const activeUsers = users.filter(u => u.isActive);
+      
+      let html = `
+        <div onclick="openProfileMenu('superadmin')" class="profile-card flex flex-col items-center gap-3 cursor-pointer group">
+          <div class="profile-img w-28 h-28 md:w-36 md:h-36 bg-[#e53935] border-[3px] border-[#b71c1c] rounded-2xl flex items-center justify-center shadow-lg transition-all relative overflow-hidden">
+             <div class="absolute inset-0 bg-black/10"></div>
+             <i data-lucide="shield" class="w-12 h-12 md:w-16 md:h-16 text-white drop-shadow-md z-10"></i>
+          </div>
+          <span class="text-white font-bold md:text-lg group-hover:text-red-300 transition-colors drop-shadow">Super-Admin</span>
+        </div>
+      `;
+
+      activeUsers.forEach(u => {
+        html += `
+          <div onclick="openProfileMenu('${u.id}')" class="profile-card flex flex-col items-center gap-3 cursor-pointer group">
+            <div class="profile-img w-28 h-28 md:w-36 md:h-36 bg-[#ece9d8] border-[3px] border-[#003C74] rounded-2xl flex items-center justify-center shadow-lg transition-all">
+               <i data-lucide="${u.icon || 'user'}" class="w-12 h-12 md:w-16 md:h-16 text-[#0058e6] drop-shadow-sm"></i>
+            </div>
+            <span class="text-white font-bold md:text-lg group-hover:text-yellow-300 transition-colors drop-shadow tracking-wide">${escapeHTML(u.username)}</span>
+          </div>
+        `;
+      });
+      
+      grid.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    function openProfileMenu(userId) {
+      tempAuthUserId = userId;
+      document.getElementById('login-error').classList.add('hidden');
+      document.getElementById('auth-pass').value = '';
+
+      const pelawatSection = document.getElementById('auth-pelawat-section');
+      const profileName = document.getElementById('auth-profile-name');
+      const profileDept = document.getElementById('auth-profile-dept');
+      const iconContainer = document.getElementById('auth-profile-icon-container');
+      const passwordLabel = document.getElementById('auth-password-label');
+
+      if (userId === 'superadmin') {
+        pelawatSection.classList.add('hidden');
+        profileName.innerText = "Sistem Super-Admin";
+        profileName.className = "text-lg font-bold text-red-600 text-center";
+        profileDept.innerText = "Mod Keselamatan Tertinggi";
+        iconContainer.innerHTML = `<i data-lucide="shield" class="w-8 h-8 text-red-600"></i>`;
+        iconContainer.className = "w-16 h-16 rounded-xl border-2 border-red-600 bg-red-50 flex items-center justify-center mb-3 shadow-sm";
+        passwordLabel.innerHTML = `Kata Laluan <span class="text-[#888] font-normal">(Taip 'admin' atau biar kosong)</span>:`;
+      } else {
+        const user = users.find(u => u.id === userId);
+        pelawatSection.classList.remove('hidden');
+        profileName.innerText = user.username;
+        profileName.className = "text-lg font-bold text-[#000080] text-center";
+        profileDept.innerText = user.departmentName;
+        iconContainer.innerHTML = `<i data-lucide="${user.icon || 'user'}" class="w-8 h-8 text-[#000080]"></i>`;
+        iconContainer.className = "w-16 h-16 rounded-xl border-2 border-[#003C74] bg-white flex items-center justify-center mb-3 shadow-sm";
+        passwordLabel.innerHTML = `Kata Laluan Admin:`;
+      }
+
+      document.getElementById('profile-auth-modal').classList.remove('hidden');
+      lucide.createIcons();
+      setTimeout(()=> document.getElementById('auth-pass').focus(), 100);
+    }
+
+    function closeProfileMenu() {
+      document.getElementById('profile-auth-modal').classList.add('hidden');
+      tempAuthUserId = null;
+    }
+
+    function showLoginError(msg) {
+      document.getElementById('login-error-msg').innerText = msg;
+      document.getElementById('login-error').classList.remove('hidden');
+    }
+
+    function executeLogin(role) {
+      document.getElementById('login-error').classList.add('hidden');
+      const pass = document.getElementById('auth-pass').value;
+      
+      impersonatingFromSA = false;
+      document.getElementById('footer-logout-btn').innerHTML = `<i data-lucide="log-out" class="w-3 h-3"></i> Log Keluar`;
+
+      if (tempAuthUserId === 'superadmin') {
+        if (pass === 'admin' || pass === '') {
+          currentUserRole = 'superadmin';
+          currentUserId = null;
+          
+          document.getElementById('status-role-text').innerText = 'SUPER ADMIN';
+          document.getElementById('profile-auth-modal').classList.add('hidden');
+          document.getElementById('login-screen').classList.add('hidden');
+          
+          document.getElementById('main-app-window').classList.remove('hidden');
+          document.getElementById('top-nav-controls').classList.add('hidden');
+          document.getElementById('superadmin-nav').classList.remove('hidden');
+          document.getElementById('footer-logout-btn').classList.add('hidden');
+
+          viewMode = 'superadmin';
+          renderApp();
+          return;
+        } else {
+          return showLoginError('Kata Laluan Super-Admin Salah!');
+        }
+      }
+
+      const user = users.find(u => u.id === tempAuthUserId);
+      if (role === 'admin') {
+        if (user.password && user.password !== '' && pass !== user.password) {
+           return showLoginError('Kata laluan salah. Sila cuba lagi.');
+        }
+      }
+      
+      currentUserId = tempAuthUserId;
+      currentUserRole = role;
+      
+      document.getElementById('status-role-text').innerText = role === 'admin' ? `Admin (${user.username})` : `Penonton (${user.username})`;
+      
+      document.getElementById('profile-auth-modal').classList.add('hidden');
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('main-app-window').classList.remove('hidden');
+      
+      document.getElementById('top-nav-controls').classList.remove('hidden');
+      document.getElementById('superadmin-nav').classList.add('hidden');
+      document.getElementById('footer-logout-btn').classList.remove('hidden');
+
+      viewMode = 'weekly';
+      renderApp();
+    }
+
+    function handleLogout() {
+      if (impersonatingFromSA) {
+        impersonatingFromSA = false;
+        currentUserRole = 'superadmin';
+        currentUserId = null;
+        
+        document.getElementById('status-role-text').innerText = 'SUPER ADMIN';
+        document.getElementById('top-nav-controls').classList.add('hidden');
+        document.getElementById('superadmin-nav').classList.remove('hidden');
+        document.getElementById('footer-logout-btn').classList.add('hidden');
+        
+        viewMode = 'superadmin';
+        renderApp();
+        return;
+      }
+
+      currentUserRole = null;
+      currentUserId = null;
+      tempAuthUserId = null;
+      
+      document.getElementById('main-app-window').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('profile-grid').classList.remove('hidden');
+      
+      renderProfileGrid(); 
+    }
+
+    // Fungsi Akses Terus Super-Admin Ke Profil Pengguna
+    function impersonateUser(userId) {
+      const user = users.find(u => u.id === userId);
+      if(!user) return;
+
+      currentUserId = userId;
+      currentUserRole = 'admin'; 
+      impersonatingFromSA = true;
+
+      document.getElementById('status-role-text').innerText = `Admin (${user.username}) - Pihak Super-Admin`;
+      
+      document.getElementById('top-nav-controls').classList.remove('hidden');
+      document.getElementById('superadmin-nav').classList.add('hidden');
+      
+      const logoutBtn = document.getElementById('footer-logout-btn');
+      logoutBtn.classList.remove('hidden');
+      logoutBtn.innerHTML = `<i data-lucide="arrow-left" class="w-3 h-3"></i> Kembali ke SA`;
+      
+      viewMode = 'weekly';
+      renderApp();
+    }
+
+    function formatTimeDisplay(time24) {
+      if (!time24) return '';
+      const parts = time24.split(':');
+      let h = parseInt(parts[0], 10);
+      const mStr = parts[1];
+      let period = 'pg';
+      if (h >= 12) {
+        if (h === 12) period = 'tgh';
+        else if (h < 19) period = 'ptg';
+        else period = 'mlm';
+      }
+      const h12 = h % 12 || 12;
+      return `${h12}:${mStr} ${period}`;
+    }
+
+    function getDisplayTime(start, end, isAllDay) {
+      if (isAllDay) return '-';
+      if (!start && !end) return '-';
+      const s = formatTimeDisplay(start);
+      const e = formatTimeDisplay(end);
+      if (s && e) return `${s} - ${e}`;
+      return s || e || '-';
+    }
+
+    function timeToMinutes(timeStr) {
+      if (!timeStr) return null;
+      const parts = timeStr.split(':');
+      return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    }
+
+    function getDaysOfWeek(startDate) {
+      const days = [];
+      const start = new Date(startDate);
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        days.push({
+          dateStr, dayName: dayNamesList[d.getDay()],
+          displayDate: `${d.getDate()} ${monthNamesList[d.getMonth()]}`,
+          isWeekend: d.getDay() === 0 || d.getDay() === 6
+        });
+      }
+      return days;
+    }
+
+    function getDaysOfMonth(year, monthIndex) {
+      const days = [];
+      const date = new Date(year, monthIndex, 1);
+      while (date.getMonth() === monthIndex) {
+        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        days.push({
+          dateStr, dayName: dayNamesList[date.getDay()],
+          displayDate: `${date.getDate()} ${monthNamesList[date.getMonth()]}`,
+          isWeekend: date.getDay() === 0 || date.getDay() === 6
+        });
+        date.setDate(date.getDate() + 1);
+      }
+      return days;
+    }
+
+    function escapeHTML(str) {
+      if(!str) return '';
+      return str.replace(/[&<>'"]/g, tag => ({'&': '&amp;','<': '&lt;','>': '&gt;',"'": '&#39;','"': '&quot;'}[tag]));
+    }
+
+    function changeView(mode) {
+      viewMode = mode;
+      
+      const tabs = ['weekly', 'matrix', 'settings'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if (!btn) return;
+        if(t === mode) {
+          btn.className = `tab-btn active ${t === 'weekly' ? 'text-[#0058e6]' : t === 'matrix' ? 'text-[#008000]' : 'text-[#555]'}`;
+        } else {
+          btn.className = `tab-btn ${t === 'weekly' ? 'text-[#0058e6]' : t === 'matrix' ? 'text-[#008000]' : 'text-[#555]'}`;
+        }
+      });
+
+      const weekControls = document.getElementById('week-controls');
+      if(mode === 'settings') {
+        weekControls.classList.add('opacity-50', 'pointer-events-none');
+        document.getElementById('view-container').className = ''; 
+      } else {
+        weekControls.classList.remove('opacity-50', 'pointer-events-none');
+        document.getElementById('view-container').className = 'bg-white xp-panel p-2';
+      }
+      renderApp();
+    }
+
+    function handlePrevWeek() { baseDate = new Date(baseDate.getTime() - 7 * 24 * 60 * 60 * 1000); renderApp(); }
+    function handleNextWeek() { baseDate = new Date(baseDate.getTime() + 7 * 24 * 60 * 60 * 1000); renderApp(); }
+    function handleCurrentWeek() { baseDate = new Date(); renderApp(); }
+
+    function buildMatrixHTML(days, actsData, title, dateRangeText, includeOverlayBtn) {
+      const user = users.find(u => u.id === currentUserId);
+      const deptName = user ? user.departmentName : '';
+
+      const groupedData = {};
+      days.forEach(day => { groupedData[day.dateStr] = { dayInfo: day, activities: [] }; });
+      actsData.forEach(act => { if(groupedData[act.date]) groupedData[act.date].activities.push(act); });
+
+      let tbodyHTML = '';
+      
+      Object.values(groupedData).forEach((group, groupIdx) => {
+        const acts = group.activities.sort((a,b) => {
+           if(a.isAllDay) return -1;
+           return timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
+        });
+        const rowActs = acts.length > 0 ? acts : [null];
+        const rowClass = group.dayInfo.isWeekend 
+          ? 'bg-gradient-to-r from-[#e2e8f0] to-[#cbd5e1]'
+          : 'bg-gradient-to-r from-white to-[#f1f5f9] hover:from-[#f8fafc] hover:to-[#e2e8f0]';
+        
+        rowActs.forEach((act, idx) => {
+          tbodyHTML += `<tr class="${rowClass}">`;
+          if(idx === 0) {
+            tbodyHTML += `
+              <td class="border border-black p-3 text-center align-top font-bold text-black" rowspan="${rowActs.length}">
+                ${group.dayInfo.dayName}<br/>
+                <span class="text-sm text-black">${group.dayInfo.displayDate.split(' ')[0]}</span><br/>
+                <span class="text-[10px] uppercase text-black">${group.dayInfo.displayDate.split(' ')[1]}</span>
+              </td>
+            `;
+          }
+
+          if (act) {
+            let editBtnHTML = (includeOverlayBtn && currentUserRole === 'admin') ? `
+              <button onclick="openModal('${act.id}')" class="absolute top-1 right-1 xp-button-mini no-print opacity-0 group-hover:opacity-100 p-1 rounded">
+                <i data-lucide="edit" class="w-3 h-3 text-black"></i>
+              </button>
+            ` : '';
+
+            tbodyHTML += `
+              <td class="border border-black p-3 text-center align-top whitespace-pre-line font-medium text-black">
+                ${getDisplayTime(act.startTime, act.endTime, act.isAllDay)}
+              </td>
+              <td class="border border-black p-3 align-top group relative">
+                <div class="font-bold text-black text-sm">${escapeHTML(act.program)}</div>
+                ${act.notes ? `<div class="mt-1.5 text-[10px] text-black whitespace-pre-line">${escapeHTML(act.notes)}</div>` : ''}
+                ${editBtnHTML}
+              </td>
+              <td class="border border-black p-3 align-top text-center whitespace-pre-line text-black">${escapeHTML(act.location)}</td>
+              <td class="border border-black p-3 align-top whitespace-pre-line text-black">${escapeHTML(act.officers)}</td>
+            `;
+          } else {
+            tbodyHTML += `
+              <td class="border border-black p-3 text-center text-black">-</td>
+              <td class="border border-black p-3 text-center italic text-black font-semibold">Tiada Aktiviti</td>
+              <td class="border border-black p-3 text-center text-black">-</td>
+              <td class="border border-black p-3 text-center text-black">-</td>
+            `;
+          }
+          tbodyHTML += `</tr>`;
+        });
+      });
+
+      let overlayBtn = includeOverlayBtn ? `
+        <div class="absolute top-4 right-4 no-print">
+          <button onclick="window.print()" class="xp-button h-8 rounded-lg font-bold">
+            <i data-lucide="printer" class="w-4 h-4 text-black"></i> Jana PDF / Cetak
+          </button>
+        </div>
+      ` : '';
+
+      return `
+        <div class="bg-white p-8 overflow-x-auto relative border border-[#a9a9a9] shadow-inner printable-container rounded-lg" id="print-area">
+          ${overlayBtn}
+          <div class="text-center mb-8">
+            <h2 class="font-bold text-xl uppercase text-black">${title}</h2>
+            <h3 class="font-bold text-lg uppercase text-black" id="matrix-dept-name">${escapeHTML(deptName)}</h3>
+            <p class="mt-1 text-black font-semibold text-sm">${dateRangeText}</p>
+          </div>
+          <table class="w-full border-collapse border border-black text-xs print-table">
+            <thead>
+              <tr class="bg-gradient-to-r from-gray-100 to-gray-200">
+                <th class="border border-black p-3 font-bold text-center w-[10%] uppercase text-black">TARIKH</th>
+                <th class="border border-black p-3 font-bold text-center w-[12%] uppercase text-black">MASA</th>
+                <th class="border border-black p-3 font-bold text-center w-[38%] uppercase text-black">MESYUARAT / PROGRAM</th>
+                <th class="border border-black p-3 font-bold text-center w-[20%] uppercase text-black">TEMPAT</th>
+                <th class="border border-black p-3 font-bold text-center w-[20%] uppercase text-black">PEGAWAI</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tbodyHTML}
+            </tbody>
+          </table>
+          <p class="mt-3 text-[10px] italic text-black font-semibold">* (Tertakluk kepada sebarang pindaan)</p>
+        </div>
+      `;
+    }
+
+    function renderApp() {
+      const container = document.getElementById('view-container');
+      
+      const titleEl = document.getElementById('app-title-text');
+      if (currentUserRole === 'superadmin') {
+        titleEl.innerText = "Pengurusan Kalendar Aktiviti (Super-Admin)";
+      } else if (currentUserId) {
+        const user = users.find(u => u.id === currentUserId);
+        if (user) {
+          titleEl.innerText = "Pengurusan Kalendar Aktiviti " + user.departmentName;
+        }
+      } else {
+        titleEl.innerText = "Pengurusan Kalendar Aktiviti";
+      }
+
+      // LOGIK SUPER ADMIN
+      if (currentUserRole === 'superadmin') {
+        let userRows = users.map(u => `
+          <tr class="hover:bg-[#ffffe1]">
+            <td class="border border-[#a9a9a9] p-3">
+              <div class="flex items-center gap-2">
+                <i data-lucide="${u.icon || 'user'}" class="w-4 h-4 text-[#0058e6]"></i>
+                <span class="font-bold text-[#000080]">${escapeHTML(u.username)}</span>
+              </div>
+            </td>
+            <td class="border border-[#a9a9a9] p-3 font-medium">
+              <span onclick="impersonateUser('${u.id}')" class="cursor-pointer text-[#0058e6] hover:underline hover:text-blue-800 transition-colors block" title="Klik untuk terus masuk ke Dashboard profil ini">
+                ${escapeHTML(u.departmentName)}
+              </span>
+            </td>
+            <td class="border border-[#a9a9a9] p-3 font-medium text-red-600">${escapeHTML(u.password) || '<i class="text-gray-400 text-[10px]">Tiada (Bypass)</i>'}</td>
+            <td class="border border-[#a9a9a9] p-3 text-center">
+              ${u.isActive 
+                ? '<span class="bg-green-100 text-green-800 font-bold px-2 py-1 rounded text-[10px]">Aktif</span>' 
+                : '<span class="bg-red-100 text-red-800 font-bold px-2 py-1 rounded text-[10px]">Tidak Aktif</span>'
+              }
+            </td>
+            <td class="border border-[#a9a9a9] p-3 text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button onclick="openSAModal('${u.id}')" class="xp-button text-[#0058e6] px-2" title="Edit Profil">Edit</button>
+                <button onclick="toggleSAUserStatus('${u.id}')" class="xp-button ${u.isActive ? 'text-orange-600' : 'text-green-600'} px-2" title="Tukar Status">
+                  ${u.isActive ? 'Gantung' : 'Aktifkan'}
+                </button>
+                <button onclick="deleteSAUser('${u.id}')" class="xp-button text-red-600 px-2" title="Padam Kekal">Padam</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+
+        container.innerHTML = `
+          <div class="bg-white p-6 rounded-lg shadow-sm border border-[#a9a9a9] min-h-[400px]">
+            <div class="flex justify-between items-center mb-4">
+              <p class="text-sm font-semibold text-[#555]">Senarai Profil Pengguna & Bahagian</p>
+              <button onclick="openSAModal(null)" class="xp-button h-8 px-4 font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000]">
+                <i data-lucide="user-plus" class="w-4 h-4"></i> Tambah Setiausaha
+              </button>
+            </div>
+            
+            <table class="w-full border-collapse sa-table text-xs">
+              <thead>
+                <tr>
+                  <th class="w-[20%]">Nama Pengguna (Ikon)</th>
+                  <th class="w-[25%]">Nama Bahagian</th>
+                  <th class="w-[15%]">Kata Laluan</th>
+                  <th class="w-[10%] text-center">Status</th>
+                  <th class="w-[30%] text-center">Tindakan</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${userRows}
+              </tbody>
+            </table>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      // LOGIK ADMIN / VIEWER BIASA
+      const btnAdd = document.getElementById('btn-add-activity');
+      const tabSettings = document.getElementById('tab-settings');
+
+      if (currentUserRole === 'viewer') {
+        btnAdd.classList.add('hidden');
+        tabSettings.classList.add('hidden');
+        if(viewMode === 'settings') changeView('weekly'); 
+      } else {
+        btnAdd.classList.remove('hidden');
+        tabSettings.classList.remove('hidden');
+      }
+
+      const weekDays = getDaysOfWeek(baseDate);
+      const myActivities = activities.filter(a => a.userId === currentUserId);
+
+      if (viewMode === 'weekly') {
+        let html = `<div class="flex flex-col p-1 bg-white overflow-hidden rounded-lg">`;
+        
+        weekDays.forEach(dayObj => {
+          const dayActivities = myActivities.filter(a => a.date === dayObj.dateStr).sort((a,b) => {
+            if(a.isAllDay) return -1;
+            return timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
+          });
+          const bgRow = dayObj.isWeekend ? 'bg-[#e2dfd3]' : 'bg-white';
+          const bgHeader = dayObj.isWeekend ? 'bg-[#d2cbbb]' : 'bg-[#ece9d8]';
+          
+          html += `
+            <div class="flex border-b border-[#a9a9a9] last:border-0 min-h-[100px] ${bgRow}">
+              <div class="w-40 p-3 flex flex-col justify-center border-r border-[#a9a9a9] ${bgHeader} shadow-inner-right">
+                <h3 class="font-bold text-black uppercase text-xs">${dayObj.dayName}</h3>
+                <p class="text-[#333] text-sm font-semibold">${dayObj.displayDate}</p>
+              </div>
+              <div class="flex-1 p-3 flex gap-3 overflow-x-auto items-start">
+          `;
+
+          if(dayActivities.length > 0) {
+            dayActivities.forEach(act => {
+              let editBtn = currentUserRole === 'admin' 
+                ? `<button onclick="openModal('${act.id}')" class="p-1 xp-button-mini text-black rounded"><i data-lucide="edit" class="w-3.5 h-3.5"></i></button>`
+                : '';
+
+              html += `
+                <div class="min-w-[240px] max-w-[300px] p-3 bg-[#ffffe1] border border-[#a9a9a9] rounded-lg shadow-[1px_1px_4px_rgba(0,0,0,0.15)] flex flex-col">
+                  <div class="flex justify-between items-start mb-2">
+                    <span class="inline-flex items-center text-[11px] font-bold text-[#000080]">
+                      <i data-lucide="clock" class="w-3.5 h-3.5 mr-1.5"></i>
+                      ${getDisplayTime(act.startTime, act.endTime, act.isAllDay)}
+                    </span>
+                    ${editBtn}
+                  </div>
+                  <h4 class="font-bold text-black text-[13px] mb-2 line-clamp-2 leading-tight">${escapeHTML(act.program)}</h4>
+                  <div class="mt-auto space-y-1">
+                    <div class="flex items-start text-[11px] text-black">
+                      <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1.5 mt-0.5 text-[#555] flex-shrink-0"></i>
+                      <span class="line-clamp-1">${escapeHTML(act.location)}</span>
+                    </div>
+                    <div class="flex items-start text-[11px] text-black">
+                      <i data-lucide="users" class="w-3.5 h-3.5 mr-1.5 mt-0.5 text-[#555] flex-shrink-0"></i>
+                      <span class="line-clamp-1 whitespace-pre-line">${escapeHTML(act.officers).replace(/\n/g, ', ')}</span>
+                    </div>
+                  </div>
+                </div>
+              `;
+            });
+            if(currentUserRole === 'admin') {
+              html += `
+                <div onclick="openModal(null, '${dayObj.dateStr}')" class="min-w-[48px] h-full border-2 border-dashed border-[#a9a9a9] rounded-lg flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors">
+                  <i data-lucide="plus" class="w-5 h-5"></i>
+                </div>
+              `;
+            }
+          } else {
+            if(currentUserRole === 'admin') {
+              html += `
+                <div onclick="openModal(null, '${dayObj.dateStr}')" class="min-w-[200px] h-full flex-1 border-2 border-dashed border-[#a9a9a9] rounded-lg flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors">
+                  <i data-lucide="plus" class="w-5 h-5"></i>
+                </div>
+              `;
+            } else {
+               html += `<div class="w-full flex items-center justify-center text-[#888] italic text-xs font-semibold">Tiada Aktiviti Didaftarkan</div>`;
+            }
+          }
+          
+          html += `</div></div>`;
+        });
+        
+        html += `</div>`;
+        container.innerHTML = html;
+        
+      } else if (viewMode === 'matrix') {
+        const titleText = `${weekDays[0].displayDate} - ${weekDays[6].displayDate} ${weekDays[0].dateStr.substring(0,4)}`;
+        container.innerHTML = buildMatrixHTML(weekDays, myActivities, "Kalendar Aktiviti", titleText, true);
+
+      } else if (viewMode === 'settings') {
+        const user = users.find(u => u.id === currentUserId);
+        
+        const iconHTML = availableIcons.map(ic => `
+          <div onclick="selectTenantIcon('${ic}')" class="icon-picker-btn w-10 h-10 flex items-center justify-center rounded cursor-pointer hover:bg-slate-100 ${user.icon === ic ? 'selected' : ''}" data-icon="${ic}">
+             <i data-lucide="${ic}" class="w-6 h-6 text-[#555]"></i>
+          </div>
+        `).join('');
+
+        container.innerHTML = `
+          <div class="bg-[#ece9d8] border border-[#a9a9a9] p-8 rounded-lg min-h-[400px]">
+            <div class="max-w-xl mx-auto space-y-6">
+              
+              <div class="bg-white p-6 rounded-xl border border-[#a9a9a9] shadow-sm">
+                <h2 class="font-bold text-sm text-[#000080] border-b border-[#a9a9a9] pb-3 mb-5 flex items-center gap-2">
+                  <i data-lucide="settings" class="w-4 h-4"></i> Tetapan Profil Anda
+                </h2>
+                <div class="flex flex-col gap-4">
+                  <div>
+                    <label class="font-bold text-xs text-black block mb-1">Nama Bahagian / Unit:</label>
+                    <div class="flex gap-2">
+                       <input type="text" id="setting-dept" value="${escapeHTML(user.departmentName)}" class="xp-input text-sm w-full font-bold py-2" />
+                       <button onclick="updateDepartmentName()" class="xp-button text-[#000080] font-bold">Simpan</button>
+                    </div>
+                    <p class="text-[10px] text-[#555] font-semibold mt-1">Ini akan mengubah tajuk di Laporan Matriks untuk kalendar anda.</p>
+                  </div>
+                  
+                  <div>
+                    <label class="font-bold text-xs text-black block mb-1">Pilih Ikon Profil:</label>
+                    <div class="flex flex-wrap gap-2 p-2 border border-slate-200 rounded-lg bg-slate-50" id="tenant-icon-grid">
+                      ${iconHTML}
+                    </div>
+                    <p class="text-[10px] text-[#555] font-semibold mt-1">Ikon ini akan membezakan profil anda di skrin log masuk.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- BAHAGIAN KESELAMATAN KATA LALUAN -->
+              <div class="bg-white p-6 rounded-xl border border-[#a9a9a9] shadow-sm">
+                <h2 class="font-bold text-sm text-[#e53935] border-b border-[#a9a9a9] pb-3 mb-5 flex items-center gap-2">
+                  <i data-lucide="key" class="w-4 h-4"></i> Keselamatan (Kata Laluan)
+                </h2>
+                <div class="flex flex-col gap-2">
+                  <label class="font-bold text-xs text-black">Kata Laluan Baharu:</label>
+                  <div class="flex gap-2">
+                     <input type="password" id="setting-password" placeholder="Masukkan kata laluan baharu..." class="xp-input text-sm w-full font-bold py-2" />
+                     <button onclick="updatePassword()" class="xp-button text-[#000080] font-bold">Simpan</button>
+                  </div>
+                  <p class="text-[10px] text-[#555] font-semibold mt-1">Biarkan kosong jika tidak mahu menggunakan kata laluan (Bypass).</p>
+                </div>
+              </div>
+
+              <div class="bg-[#ffffe1] p-6 rounded-xl border border-[#a9a9a9] shadow-sm">
+                <h2 class="font-bold text-sm text-[#008000] border-b border-[#a9a9a9] pb-3 mb-5 flex items-center gap-2">
+                  <i data-lucide="file-text" class="w-4 h-4"></i> Laporan Bulanan
+                </h2>
+                <div class="flex flex-col gap-4">
+                  <label class="font-bold text-xs text-black">Pilih Bulan & Tahun:</label>
+                  <div class="flex flex-wrap items-center gap-4">
+                    <input type="month" id="setting-month" value="${printMonth}" onchange="updatePrintMonth(this.value)" class="xp-input text-sm font-bold py-1.5" />
+                    <button onclick="handlePrintMonthly()" class="xp-button h-9 font-bold text-[#000080] shadow-sm px-4">
+                      <i data-lucide="printer" class="w-4 h-4"></i> Jana Laporan PDF
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        `;
+      }
+
+      lucide.createIcons();
+    }
+
+    function updateDepartmentName() { 
+      const newName = document.getElementById('setting-dept').value;
+      const user = users.find(u => u.id === currentUserId);
+      if(user) {
+        user.departmentName = newName;
+        showToast("Nama bahagian telah dikemaskini.");
+        renderApp();
+      }
+    }
+
+    function updatePassword() {
+      const newPass = document.getElementById('setting-password').value;
+      const user = users.find(u => u.id === currentUserId);
+      if(user) {
+        user.password = newPass;
+        showToast("Kata laluan berjaya dikemaskini.");
+        document.getElementById('setting-password').value = '';
+      }
+    }
+
+    function selectTenantIcon(iconName) {
+      const user = users.find(u => u.id === currentUserId);
+      if(user) {
+        user.icon = iconName;
+        const grid = document.getElementById('tenant-icon-grid');
+        Array.from(grid.children).forEach(el => {
+           if(el.dataset.icon === iconName) el.classList.add('selected');
+           else el.classList.remove('selected');
+        });
+        showToast("Ikon profil dikemaskini.");
+      }
+    }
+
+    function updatePrintMonth(val) { printMonth = val; }
+
+    function handlePrintMonthly() {
+      const printContainer = document.getElementById('monthly-print-container');
+      const [yStr, mStr] = printMonth.split('-');
+      const year = parseInt(yStr, 10);
+      const monthIndex = parseInt(mStr, 10) - 1;
+      const daysInMonth = getDaysOfMonth(year, monthIndex);
+      
+      const rangeText = `BULAN ${['JANUARI', 'FEBRUARI', 'MAC', 'APRIL', 'MEI', 'JUN', 'JULAI', 'OGOS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DISEMBER'][monthIndex]} ${year}`;
+      const myActivities = activities.filter(a => a.userId === currentUserId);
+
+      printContainer.innerHTML = buildMatrixHTML(daysInMonth, myActivities, "Laporan Aktiviti Bulanan", rangeText, false);
+      
+      document.body.classList.add('printing-monthly');
+      lucide.createIcons();
+      
+      setTimeout(() => {
+        window.print();
+        document.body.classList.remove('printing-monthly');
+      }, 400);
+    }
+
+    function showSAError(msg) {
+      document.getElementById('sa-error-msg').innerText = msg;
+      document.getElementById('sa-error').classList.remove('hidden');
+    }
+
+    function buildSAIconGrid(selectedIcon) {
+      return availableIcons.map(ic => `
+          <div onclick="selectSAIcon('${ic}')" class="sa-icon-btn w-10 h-10 flex items-center justify-center rounded cursor-pointer hover:bg-slate-200 ${selectedIcon === ic ? 'border-2 border-[#0058e6] bg-[#e6f0ff]' : 'border-2 border-transparent'}" data-icon="${ic}">
+             <i data-lucide="${ic}" class="w-6 h-6 text-[#000080]"></i>
+          </div>
+      `).join('');
+    }
+
+    function selectSAIcon(iconName) {
+      selectedIconTemp = iconName;
+      const grid = document.getElementById('sa-icon-grid');
+      Array.from(grid.children).forEach(el => {
+         if(el.dataset.icon === iconName) {
+           el.className = "sa-icon-btn w-10 h-10 flex items-center justify-center rounded cursor-pointer hover:bg-slate-200 border-2 border-[#0058e6] bg-[#e6f0ff]";
+         } else {
+           el.className = "sa-icon-btn w-10 h-10 flex items-center justify-center rounded cursor-pointer hover:bg-slate-200 border-2 border-transparent";
+         }
+      });
+    }
+
+    function openSAModal(userId = null) {
+      document.getElementById('sa-modal').classList.remove('hidden');
+      document.getElementById('sa-error').classList.add('hidden');
+      
+      if (userId) {
+        editingSAUserId = userId;
+        const u = users.find(x => x.id === userId);
+        document.getElementById('sa-modal-title').innerText = 'Pindaan Profil Setiausaha';
+        document.getElementById('sa-username').value = u.username;
+        document.getElementById('sa-department').value = u.departmentName;
+        document.getElementById('sa-password').value = u.password;
+        selectedIconTemp = u.icon || 'user';
+      } else {
+        editingSAUserId = null;
+        document.getElementById('sa-modal-title').innerText = 'Tambah Profil Baharu';
+        document.getElementById('sa-username').value = '';
+        document.getElementById('sa-department').value = '';
+        document.getElementById('sa-password').value = '';
+        selectedIconTemp = 'user';
+      }
+
+      document.getElementById('sa-icon-grid').innerHTML = buildSAIconGrid(selectedIconTemp);
+      lucide.createIcons();
+    }
+
+    function closeSAModal() {
+      document.getElementById('sa-modal').classList.add('hidden');
+      editingSAUserId = null;
+    }
+
+    function saveSAUser() {
+      document.getElementById('sa-error').classList.add('hidden');
+      const username = document.getElementById('sa-username').value;
+      const dept = document.getElementById('sa-department').value;
+      const pass = document.getElementById('sa-password').value;
+
+      if(!username || !dept) return showSAError('Nama profil dan bahagian wajib diisi.');
+
+      if (editingSAUserId) {
+        let u = users.find(x => x.id === editingSAUserId);
+        u.username = username;
+        u.departmentName = dept;
+        u.password = pass;
+        u.icon = selectedIconTemp;
+        showToast('Profil dikemaskini.');
+      } else {
+        const newId = 'u' + Date.now();
+        users.push({
+          id: newId,
+          username: username,
+          departmentName: dept,
+          password: pass,
+          isActive: true,
+          icon: selectedIconTemp
+        });
+        showToast('Profil baharu ditambah.');
+      }
+      closeSAModal();
+      renderApp();
+    }
+
+    function toggleSAUserStatus(id) {
+      let u = users.find(x => x.id === id);
+      if(u) {
+        u.isActive = !u.isActive;
+        showToast(`Profil ${u.isActive ? 'diaktifkan' : 'digantung'}.`);
+        renderApp();
+      }
+    }
+
+    let pendingDeleteId = null;
+
+    function deleteSAUser(id) {
+      const u = users.find(x => x.id === id);
+      document.getElementById('confirm-modal-msg').innerText = `Padam profil ${u.username}?`;
+      pendingDeleteId = id;
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function executeDelete() {
+      if(pendingDeleteId) {
+        users = users.filter(x => x.id !== pendingDeleteId);
+        activities = activities.filter(a => a.userId !== pendingDeleteId);
+        showToast('Profil dipadam.');
+        pendingDeleteId = null;
+        document.getElementById('confirm-modal').classList.add('hidden');
+        renderApp();
+      }
+    }
+
+    function cancelDelete() {
+      pendingDeleteId = null;
+      document.getElementById('confirm-modal').classList.add('hidden');
+    }
+
+    function openModal(actId = null, specificDateStr = null) {
+      if(currentUserRole !== 'admin') return; 
+      
+      document.getElementById('conflict-error').classList.add('hidden');
+      
+      const formDate = document.getElementById('form-date');
+      const formStartTime = document.getElementById('form-startTime');
+      const formEndTime = document.getElementById('form-endTime');
+      const formIsAllDay = document.getElementById('form-isAllDay');
+      const formProgram = document.getElementById('form-program');
+      const formLocation = document.getElementById('form-location');
+      const formOfficers = document.getElementById('form-officers');
+      const formNotes = document.getElementById('form-notes');
+      
+      const modalTitle = document.getElementById('modal-title');
+      const btnDelete = document.getElementById('btn-delete');
+
+      if (actId) {
+        editingId = actId;
+        const act = activities.find(a => a.id === actId);
+        
+        modalTitle.innerHTML = `<i data-lucide="edit" class="w-4 h-4"></i> Dialog Pindaan Rekod`;
+        btnDelete.classList.remove('hidden');
+
+        formDate.value = act.date;
+        formStartTime.value = act.startTime || '';
+        formEndTime.value = act.endTime || '';
+        formIsAllDay.checked = act.isAllDay;
+        formProgram.value = act.program;
+        formLocation.value = act.location;
+        formOfficers.value = act.officers;
+        formNotes.value = act.notes;
+      } else {
+        editingId = Date.now().toString();
+        
+        modalTitle.innerHTML = `<i data-lucide="plus" class="w-4 h-4"></i> Dialog Rekod Baharu`;
+        btnDelete.classList.add('hidden');
+        
+        const weekDays = getDaysOfWeek(baseDate);
+        formDate.value = specificDateStr || weekDays[0].dateStr;
+        formStartTime.value = '09:00';
+        formEndTime.value = '10:00';
+        formIsAllDay.checked = false;
+        formProgram.value = '';
+        formLocation.value = '';
+        formOfficers.value = '';
+        formNotes.value = '';
+      }
+
+      toggleTimeFields();
+      document.getElementById('modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+      editingId = null;
+    }
+
+    function toggleTimeFields() {
+      const isAllDay = document.getElementById('form-isAllDay').checked;
+      const sTime = document.getElementById('form-startTime');
+      const eTime = document.getElementById('form-endTime');
+      
+      sTime.disabled = isAllDay;
+      eTime.disabled = isAllDay;
+      
+      if(isAllDay) {
+        sTime.classList.add('bg-slate-200', 'text-slate-400');
+        eTime.classList.add('bg-slate-200', 'text-slate-400');
+      } else {
+        sTime.classList.remove('bg-slate-200', 'text-slate-400');
+        eTime.classList.remove('bg-slate-200', 'text-slate-400');
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toast-msg').innerText = msg;
+      t.classList.remove('hidden');
+      t.classList.remove('toast-anim');
+      void t.offsetWidth;
+      t.classList.add('toast-anim');
+      setTimeout(() => { t.classList.add('hidden'); }, 3000);
+    }
+
+    function showError(msg) {
+      document.getElementById('conflict-error-msg').innerText = msg;
+      document.getElementById('conflict-error').classList.remove('hidden');
+    }
+
+    function saveActivity() {
+      const form = document.getElementById('activityForm');
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const dateVal = document.getElementById('form-date').value;
+      const isAllDay = document.getElementById('form-isAllDay').checked;
+      const startVal = document.getElementById('form-startTime').value;
+      const endVal = document.getElementById('form-endTime').value;
+      
+      document.getElementById('conflict-error').classList.add('hidden');
+
+      if (!isAllDay) {
+        const newStart = timeToMinutes(startVal);
+        const newEnd = timeToMinutes(endVal);
+        
+        if (newStart === null) return showError('RALAT: Sila masukkan masa mula!');
+        if (newEnd !== null && newEnd <= newStart) return showError('RALAT: Masa tamat mestilah LEPAS masa mula!');
+
+        const dateActivities = activities.filter(a => a.date === dateVal && a.id !== editingId && !a.isAllDay && a.userId === currentUserId);
+        
+        const hasConflict = dateActivities.some(act => {
+          const extStart = timeToMinutes(act.startTime);
+          const extEnd = timeToMinutes(act.endTime) || (extStart + 60);
+          if (extStart === null) return false;
+          const testEnd = newEnd || (newStart + 60);
+          return (newStart < extEnd && testEnd > extStart);
+        });
+
+        if (hasConflict) return showError('RALAT: Terdapat pertindihan masa dengan program lain pada tarikh ini!');
+      }
+
+      const dateObj = new Date(dateVal);
+      const updatedData = {
+        id: editingId,
+        userId: currentUserId,
+        date: dateVal,
+        day: dayNamesList[dateObj.getDay()],
+        startTime: isAllDay ? '' : startVal,
+        endTime: isAllDay ? '' : endVal,
+        isAllDay: isAllDay,
+        program: document.getElementById('form-program').value,
+        location: document.getElementById('form-location').value,
+        officers: document.getElementById('form-officers').value,
+        notes: document.getElementById('form-notes').value
+      };
+
+      const isExisting = activities.find(a => a.id === editingId);
+      if (isExisting) {
+        activities = activities.map(a => a.id === editingId ? updatedData : a);
+        showToast('Aktiviti berjaya dikemaskini!');
+      } else {
+        activities.push(updatedData);
+        activities.sort((a, b) => new Date(a.date) - new Date(b.date));
+        showToast('Aktiviti baharu berjaya ditambah!');
+      }
+
+      closeModal();
+      renderApp();
+    }
+
+    function handleDelete() {
+      activities = activities.filter(a => a.id !== editingId);
+      showToast('Aktiviti telah dipadam.');
+      closeModal();
+      renderApp();
+    }
+
+  </script>
+</body>
+</html>
