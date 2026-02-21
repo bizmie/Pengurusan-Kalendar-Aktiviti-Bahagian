@@ -199,15 +199,22 @@
   </div>
 
   <!-- SKRIN LOG MASUK -->
-  <div id="login-screen" class="w-full flex flex-col items-center justify-center min-h-[80vh]">
+  <div id="login-screen" class="w-full flex flex-col items-center justify-center min-h-[80vh] relative">
+    
     <div class="text-center mb-10">
+      <!-- Tarikh Penuh -->
+      <div id="login-date-display" class="text-sm md:text-base font-bold text-yellow-300 drop-shadow-md mb-2 tracking-wide uppercase"></div>
+      
       <h1 class="text-3xl md:text-4xl font-bold text-white mb-3" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">Pengurusan Kalendar Aktiviti Bahagian</h1>
       <h2 class="text-xl md:text-2xl text-slate-200 font-medium" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Pilih Profil Akses</h2>
     </div>
 
-    <div id="profile-grid" class="flex flex-wrap justify-center gap-8 md:gap-12 max-w-5xl px-4">
+    <div id="profile-grid" class="flex flex-wrap justify-center gap-8 md:gap-12 max-w-5xl px-4 z-10">
       <!-- Dijana oleh JS -->
     </div>
+    
+    <!-- Versi Aplikasi -->
+    <div class="absolute bottom-4 text-xs font-semibold text-slate-300 drop-shadow">Versi 1.1.0</div>
   </div>
 
   <!-- MODAL SUB-MENU LOGIN -->
@@ -379,9 +386,13 @@
 
           <div class="flex flex-col gap-1">
             <label class="text-xs font-bold text-black">Tempat Lokasi:</label>
-            <select id="form-location" required class="xp-input text-xs w-full py-1.5 cursor-pointer">
+            <select id="form-location" required class="xp-input text-xs w-full py-1.5 cursor-pointer" onchange="toggleCustomLocation()">
               <!-- Dijana oleh JS -->
             </select>
+            <!-- Input khas jika "Lain-lain" dipilih -->
+            <div id="form-custom-location-container" class="hidden mt-1">
+              <input type="text" id="form-custom-location" class="xp-input text-xs w-full py-1.5" placeholder="Sila nyatakan lokasi terperinci..." />
+            </div>
           </div>
 
           <div class="flex flex-col gap-1">
@@ -598,6 +609,17 @@
       select.innerHTML = meetingRooms.map(r => `<option value="${r}">${r}</option>`).join('');
     }
 
+    function toggleCustomLocation() {
+      const locSelect = document.getElementById('form-location');
+      const customLocContainer = document.getElementById('form-custom-location-container');
+      
+      if (locSelect.value === 'Lain-lain / Luar Kawasan') {
+        customLocContainer.classList.remove('hidden');
+      } else {
+        customLocContainer.classList.add('hidden');
+      }
+    }
+
     function updateCurrentDateDisplay() {
       const d = new Date();
       const dayStr = dayNamesList[d.getDay()];
@@ -608,6 +630,9 @@
       
       const el = document.getElementById('current-date-display');
       if (el) el.innerText = display;
+
+      const loginDateEl = document.getElementById('login-date-display');
+      if (loginDateEl) loginDateEl.innerText = display;
     }
 
     function setAppStatus(msg, type = 'normal') {
@@ -1483,6 +1508,7 @@
       const formIsAllDay = document.getElementById('form-isAllDay');
       const formProgram = document.getElementById('form-program');
       const formLocation = document.getElementById('form-location');
+      const formCustomLocation = document.getElementById('form-custom-location');
       const formOfficers = document.getElementById('form-officers');
       const formNotes = document.getElementById('form-notes');
       
@@ -1502,7 +1528,17 @@
         formEndTime.value = act.endTime || '';
         formIsAllDay.checked = act.isAllDay;
         formProgram.value = act.program;
-        formLocation.value = act.location;
+        
+        if (meetingRooms.includes(act.location)) {
+          formLocation.value = act.location;
+          formCustomLocation.value = '';
+          document.getElementById('form-custom-location-container').classList.add('hidden');
+        } else {
+          formLocation.value = 'Lain-lain / Luar Kawasan';
+          formCustomLocation.value = act.location;
+          document.getElementById('form-custom-location-container').classList.remove('hidden');
+        }
+        
         formOfficers.value = act.officers;
         formNotes.value = act.notes;
       } else {
@@ -1518,7 +1554,9 @@
         formEndTime.value = '10:00';
         formIsAllDay.checked = false;
         formProgram.value = '';
-        formLocation.value = '';
+        formLocation.value = meetingRooms[0];
+        formCustomLocation.value = '';
+        document.getElementById('form-custom-location-container').classList.add('hidden');
         formOfficers.value = '';
         formNotes.value = '';
       }
@@ -1579,24 +1617,29 @@
       const isAllDay = document.getElementById('form-isAllDay').checked;
       const startVal = document.getElementById('form-startTime').value;
       const endVal = document.getElementById('form-endTime').value;
-      const locationVal = document.getElementById('form-location').value;
+      
+      const locationDropdownValue = document.getElementById('form-location').value;
+      let locationVal = locationDropdownValue;
+      
+      if (locationDropdownValue === 'Lain-lain / Luar Kawasan') {
+        locationVal = document.getElementById('form-custom-location').value.trim();
+        if (!locationVal) return showError('RALAT: Sila nyatakan lokasi!');
+      }
       
       document.getElementById('conflict-error').classList.add('hidden');
 
       if (!startDateVal || !endDateVal) return showError('RALAT: Sila masukkan tarikh mula dan tamat!');
       if (startDateVal > endDateVal) return showError('RALAT: Tarikh tamat tidak boleh sebelum tarikh mula!');
 
-      // Fungsi bantuan untuk tukar tarikh dan masa kepada nilai Timestamp matematik
       const parseTS = (dStr, tStr, isEnd) => {
         if (isEnd && (!tStr || tStr.trim() === '')) return new Date(`${dStr}T23:59:59`).getTime();
         let t = tStr || '00:00';
-        if (t.split(':').length === 2) t += ':00'; // Tambah saat jika HH:MM sahaja
+        if (t.split(':').length === 2) t += ':00'; 
         return new Date(`${dStr}T${t}`).getTime();
       };
 
       if (!isAllDay && !startVal) return showError('RALAT: Sila masukkan masa mula!');
 
-      // Kira titik permulaan dan tamat (Termasuk logik sepanjang hari)
       const newStartTS = isAllDay ? parseTS(startDateVal, null, false) : parseTS(startDateVal, startVal, false);
       const newEndTS = isAllDay ? parseTS(endDateVal, null, true) : parseTS(endDateVal, endVal, true);
 
@@ -1604,7 +1647,6 @@
         return showError('RALAT: Masa tamat mestilah selepas masa mula!');
       }
 
-      // Semak rekod dari SEMUA profile untuk pertembungan Bilik termasuk program Sepanjang Hari
       const otherActivities = activities.filter(a => a.id !== editingId);
       
       for (let act of otherActivities) {
@@ -1617,12 +1659,10 @@
         const isOverlapping = (newStartTS < extEndTS) && (newEndTS > extStartTS);
         
         if (isOverlapping) {
-           // 1. Semakan Kekosongan Lokasi (Global, Semua Profil)
-           if (locationVal !== 'Lain-lain / Luar Kawasan' && act.location === locationVal) {
+           if (locationDropdownValue !== 'Lain-lain / Luar Kawasan' && act.location === locationVal) {
               return showError(`RALAT: ${locationVal} telah ditempah pada waktu tersebut!`);
            }
            
-           // 2. Semakan Profil Sendiri (Tidak Boleh Double Booking diri sendiri)
            if (act.userId === currentUserId) {
               return showError('RALAT: Anda sudah mempunyai program lain yang bertindih pada waktu ini!');
            }
