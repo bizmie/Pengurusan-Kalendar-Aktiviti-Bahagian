@@ -454,13 +454,13 @@
     </div>
   </div>
 
-  <!-- FIREBASE INITIALIZATION -->
+  <!-- FIREBASE INITIALIZATION & DB API -->
   <script type="module">
-    // Import from Firebase CDN for vanilla HTML usage
+    // Menggunakan CDN Firebase untuk Vanila HTML
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Your web app's Firebase configuration
+    // Konfigurasi Pangkalan Data Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyB8XX20lI2qvK4vcmTFR8Idk_YYr7c3VqA",
       authDomain: "pengurusan-kalendar-aktiviti.firebaseapp.com",
@@ -471,28 +471,52 @@
       measurementId: "G-JGRLJDRFEK"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
 
-    // Dedahkan (expose) konfigurasi ke global untuk kegunaan pengkalan data kelak
-    window.firebaseApp = app;
-    console.log("Firebase App Initialized Successfully");
+    // Dedahkan API Pangkalan Data untuk skrip logik utama
+    window.dbAPI = {
+      async getActivities() {
+        const snap = await getDocs(collection(db, "activities"));
+        return snap.docs.map(d => d.data());
+      },
+      async saveActivity(data) {
+        await setDoc(doc(db, "activities", data.id), data);
+      },
+      async deleteActivity(id) {
+        await deleteDoc(doc(db, "activities", id));
+      },
+      async getUsers() {
+        const snap = await getDocs(collection(db, "users"));
+        return snap.docs.map(d => d.data());
+      },
+      async saveUser(data) {
+        await setDoc(doc(db, "users", data.id), data);
+      },
+      async deleteUser(id) {
+        await deleteDoc(doc(db, "users", id));
+      }
+    };
+
+    // Apabila modul siap dimuatkan, panggil fungsi permulaan dari skrip bawah
+    if(typeof window.initAppFromDB === 'function') {
+       window.initAppFromDB();
+    }
   </script>
 
+  <!-- LOGIK APLIKASI -->
   <script>
     const availableIcons = ['user', 'users', 'briefcase', 'folder', 'monitor', 'hard-drive', 'building', 'clipboard-list', 'award'];
 
+    // Data Lalai (Mockup) - Akan diganti oleh data pangkalan data
     let users = [
       { id: 'u1', username: 'Setiausaha BPS', departmentName: 'Bahagian Perancangan Strategik', password: '', isActive: true, icon: 'briefcase' },
-      { id: 'u2', username: 'Setiausaha BTM', departmentName: 'Bahagian Teknologi Maklumat', password: '', isActive: true, icon: 'monitor' },
-      { id: 'u3', username: 'Setiausaha HR', departmentName: 'Bahagian Sumber Manusia', password: '', isActive: false, icon: 'users' }
+      { id: 'u2', username: 'Setiausaha BTM', departmentName: 'Bahagian Teknologi Maklumat', password: '', isActive: true, icon: 'monitor' }
     ];
 
     let activities = [
       { id: '1', userId: 'u1', date: '2024-12-23', day: 'Isnin', startTime: '09:30', endTime: '12:00', isAllDay: false, program: 'Perbincangan Bersama Pegawai', location: 'Bilik Pengarah PS', officers: 'En Nizam\nPn Normazmin\nPn Azora', notes: '' },
-      { id: '2', userId: 'u1', date: '2024-12-23', day: 'Isnin', startTime: '14:30', endTime: '16:30', isAllDay: false, program: 'Mesyuarat Panel Peperiksaan Bil.2/2024', location: 'Bilik Mesyuarat Kembang Semangkuk', officers: 'En Nizam', notes: 'Pengerusi: YBrs. Encik Mohd Amin Bin Kadir\nUrusetia: Seksyen Pengurusan Sumber Manusia' },
-      { id: '3', userId: 'u1', date: '2024-12-24', day: 'Selasa', startTime: '09:30', endTime: '12:00', isAllDay: false, program: 'Perbincangan Bersama Unit Penerbitan', location: 'Bilik Pengarah PS', officers: 'En Nizam\nPn Rahilah', notes: '' },
+      { id: '2', userId: 'u1', date: '2024-12-23', day: 'Isnin', startTime: '14:30', endTime: '16:30', isAllDay: false, program: 'Mesyuarat Panel Peperiksaan Bil.2/2024', location: 'Bilik Mesyuarat Kembang Semangkuk', officers: 'En Nizam', notes: 'Pengerusi: YBrs. Encik Mohd Amin Bin Kadir' },
       { id: '4', userId: 'u2', date: '2024-12-24', day: 'Selasa', startTime: '14:30', endTime: '16:30', isAllDay: false, program: 'Taklimat Infrastruktur IT Terkini', location: 'Bilik Server', officers: 'En Hakim\nPn Siti', notes: 'Hanya staf teknikal' }
     ];
 
@@ -506,15 +530,39 @@
     let editingSAUserId = null;
     let selectedIconTemp = 'user';
     let tempAuthUserId = null; 
-    
-    // Status flag jika Super-Admin sedang melihat profil (impersonate)
     let impersonatingFromSA = false;
     let statusTimeout = null;
 
     const dayNamesList = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
     const monthNamesList = ['JAN', 'FEB', 'MAC', 'APR', 'MEI', 'JUN', 'JUL', 'OGO', 'SEP', 'OKT', 'NOV', 'DIS'];
 
-    window.onload = () => {
+    // FUNGSI PERMULAAN YANG DIPANGGIL OLEH FIREBASE MODULE
+    window.initAppFromDB = async () => {
+      setAppStatus('Memuat turun data dari pangkalan...', 'normal');
+      try {
+        if (window.dbAPI) {
+          const dbUsers = await window.dbAPI.getUsers();
+          if (dbUsers && dbUsers.length > 0) {
+            users = dbUsers; // Pakai data DB jika ada
+          } else if (dbUsers && dbUsers.length === 0) {
+            // Jika DB kosong sama sekali, seed data lalai
+            for (const u of users) await window.dbAPI.saveUser(u);
+          }
+
+          const dbActs = await window.dbAPI.getActivities();
+          if (dbActs && dbActs.length > 0) {
+            activities = dbActs; // Pakai data DB
+          } else if (dbActs && dbActs.length === 0) {
+             // Jika DB kosong, seed data aktiviti lalai
+            for (const a of activities) await window.dbAPI.saveActivity(a);
+          }
+        }
+        setAppStatus('Sedia', 'normal');
+      } catch(e) {
+        console.error("Firebase Error:", e);
+        setAppStatus('Gagal menyambung ke Pelayan DB (Menggunakan Mod Tempatan)', 'error');
+      }
+      
       updateCurrentDateDisplay();
       renderProfileGrid();
       lucide.createIcons();
@@ -1169,36 +1217,51 @@
       lucide.createIcons();
     }
 
-    function updateDepartmentName() { 
+    async function updateDepartmentName() { 
       const newName = document.getElementById('setting-dept').value;
       const user = users.find(u => u.id === currentUserId);
       if(user) {
         user.departmentName = newName;
-        showToast("Data berjaya disimpan");
-        renderApp();
+        try {
+          if (window.dbAPI) await window.dbAPI.saveUser(user);
+          showToast("Data berjaya disimpan");
+          renderApp();
+        } catch(e) {
+          setAppStatus('Gagal menyimpan pangkalan data', 'error');
+        }
       }
     }
 
-    function updatePassword() {
+    async function updatePassword() {
       const newPass = document.getElementById('setting-password').value;
       const user = users.find(u => u.id === currentUserId);
       if(user) {
         user.password = newPass;
-        showToast("Data berjaya disimpan");
-        document.getElementById('setting-password').value = '';
+        try {
+          if (window.dbAPI) await window.dbAPI.saveUser(user);
+          showToast("Data berjaya disimpan");
+          document.getElementById('setting-password').value = '';
+        } catch(e) {
+          setAppStatus('Gagal menyimpan pangkalan data', 'error');
+        }
       }
     }
 
-    function selectTenantIcon(iconName) {
+    async function selectTenantIcon(iconName) {
       const user = users.find(u => u.id === currentUserId);
       if(user) {
         user.icon = iconName;
-        const grid = document.getElementById('tenant-icon-grid');
-        Array.from(grid.children).forEach(el => {
-           if(el.dataset.icon === iconName) el.classList.add('selected');
-           else el.classList.remove('selected');
-        });
-        showToast("Data berjaya disimpan");
+        try {
+          if (window.dbAPI) await window.dbAPI.saveUser(user);
+          const grid = document.getElementById('tenant-icon-grid');
+          Array.from(grid.children).forEach(el => {
+             if(el.dataset.icon === iconName) el.classList.add('selected');
+             else el.classList.remove('selected');
+          });
+          showToast("Data berjaya disimpan");
+        } catch(e) {
+          setAppStatus('Gagal menyimpan pangkalan data', 'error');
+        }
       }
     }
 
@@ -1281,7 +1344,7 @@
       editingSAUserId = null;
     }
 
-    function saveSAUser() {
+    async function saveSAUser() {
       document.getElementById('sa-error').classList.add('hidden');
       const username = document.getElementById('sa-username').value;
       const dept = document.getElementById('sa-department').value;
@@ -1289,35 +1352,48 @@
 
       if(!username || !dept) return showSAError('Nama profil dan bahagian wajib diisi.');
 
-      if (editingSAUserId) {
-        let u = users.find(x => x.id === editingSAUserId);
-        u.username = username;
-        u.departmentName = dept;
-        u.password = pass;
-        u.icon = selectedIconTemp;
-        showToast('Data berjaya disimpan');
-      } else {
-        const newId = 'u' + Date.now();
-        users.push({
-          id: newId,
-          username: username,
-          departmentName: dept,
-          password: pass,
-          isActive: true,
-          icon: selectedIconTemp
-        });
-        showToast('Data berjaya disimpan');
+      setAppStatus('Menyimpan ke pangkalan data...', 'normal');
+      try {
+        if (editingSAUserId) {
+          let u = users.find(x => x.id === editingSAUserId);
+          u.username = username;
+          u.departmentName = dept;
+          u.password = pass;
+          u.icon = selectedIconTemp;
+          if (window.dbAPI) await window.dbAPI.saveUser(u);
+          showToast('Data berjaya disimpan');
+        } else {
+          const newId = 'u' + Date.now();
+          const newUser = {
+            id: newId,
+            username: username,
+            departmentName: dept,
+            password: pass,
+            isActive: true,
+            icon: selectedIconTemp
+          };
+          users.push(newUser);
+          if (window.dbAPI) await window.dbAPI.saveUser(newUser);
+          showToast('Data berjaya disimpan');
+        }
+        closeSAModal();
+        renderApp();
+      } catch(e) {
+        showSAError('Ralat Pangkalan Data (Kebenaran disekat?)');
       }
-      closeSAModal();
-      renderApp();
     }
 
-    function toggleSAUserStatus(id) {
+    async function toggleSAUserStatus(id) {
       let u = users.find(x => x.id === id);
       if(u) {
         u.isActive = !u.isActive;
-        showToast('Data berjaya disimpan');
-        renderApp();
+        try {
+          if (window.dbAPI) await window.dbAPI.saveUser(u);
+          showToast('Data berjaya disimpan');
+          renderApp();
+        } catch(e) {
+          setAppStatus('Gagal menyimpan pangkalan data', 'error');
+        }
       }
     }
 
@@ -1330,14 +1406,28 @@
       document.getElementById('confirm-modal').classList.remove('hidden');
     }
 
-    function executeDelete() {
+    async function executeDelete() {
       if(pendingDeleteId) {
-        users = users.filter(x => x.id !== pendingDeleteId);
-        activities = activities.filter(a => a.userId !== pendingDeleteId);
-        showToast('Data berjaya dipadam');
-        pendingDeleteId = null;
-        document.getElementById('confirm-modal').classList.add('hidden');
-        renderApp();
+        try {
+          setAppStatus('Memadam profil...', 'normal');
+          if (window.dbAPI) await window.dbAPI.deleteUser(pendingDeleteId);
+          
+          const actsToDelete = activities.filter(a => a.userId === pendingDeleteId);
+          if (window.dbAPI) {
+            for(let act of actsToDelete) {
+              await window.dbAPI.deleteActivity(act.id);
+            }
+          }
+
+          users = users.filter(x => x.id !== pendingDeleteId);
+          activities = activities.filter(a => a.userId !== pendingDeleteId);
+          showToast('Data berjaya dipadam');
+          pendingDeleteId = null;
+          document.getElementById('confirm-modal').classList.add('hidden');
+          renderApp();
+        } catch(e) {
+          setAppStatus('Gagal memadam dari pangkalan data', 'error');
+        }
       }
     }
 
@@ -1439,7 +1529,7 @@
       document.getElementById('conflict-error').classList.remove('hidden');
     }
 
-    function saveActivity() {
+    async function saveActivity() {
       const form = document.getElementById('activityForm');
       if (!form.checkValidity()) {
         form.reportValidity();
@@ -1489,24 +1579,38 @@
       };
 
       const isExisting = activities.find(a => a.id === editingId);
-      if (isExisting) {
-        activities = activities.map(a => a.id === editingId ? updatedData : a);
-        showToast('Data berjaya disimpan');
-      } else {
-        activities.push(updatedData);
-        activities.sort((a, b) => new Date(a.date) - new Date(b.date));
-        showToast('Data berjaya disimpan');
-      }
+      
+      setAppStatus('Menyimpan ke pangkalan data...', 'normal');
+      try {
+        if (window.dbAPI) await window.dbAPI.saveActivity(updatedData);
 
-      closeModal();
-      renderApp();
+        if (isExisting) {
+          activities = activities.map(a => a.id === editingId ? updatedData : a);
+        } else {
+          activities.push(updatedData);
+          activities.sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+        showToast('Data berjaya disimpan');
+        closeModal();
+        renderApp();
+      } catch(e) {
+        console.error("Save Error:", e);
+        showError('Pangkalan data ralat (Semak kebenaran Rules DB anda)');
+      }
     }
 
-    function handleDelete() {
-      activities = activities.filter(a => a.id !== editingId);
-      showToast('Data berjaya dipadam');
-      closeModal();
-      renderApp();
+    async function handleDelete() {
+      setAppStatus('Memadam data...', 'normal');
+      try {
+        if (window.dbAPI) await window.dbAPI.deleteActivity(editingId);
+        activities = activities.filter(a => a.id !== editingId);
+        showToast('Data berjaya dipadam');
+        closeModal();
+        renderApp();
+      } catch (e) {
+        console.error("Delete Error:", e);
+        setAppStatus('Gagal memadam dari pangkalan data', 'error');
+      }
     }
 
   </script>
