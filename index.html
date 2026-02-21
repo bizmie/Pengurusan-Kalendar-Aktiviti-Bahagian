@@ -52,6 +52,7 @@
       color: #000; 
       display: inline-flex; 
       align-items: center; 
+      justify-content: center;
       gap: 6px; 
       cursor: pointer; 
       font-family: 'Tahoma', sans-serif;
@@ -95,7 +96,7 @@
       border-right: 2px solid #FFFFFF; 
       border-bottom: 2px solid #FFFFFF; 
       border-radius: 6px;
-      padding: 4px 8px; 
+      padding: 6px 10px; 
       font-family: 'Tahoma', sans-serif; 
       outline: none; 
     }
@@ -190,30 +191,34 @@
     }
   </style>
 </head>
-<body class="xp-desktop p-4 flex justify-center items-start">
+<body class="xp-desktop p-2 md:p-4 flex justify-center items-start overflow-x-hidden">
 
   <!-- Toast Notifikasi -->
-  <div id="toast" class="fixed top-4 right-4 z-50 bg-[#008000] text-white px-4 py-3 rounded-lg border-2 border-white shadow-lg flex items-center font-bold text-sm no-print hidden toast-anim">
-    <i data-lucide="check-circle-2" class="w-5 h-5 mr-2"></i>
+  <div id="toast" class="fixed top-4 right-4 z-50 bg-[#008000] text-white px-4 py-3 rounded-lg border-2 border-white shadow-lg flex items-center font-bold text-sm no-print hidden toast-anim max-w-[90vw]">
+    <i data-lucide="check-circle-2" class="w-5 h-5 mr-2 shrink-0"></i>
     <span id="toast-msg">Mesej Berjaya</span>
   </div>
 
   <!-- SKRIN LOG MASUK -->
-  <div id="login-screen" class="w-full flex flex-col items-center justify-center min-h-[80vh] relative">
+  <div id="login-screen" class="w-full flex flex-col items-center justify-center min-h-[80vh] relative pt-8">
     
     <div class="text-center mb-10">
-      <!-- Tarikh Penuh -->
       <div id="login-date-display" class="text-sm md:text-base font-bold text-yellow-300 drop-shadow-md mb-2 tracking-wide uppercase"></div>
-      
-      <h1 class="text-3xl md:text-4xl font-bold text-white mb-3" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">Pengurusan Kalendar Aktiviti Bahagian</h1>
-      <h2 class="text-xl md:text-2xl text-slate-200 font-medium" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Pilih Profil Akses</h2>
+      <h1 class="text-2xl md:text-4xl font-bold text-white mb-3 leading-tight px-2" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">Pengurusan Kalendar Aktiviti Bahagian</h1>
+      <h2 class="text-lg md:text-2xl text-slate-200 font-medium" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Pilih Profil Akses</h2>
     </div>
 
-    <div id="profile-grid" class="flex flex-wrap justify-center gap-8 md:gap-12 max-w-5xl px-4 z-10">
+    <div id="profile-grid" class="flex flex-wrap justify-center gap-6 md:gap-12 max-w-5xl px-4 z-10 mb-8">
       <!-- Dijana oleh JS -->
     </div>
     
-    <!-- Versi Aplikasi -->
+    <div class="mt-4 z-10">
+      <button onclick="openProfileMenu('superadmin')" class="flex items-center gap-2 text-slate-200 hover:text-white bg-black/20 hover:bg-black/40 px-5 py-2.5 rounded-full backdrop-blur-sm transition-all border border-transparent hover:border-slate-400 shadow-sm">
+        <i data-lucide="shield" class="w-5 h-5 text-red-400"></i>
+        <span class="text-sm font-bold tracking-wide">Akses Super-Admin</span>
+      </button>
+    </div>
+
     <div class="absolute bottom-4 text-xs font-semibold text-slate-300 drop-shadow">Versi 1.1.0</div>
   </div>
 
@@ -224,7 +229,7 @@
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
-      <div class="xp-titlebar">
+      <div class="xp-titlebar flex-wrap">
         <span class="text-sm flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4"></i> Pengesahan Akses</span>
       </div>
 
@@ -233,11 +238,11 @@
            <i data-lucide="user" class="w-8 h-8 text-[#000080]" id="auth-profile-icon"></i>
         </div>
         <h3 class="text-lg font-bold text-[#000080] text-center" id="auth-profile-name">Nama Profil</h3>
-        <p class="text-xs text-[#555] mb-5 text-center" id="auth-profile-dept">Bahagian Profil</p>
+        <p class="text-xs text-[#555] mb-5 text-center px-4" id="auth-profile-dept">Bahagian Profil</p>
 
-        <div id="login-error" class="w-full bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-3 py-2 rounded text-xs font-bold flex items-center gap-2 hidden mb-4">
-          <span class="w-4 h-4 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-[10px] flex-shrink-0">!</span>
-          <span id="login-error-msg"></span>
+        <div id="login-error" class="w-full bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-3 py-2 rounded text-xs font-bold flex items-start gap-2 hidden mb-4">
+          <span class="w-4 h-4 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-[10px] shrink-0 mt-0.5">!</span>
+          <span id="login-error-msg" class="flex-1"></span>
         </div>
 
         <div class="w-full" id="auth-pelawat-section">
@@ -247,7 +252,7 @@
           
           <div class="flex items-center gap-3 my-4">
             <div class="h-px bg-[#a9a9a9] flex-1"></div>
-            <span class="text-[10px] font-bold text-[#777] uppercase">Kawasan Admin / Setiausaha</span>
+            <span class="text-[10px] font-bold text-[#777] uppercase">Kawasan Admin</span>
             <div class="h-px bg-[#a9a9a9] flex-1"></div>
           </div>
         </div>
@@ -264,55 +269,54 @@
   </div>
 
   <!-- TETINGKAP UTAMA APLIKASI -->
-  <div class="xp-window w-full max-w-6xl flex flex-col hide-on-monthly-print hidden" id="main-app-window">
+  <div class="xp-window w-full max-w-6xl flex flex-col hide-on-monthly-print hidden max-h-[96vh]" id="main-app-window">
     
-    <div class="xp-titlebar">
-      <div class="flex items-center gap-2">
-        <i data-lucide="calendar" class="w-4 h-4 text-white drop-shadow"></i>
-        <span class="text-sm tracking-wide" id="app-title-text">Pengurusan Kalendar Aktiviti</span>
+    <div class="xp-titlebar flex-wrap gap-2 md:gap-4">
+      <div class="flex items-center gap-2 max-w-full overflow-hidden">
+        <i data-lucide="calendar" class="w-4 h-4 text-white drop-shadow shrink-0"></i>
+        <span class="text-xs md:text-sm tracking-wide truncate" id="app-title-text">Pengurusan Kalendar Aktiviti</span>
       </div>
-      <!-- Tarikh Semasa Tambahan Di Kanan Bar -->
-      <div class="text-xs font-medium text-white drop-shadow ml-auto" id="current-date-display"></div>
+      <div class="text-[10px] md:text-xs font-medium text-white drop-shadow ml-auto shrink-0" id="current-date-display"></div>
     </div>
 
-    <div class="p-4 bg-[#ece9d8] flex-1">
+    <div class="p-2 md:p-4 bg-[#ece9d8] flex-1 overflow-y-auto">
       
-      <div id="top-nav-controls" class="flex flex-col sm:flex-row justify-between items-center pb-4 border-b border-[#a9a9a9] mb-4 gap-4 no-print">
+      <div id="top-nav-controls" class="flex flex-col md:flex-row justify-between items-center pb-3 md:pb-4 border-b border-[#a9a9a9] mb-3 md:mb-4 gap-3 no-print">
         
-        <div class="flex gap-1 flex-wrap" id="tabs-container">
-          <button onclick="changeView('weekly')" id="tab-weekly" class="tab-btn active text-[#0058e6]">
-            <i data-lucide="layout-grid" class="w-4 h-4"></i> Jadual Mingguan
+        <div class="flex gap-1 flex-wrap justify-center w-full md:w-auto" id="tabs-container">
+          <button onclick="changeView('weekly')" id="tab-weekly" class="tab-btn active text-[#0058e6] flex-1 md:flex-none justify-center">
+            <i data-lucide="layout-grid" class="w-4 h-4"></i> Mingguan
           </button>
-          <button onclick="changeView('matrix')" id="tab-matrix" class="tab-btn text-[#008000]">
-            <i data-lucide="file-text" class="w-4 h-4"></i> Laporan Matriks
+          <button onclick="changeView('matrix')" id="tab-matrix" class="tab-btn text-[#008000] flex-1 md:flex-none justify-center">
+            <i data-lucide="file-text" class="w-4 h-4"></i> Laporan
           </button>
-          <button onclick="changeView('settings')" id="tab-settings" class="tab-btn text-[#555]">
+          <button onclick="changeView('settings')" id="tab-settings" class="tab-btn text-[#555] flex-1 md:flex-none justify-center">
             <i data-lucide="settings" class="w-4 h-4"></i> Tetapan
           </button>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center justify-center gap-2 w-full md:w-auto">
           <div class="flex items-center gap-1 xp-panel p-1 bg-white" id="week-controls">
-            <button onclick="handlePrevWeek()" class="xp-button h-8 w-10 flex items-center justify-center p-0" title="Minggu Lepas">
+            <button onclick="handlePrevWeek()" class="xp-button h-8 w-10 p-0" title="Minggu Lepas">
               <i data-lucide="chevron-left" class="w-4 h-4 text-[#000080]"></i>
             </button>
-            <button onclick="handleCurrentWeek()" class="xp-button h-8 px-5 font-bold text-[#000080] text-[10px] flex items-center justify-center">
+            <button onclick="handleCurrentWeek()" class="xp-button h-8 px-3 md:px-5 font-bold text-[#000080] text-[10px]">
               MINGGU SEMASA
             </button>
-            <button onclick="handleNextWeek()" class="xp-button h-8 w-10 flex items-center justify-center p-0" title="Minggu Depan">
+            <button onclick="handleNextWeek()" class="xp-button h-8 w-10 p-0" title="Minggu Depan">
               <i data-lucide="chevron-right" class="w-4 h-4 text-[#000080]"></i>
             </button>
           </div>
-          <button onclick="openModal()" id="btn-add-activity" class="xp-button h-8 px-4 font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] flex items-center justify-center">
-            <i data-lucide="plus" class="w-4 h-4 text-white"></i> Tambah Aktiviti
+          <button onclick="openModal()" id="btn-add-activity" class="xp-button h-8 px-4 font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000]">
+            <i data-lucide="plus" class="w-4 h-4 text-white"></i> Tambah
           </button>
         </div>
       </div>
 
-      <div id="superadmin-nav" class="hidden pb-4 border-b border-[#a9a9a9] mb-4 no-print">
-        <div class="flex justify-between items-center">
-          <h2 class="font-bold text-lg text-[#000080] flex items-center gap-2">
-            <i data-lucide="shield" class="w-5 h-5 text-red-600"></i> Panel Super-Admin: Pengurusan Profil Sistem
+      <div id="superadmin-nav" class="hidden pb-3 md:pb-4 border-b border-[#a9a9a9] mb-3 md:mb-4 no-print">
+        <div class="flex flex-wrap justify-between items-center gap-2">
+          <h2 class="font-bold text-base md:text-lg text-[#000080] flex items-center gap-2">
+            <i data-lucide="shield" class="w-5 h-5 text-red-600 shrink-0"></i> <span class="truncate">Panel Super-Admin</span>
           </h2>
           <button onclick="handleLogout()" class="xp-button h-8 font-bold text-white bg-[#e53935] border-[#b71c1c] hover:bg-red-700">
             <i data-lucide="log-out" class="w-4 h-4"></i> Log Keluar
@@ -321,19 +325,19 @@
       </div>
 
       <!-- Bekas Utama View -->
-      <div id="view-container" class="bg-white xp-panel p-2">
+      <div id="view-container" class="bg-white xp-panel p-1 md:p-2">
       </div>
     </div>
 
     <!-- Status bar bawah -->
-    <div class="bg-[#ece9d8] border-t border-[#a9a9a9] p-1.5 flex justify-between items-center text-[10px] font-medium text-[#333] shadow-inner rounded-b-[12px] no-print">
+    <div class="bg-[#ece9d8] border-t border-[#a9a9a9] p-1.5 flex justify-between items-center text-[10px] font-medium text-[#333] shadow-inner rounded-b-[12px] no-print flex-wrap gap-1">
       <div class="flex items-center gap-2 pl-2">
-        <span class="text-[#0058e6] font-bold">Akses:</span> <span id="status-role-text" class="uppercase font-bold"></span>
+        <span class="text-[#0058e6] font-bold shrink-0">Akses:</span> <span id="status-role-text" class="uppercase font-bold truncate max-w-[150px] md:max-w-xs"></span>
       </div>
       <div class="pr-2 flex items-center gap-3">
-        <span id="app-status-text" class="transition-all duration-300">Status: Sedia</span>
-        <button onclick="handleLogout()" id="footer-logout-btn" class="ml-2 bg-[#e53935] text-white px-2 py-0.5 rounded flex items-center gap-1 hover:bg-red-600 transition-colors border border-red-800">
-          <i data-lucide="log-out" class="w-3 h-3"></i> Log Keluar
+        <span id="app-status-text" class="transition-all duration-300 hidden md:inline">Status: Sedia</span>
+        <button onclick="handleLogout()" id="footer-logout-btn" class="bg-[#e53935] text-white px-2 py-0.5 rounded flex items-center gap-1 hover:bg-red-600 transition-colors border border-red-800 shrink-0">
+          <i data-lucide="log-out" class="w-3 h-3"></i> Keluar
         </button>
       </div>
     </div>
@@ -343,106 +347,112 @@
   <div id="monthly-print-container" class="monthly-print-only w-full max-w-6xl"></div>
 
   <!-- MODAL BORANG AKTIVITI -->
-  <div id="modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print hidden">
+  <div id="modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4 no-print hidden">
     <div class="xp-window w-full max-w-2xl flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
       <div class="xp-titlebar">
         <span class="text-sm flex items-center gap-2" id="modal-title"></span>
+        <button onclick="closeModal()" class="text-white hover:text-red-200 transition-colors md:hidden">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
       </div>
-      <div class="p-5 bg-[#ece9d8]">
-        <div id="conflict-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-3 py-2 rounded text-xs font-bold mb-3 flex items-center gap-2 hidden">
-          <span class="w-4 h-4 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-[10px] flex-shrink-0">!</span>
-          <span id="conflict-error-msg"></span>
+      <div class="p-4 md:p-5 bg-[#ece9d8] overflow-y-auto max-h-[75vh]">
+        
+        <!-- Ralat Konflik yang Boleh Papar Multi-Baris -->
+        <div id="conflict-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-3 py-2 rounded mb-4 flex items-start gap-2 hidden shadow-sm">
+          <span class="w-4 h-4 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-[10px] shrink-0 mt-0.5">!</span>
+          <div id="conflict-error-msg" class="flex-1 w-full text-xs"></div>
         </div>
+
         <form id="activityForm" class="space-y-4">
           
           <div class="flex items-center gap-2">
-            <input type="checkbox" id="form-isAllDay" onchange="toggleTimeFields()" class="rounded" /> 
+            <input type="checkbox" id="form-isAllDay" onchange="toggleTimeFields()" class="rounded w-4 h-4" /> 
             <label for="form-isAllDay" class="text-xs font-bold text-[#000080] cursor-pointer">Sepanjang Hari / Tiada Waktu Spesifik</label>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white p-3 rounded border border-[#a9a9a9] shadow-inner">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-3 rounded-lg border border-[#a9a9a9] shadow-inner">
             <div class="flex flex-col gap-1">
               <label class="text-xs font-bold text-black">Tarikh Mula:</label>
-              <input type="date" id="form-startDate" required class="xp-input text-xs w-full py-1.5" />
+              <input type="date" id="form-startDate" required class="xp-input text-xs w-full py-2 md:py-1.5" />
             </div>
             <div class="flex flex-col gap-1">
               <label class="text-xs font-bold text-black">Masa Mula:</label>
-              <input type="time" id="form-startTime" class="xp-input text-xs w-full py-1.5" />
+              <input type="time" id="form-startTime" class="xp-input text-xs w-full py-2 md:py-1.5" />
             </div>
             <div class="flex flex-col gap-1">
               <label class="text-xs font-bold text-black">Tarikh Tamat:</label>
-              <input type="date" id="form-endDate" required class="xp-input text-xs w-full py-1.5" />
+              <input type="date" id="form-endDate" required class="xp-input text-xs w-full py-2 md:py-1.5" />
             </div>
             <div class="flex flex-col gap-1">
               <label class="text-xs font-bold text-black">Masa Tamat:</label>
-              <input type="time" id="form-endTime" class="xp-input text-xs w-full py-1.5" />
+              <input type="time" id="form-endTime" class="xp-input text-xs w-full py-2 md:py-1.5" />
             </div>
           </div>
 
           <div class="flex flex-col gap-1">
             <label class="text-xs font-bold text-black">Mesyuarat / Program:</label>
-            <input type="text" id="form-program" required class="xp-input text-xs w-full py-1.5" />
+            <input type="text" id="form-program" required class="xp-input text-xs w-full py-2 md:py-1.5" placeholder="Contoh: Mesyuarat Pengurusan" />
           </div>
 
           <div class="flex flex-col gap-1">
             <label class="text-xs font-bold text-black">Tempat Lokasi:</label>
-            <select id="form-location" required class="xp-input text-xs w-full py-1.5 cursor-pointer" onchange="toggleCustomLocation()">
+            <select id="form-location" required class="xp-input text-xs w-full py-2 md:py-1.5 cursor-pointer" onchange="toggleCustomLocation()">
               <!-- Dijana oleh JS -->
             </select>
             <!-- Input khas jika "Lain-lain" dipilih -->
-            <div id="form-custom-location-container" class="hidden mt-1">
-              <input type="text" id="form-custom-location" class="xp-input text-xs w-full py-1.5" placeholder="Sila nyatakan lokasi terperinci..." />
+            <div id="form-custom-location-container" class="hidden mt-1.5">
+              <input type="text" id="form-custom-location" class="xp-input text-xs w-full py-2 md:py-1.5 border-blue-400" placeholder="Sila nyatakan lokasi terperinci..." />
             </div>
           </div>
 
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-bold text-black">Pegawai / Staf:</label>
-            <textarea id="form-officers" rows="2" required class="xp-input text-xs w-full resize-none py-1.5"></textarea>
+            <label class="text-xs font-bold text-black">Pegawai / Staf <span class="font-normal text-[#555]">(Baris baharu setiap nama)</span>:</label>
+            <textarea id="form-officers" rows="2" required class="xp-input text-xs w-full resize-none py-2 md:py-1.5"></textarea>
           </div>
           
           <div class="flex flex-col gap-1">
             <label class="text-xs font-bold text-black">Catatan Tambahan <span class="font-normal text-[#555]">(Pilihan)</span>:</label>
-            <textarea id="form-notes" rows="2" class="xp-input text-xs w-full resize-none py-1.5"></textarea>
+            <textarea id="form-notes" rows="2" class="xp-input text-xs w-full resize-none py-2 md:py-1.5"></textarea>
           </div>
         </form>
       </div>
-      <div class="p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between items-center">
+      <div class="p-3 md:p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between items-center">
         <div>
           <button type="button" id="btn-delete" onclick="handleDelete()" class="xp-button font-bold text-[#e53935] hidden h-8 px-4">
             <i data-lucide="trash-2" class="w-4 h-4"></i> Padam
           </button>
         </div>
-        <div class="flex gap-3">
-          <button type="button" onclick="closeModal()" class="xp-button h-8 w-24 justify-center">Batal</button>
-          <button type="button" onclick="saveActivity()" class="xp-button h-8 font-bold w-24 justify-center text-white bg-[#0058e6] border-[#003C74] hover:bg-[#0040cc]">Simpan</button>
+        <div class="flex gap-2 md:gap-3">
+          <button type="button" onclick="closeModal()" class="xp-button h-8 w-20 md:w-24 justify-center">Batal</button>
+          <button type="button" onclick="saveActivity()" class="xp-button h-8 font-bold w-20 md:w-24 justify-center text-white bg-[#0058e6] border-[#003C74] hover:bg-[#0040cc]">Simpan</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- MODAL PENGURUSAN PROFIL SUPER ADMIN -->
-  <div id="sa-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print hidden">
+  <div id="sa-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print hidden">
     <div class="xp-window w-full max-w-md flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
       <div class="xp-titlebar">
         <span class="text-sm flex items-center gap-2" id="sa-modal-title">Urus Profil Setiausaha</span>
       </div>
-      <div class="p-5 bg-[#ece9d8]">
-        <div id="sa-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-3 py-2 rounded text-xs font-bold mb-3 flex items-center gap-2 hidden">
-          <span class="w-4 h-4 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-[10px]">!</span>
-          <span id="sa-error-msg"></span>
+      <div class="p-5 bg-[#ece9d8] overflow-y-auto max-h-[75vh]">
+        <div id="sa-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-3 py-2 rounded text-xs font-bold mb-3 flex items-start gap-2 hidden">
+          <span class="w-4 h-4 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-[10px] shrink-0 mt-0.5">!</span>
+          <span id="sa-error-msg" class="flex-1"></span>
         </div>
         <form id="saForm" class="space-y-4">
           <div class="flex flex-col gap-1">
             <label class="text-xs font-bold text-black">Nama Profil / Username:</label>
-            <input type="text" id="sa-username" required class="xp-input w-full py-1.5" placeholder="Cth: Setiausaha BPS" />
+            <input type="text" id="sa-username" required class="xp-input w-full py-2 md:py-1.5" placeholder="Cth: Setiausaha BPS" />
           </div>
           <div class="flex flex-col gap-1">
             <label class="text-xs font-bold text-black">Nama Bahagian / Unit:</label>
-            <input type="text" id="sa-department" required class="xp-input w-full py-1.5" placeholder="Nama penuh bahagian" />
+            <input type="text" id="sa-department" required class="xp-input w-full py-2 md:py-1.5" placeholder="Nama penuh bahagian" />
           </div>
           <div class="flex flex-col gap-1">
             <label class="text-xs font-bold text-black">Kata Laluan (Biarkan kosong untuk lalai):</label>
-            <input type="text" id="sa-password" class="xp-input w-full py-1.5" placeholder="Kata laluan" />
+            <input type="text" id="sa-password" class="xp-input w-full py-2 md:py-1.5" placeholder="Kata laluan" />
           </div>
           <div class="flex flex-col gap-1">
             <label class="text-xs font-bold text-black">Pilih Ikon Profil:</label>
@@ -460,14 +470,14 @@
   </div>
 
   <!-- MODAL PENGESAHAN PADAM -->
-  <div id="confirm-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print hidden">
+  <div id="confirm-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print hidden">
     <div class="xp-window w-full max-w-sm flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
       <div class="xp-titlebar">
         <span class="text-sm flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-yellow-300"></i> Pengesahan Padam</span>
       </div>
       <div class="p-5 bg-[#ece9d8] text-center font-bold text-sm text-black">
         <p id="confirm-modal-msg" class="mb-2">Adakah anda pasti?</p>
-        <p class="text-[10px] text-red-600 font-normal">Amaran: Semua rekod aktiviti bagi profil ini juga akan dipadam secara kekal.</p>
+        <p class="text-[10px] text-red-600 font-normal leading-tight">Amaran: Semua rekod aktiviti bagi profil ini juga akan dipadam secara kekal.</p>
       </div>
       <div class="p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-center gap-3">
         <button type="button" onclick="cancelDelete()" class="xp-button h-8 w-24 justify-center">Batal</button>
@@ -557,8 +567,17 @@
     let currentUserRole = null; 
     let currentUserId = null; 
     let viewMode = 'weekly';
-    let baseDate = new Date('2024-12-23');
-    let printMonth = '2024-12';
+    
+    // MENDAPATKAN ISNIN MINGGU SEMASA SEBAGAI LALAI
+    function getStartOfWeek(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1); 
+      return new Date(d.setDate(diff));
+    }
+    
+    let baseDate = getStartOfWeek(new Date());
+    let printMonth = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
     
     let editingId = null;
     let editingSAUserId = null;
@@ -571,7 +590,7 @@
     const monthNamesList = ['JAN', 'FEB', 'MAC', 'APR', 'MEI', 'JUN', 'JUL', 'OGO', 'SEP', 'OKT', 'NOV', 'DIS'];
 
     window.initAppFromDB = async () => {
-      setAppStatus('Memuat turun data dari pangkalan...', 'normal');
+      setAppStatus('Memuat turun data...', 'normal');
       populateLocationDropdown();
 
       try {
@@ -582,7 +601,6 @@
 
           const dbActs = await window.dbAPI.getActivities();
           if (dbActs && dbActs.length > 0) {
-            // Pemetaan data lama untuk serasi dengan rekod berbilang tarikh
             activities = dbActs.map(a => {
               if(!a.startDate) a.startDate = a.date;
               if(!a.endDate) a.endDate = a.date;
@@ -595,7 +613,7 @@
         setAppStatus('Sedia', 'normal');
       } catch(e) {
         console.error("Firebase Error:", e);
-        setAppStatus('Gagal menyambung ke Pelayan DB (Menggunakan Mod Tempatan)', 'error');
+        setAppStatus('Mod Tempatan (Tiada DB)', 'error');
       }
       
       updateCurrentDateDisplay();
@@ -658,15 +676,7 @@
       const grid = document.getElementById('profile-grid');
       const activeUsers = users.filter(u => u.isActive);
       
-      let html = `
-        <div onclick="openProfileMenu('superadmin')" class="profile-card flex flex-col items-center gap-3 cursor-pointer group">
-          <div class="profile-img w-28 h-28 md:w-36 md:h-36 bg-[#e53935] border-[3px] border-[#b71c1c] rounded-2xl flex items-center justify-center shadow-lg transition-all relative overflow-hidden">
-             <div class="absolute inset-0 bg-black/10"></div>
-             <i data-lucide="shield" class="w-12 h-12 md:w-16 md:h-16 text-white drop-shadow-md z-10"></i>
-          </div>
-          <span class="text-white font-bold md:text-lg group-hover:text-red-300 transition-colors drop-shadow">Super-Admin</span>
-        </div>
-      `;
+      let html = '';
 
       activeUsers.forEach(u => {
         html += `
@@ -674,7 +684,7 @@
             <div class="profile-img w-28 h-28 md:w-36 md:h-36 bg-[#ece9d8] border-[3px] border-[#003C74] rounded-2xl flex items-center justify-center shadow-lg transition-all">
                <i data-lucide="${u.icon || 'user'}" class="w-12 h-12 md:w-16 md:h-16 text-[#0058e6] drop-shadow-sm"></i>
             </div>
-            <span class="text-white font-bold md:text-lg group-hover:text-yellow-300 transition-colors drop-shadow tracking-wide">${escapeHTML(u.username)}</span>
+            <span class="text-white font-bold text-sm md:text-lg group-hover:text-yellow-300 transition-colors drop-shadow tracking-wide text-center">${escapeHTML(u.username)}</span>
           </div>
         `;
       });
@@ -733,7 +743,7 @@
       const pass = document.getElementById('auth-pass').value;
       
       impersonatingFromSA = false;
-      document.getElementById('footer-logout-btn').innerHTML = `<i data-lucide="log-out" class="w-3 h-3"></i> Log Keluar`;
+      document.getElementById('footer-logout-btn').innerHTML = `<i data-lucide="log-out" class="w-3 h-3"></i> Keluar`;
 
       if (tempAuthUserId === 'superadmin') {
         if (pass === 'admin' || pass === '') {
@@ -816,13 +826,13 @@
       currentUserRole = 'admin'; 
       impersonatingFromSA = true;
 
-      document.getElementById('status-role-text').innerText = `Admin (${user.username}) - Pihak Super-Admin`;
+      document.getElementById('status-role-text').innerText = `SA as: ${user.username}`;
       document.getElementById('top-nav-controls').classList.remove('hidden');
       document.getElementById('superadmin-nav').classList.add('hidden');
       
       const logoutBtn = document.getElementById('footer-logout-btn');
       logoutBtn.classList.remove('hidden');
-      logoutBtn.innerHTML = `<i data-lucide="arrow-left" class="w-3 h-3"></i> Kembali ke SA`;
+      logoutBtn.innerHTML = `<i data-lucide="arrow-left" class="w-3 h-3"></i> Kembali`;
       
       viewMode = 'weekly';
       renderApp();
@@ -877,6 +887,11 @@
     function getDaysOfWeek(startDate) {
       const days = [];
       const start = new Date(startDate);
+      // Betulkan ke Isnin minggu tersebut
+      const day = start.getDay();
+      const diff = start.getDate() - day + (day === 0 ? -6 : 1);
+      start.setDate(diff);
+
       for (let i = 0; i < 7; i++) {
         const d = new Date(start);
         d.setDate(start.getDate() + i);
@@ -917,9 +932,9 @@
         const btn = document.getElementById(`tab-${t}`);
         if (!btn) return;
         if(t === mode) {
-          btn.className = `tab-btn active ${t === 'weekly' ? 'text-[#0058e6]' : t === 'matrix' ? 'text-[#008000]' : 'text-[#555]'}`;
+          btn.className = `tab-btn active text-[#0058e6] flex-1 md:flex-none justify-center`;
         } else {
-          btn.className = `tab-btn ${t === 'weekly' ? 'text-[#0058e6]' : t === 'matrix' ? 'text-[#008000]' : 'text-[#555]'}`;
+          btn.className = `tab-btn text-[${t==='matrix'?'#008000':'#555'}] flex-1 md:flex-none justify-center`;
         }
       });
       const weekControls = document.getElementById('week-controls');
@@ -928,14 +943,14 @@
         document.getElementById('view-container').className = ''; 
       } else {
         weekControls.classList.remove('opacity-50', 'pointer-events-none');
-        document.getElementById('view-container').className = 'bg-white xp-panel p-2';
+        document.getElementById('view-container').className = 'bg-white xp-panel p-1 md:p-2';
       }
       renderApp();
     }
 
     function handlePrevWeek() { baseDate = new Date(baseDate.getTime() - 7 * 24 * 60 * 60 * 1000); renderApp(); }
     function handleNextWeek() { baseDate = new Date(baseDate.getTime() + 7 * 24 * 60 * 60 * 1000); renderApp(); }
-    function handleCurrentWeek() { baseDate = new Date(); renderApp(); }
+    function handleCurrentWeek() { baseDate = getStartOfWeek(new Date()); renderApp(); }
 
     function buildMatrixHTML(days, actsData, title, dateRangeText, includeOverlayBtn) {
       const user = users.find(u => u.id === currentUserId);
@@ -944,7 +959,6 @@
       const groupedData = {};
       days.forEach(day => { groupedData[day.dateStr] = { dayInfo: day, activities: [] }; });
       
-      // Susun aktiviti ke dalam kumpulan tarikh jika ia bertindih dengan julat tarikhnya
       actsData.forEach(act => { 
         for(let d in groupedData) {
             let sDate = act.startDate || act.date;
@@ -971,10 +985,10 @@
           tbodyHTML += `<tr class="${rowClass}">`;
           if(idx === 0) {
             tbodyHTML += `
-              <td class="border border-black p-3 text-center align-top font-bold text-black" rowspan="${rowActs.length}">
+              <td class="border border-black p-2 md:p-3 text-center align-top font-bold text-black" rowspan="${rowActs.length}">
                 ${group.dayInfo.dayName}<br/>
-                <span class="text-sm text-black">${group.dayInfo.displayDate.split(' ')[0]}</span><br/>
-                <span class="text-[10px] uppercase text-black">${group.dayInfo.displayDate.split(' ')[1]}</span>
+                <span class="text-xs md:text-sm text-black">${group.dayInfo.displayDate.split(' ')[0]}</span><br/>
+                <span class="text-[9px] md:text-[10px] uppercase text-black">${group.dayInfo.displayDate.split(' ')[1]}</span>
               </td>
             `;
           }
@@ -987,23 +1001,23 @@
             ` : '';
 
             tbodyHTML += `
-              <td class="border border-black p-3 text-center align-top whitespace-pre-line font-medium text-black text-xs">
+              <td class="border border-black p-2 md:p-3 text-center align-top whitespace-pre-line font-medium text-black text-[10px] md:text-xs">
                 ${getDisplayDateTime(act)}
               </td>
-              <td class="border border-black p-3 align-top group relative">
-                <div class="font-bold text-black text-sm">${escapeHTML(act.program)}</div>
-                ${act.notes ? `<div class="mt-1.5 text-[10px] text-black whitespace-pre-line">${escapeHTML(act.notes)}</div>` : ''}
+              <td class="border border-black p-2 md:p-3 align-top group relative">
+                <div class="font-bold text-black text-xs md:text-sm">${escapeHTML(act.program)}</div>
+                ${act.notes ? `<div class="mt-1 text-[9px] md:text-[10px] text-black whitespace-pre-line">${escapeHTML(act.notes)}</div>` : ''}
                 ${editBtnHTML}
               </td>
-              <td class="border border-black p-3 align-top text-center whitespace-pre-line text-black">${escapeHTML(act.location)}</td>
-              <td class="border border-black p-3 align-top whitespace-pre-line text-black">${escapeHTML(act.officers)}</td>
+              <td class="border border-black p-2 md:p-3 align-top text-center whitespace-pre-line text-black text-xs">${escapeHTML(act.location)}</td>
+              <td class="border border-black p-2 md:p-3 align-top whitespace-pre-line text-black text-xs">${escapeHTML(act.officers)}</td>
             `;
           } else {
             tbodyHTML += `
-              <td class="border border-black p-3 text-center text-black">-</td>
-              <td class="border border-black p-3 text-center italic text-black font-semibold">Tiada Aktiviti</td>
-              <td class="border border-black p-3 text-center text-black">-</td>
-              <td class="border border-black p-3 text-center text-black">-</td>
+              <td class="border border-black p-2 md:p-3 text-center text-black text-xs">-</td>
+              <td class="border border-black p-2 md:p-3 text-center italic text-black font-semibold text-xs">Tiada Aktiviti</td>
+              <td class="border border-black p-2 md:p-3 text-center text-black text-xs">-</td>
+              <td class="border border-black p-2 md:p-3 text-center text-black text-xs">-</td>
             `;
           }
           tbodyHTML += `</tr>`;
@@ -1011,36 +1025,36 @@
       });
 
       let overlayBtn = includeOverlayBtn ? `
-        <div class="absolute top-4 right-4 no-print">
+        <div class="absolute top-2 right-2 md:top-4 md:right-4 no-print">
           <button onclick="window.print()" class="xp-button h-8 rounded-lg font-bold">
-            <i data-lucide="printer" class="w-4 h-4 text-black"></i> Jana PDF / Cetak
+            <i data-lucide="printer" class="w-4 h-4 text-black"></i> <span class="hidden md:inline">Jana PDF / Cetak</span>
           </button>
         </div>
       ` : '';
 
       return `
-        <div class="bg-white p-8 overflow-x-auto relative border border-[#a9a9a9] shadow-inner printable-container rounded-lg" id="print-area">
+        <div class="bg-white p-4 md:p-8 overflow-x-auto relative border border-[#a9a9a9] shadow-inner printable-container rounded-lg" id="print-area">
           ${overlayBtn}
-          <div class="text-center mb-8">
-            <h2 class="font-bold text-xl uppercase text-black">${title}</h2>
-            <h3 class="font-bold text-lg uppercase text-black" id="matrix-dept-name">${escapeHTML(deptName)}</h3>
-            <p class="mt-1 text-black font-semibold text-sm">${dateRangeText}</p>
+          <div class="text-center mb-6 md:mb-8 mt-4 md:mt-0">
+            <h2 class="font-bold text-lg md:text-xl uppercase text-black">${title}</h2>
+            <h3 class="font-bold text-base md:text-lg uppercase text-black" id="matrix-dept-name">${escapeHTML(deptName)}</h3>
+            <p class="mt-1 text-black font-semibold text-xs md:text-sm">${dateRangeText}</p>
           </div>
           <table class="w-full border-collapse border border-black text-xs print-table">
             <thead>
               <tr class="bg-gradient-to-r from-gray-100 to-gray-200">
-                <th class="border border-black p-3 font-bold text-center w-[12%] uppercase text-black">TARIKH</th>
-                <th class="border border-black p-3 font-bold text-center w-[15%] uppercase text-black">MASA</th>
-                <th class="border border-black p-3 font-bold text-center w-[33%] uppercase text-black">MESYUARAT / PROGRAM</th>
-                <th class="border border-black p-3 font-bold text-center w-[20%] uppercase text-black">TEMPAT</th>
-                <th class="border border-black p-3 font-bold text-center w-[20%] uppercase text-black">PEGAWAI</th>
+                <th class="border border-black p-2 md:p-3 font-bold text-center w-[12%] uppercase text-black">TARIKH</th>
+                <th class="border border-black p-2 md:p-3 font-bold text-center w-[15%] uppercase text-black">MASA</th>
+                <th class="border border-black p-2 md:p-3 font-bold text-center w-[33%] uppercase text-black">MESYUARAT / PROGRAM</th>
+                <th class="border border-black p-2 md:p-3 font-bold text-center w-[20%] uppercase text-black">TEMPAT</th>
+                <th class="border border-black p-2 md:p-3 font-bold text-center w-[20%] uppercase text-black">PEGAWAI</th>
               </tr>
             </thead>
             <tbody>
               ${tbodyHTML}
             </tbody>
           </table>
-          <p class="mt-3 text-[10px] italic text-black font-semibold">* (Tertakluk kepada sebarang pindaan)</p>
+          <p class="mt-3 text-[9px] md:text-[10px] italic text-black font-semibold">* (Tertakluk kepada sebarang pindaan)</p>
         </div>
       `;
     }
@@ -1050,10 +1064,10 @@
       const titleEl = document.getElementById('app-title-text');
       
       if (currentUserRole === 'superadmin') {
-        titleEl.innerText = "Pengurusan Kalendar Aktiviti (Super-Admin)";
+        titleEl.innerText = "Sistem Super-Admin";
       } else if (currentUserId) {
         const user = users.find(u => u.id === currentUserId);
-        if (user) titleEl.innerText = "Pengurusan Kalendar Aktiviti " + user.departmentName;
+        if (user) titleEl.innerText = "Kalendar " + user.departmentName;
       } else {
         titleEl.innerText = "Pengurusan Kalendar Aktiviti";
       }
@@ -1064,7 +1078,7 @@
             <td class="border border-[#a9a9a9] p-3">
               <div class="flex items-center gap-2">
                 <i data-lucide="${u.icon || 'user'}" class="w-4 h-4 text-[#0058e6]"></i>
-                <span class="font-bold text-[#000080]">${escapeHTML(u.username)}</span>
+                <span class="font-bold text-[#000080] truncate">${escapeHTML(u.username)}</span>
               </div>
             </td>
             <td class="border border-[#a9a9a9] p-3 font-medium">
@@ -1072,40 +1086,40 @@
                 ${escapeHTML(u.departmentName)}
               </span>
             </td>
-            <td class="border border-[#a9a9a9] p-3 font-medium text-red-600">${escapeHTML(u.password) || '<i class="text-gray-400 text-[10px]">Tiada (Bypass)</i>'}</td>
+            <td class="border border-[#a9a9a9] p-3 font-medium text-red-600 hidden md:table-cell">${escapeHTML(u.password) || '<i class="text-gray-400 text-[10px]">Tiada</i>'}</td>
             <td class="border border-[#a9a9a9] p-3 text-center">
               ${u.isActive 
                 ? '<span class="bg-green-100 text-green-800 font-bold px-2 py-1 rounded text-[10px]">Aktif</span>' 
-                : '<span class="bg-red-100 text-red-800 font-bold px-2 py-1 rounded text-[10px]">Tidak Aktif</span>'
+                : '<span class="bg-red-100 text-red-800 font-bold px-2 py-1 rounded text-[10px]">T.Aktif</span>'
               }
             </td>
             <td class="border border-[#a9a9a9] p-3 text-center">
-              <div class="flex items-center justify-center gap-2">
-                <button onclick="openSAModal('${u.id}')" class="xp-button text-[#0058e6] px-2" title="Edit Profil">Edit</button>
-                <button onclick="toggleSAUserStatus('${u.id}')" class="xp-button ${u.isActive ? 'text-orange-600' : 'text-green-600'} px-2" title="Tukar Status">
-                  ${u.isActive ? 'Gantung' : 'Aktifkan'}
+              <div class="flex items-center justify-center gap-2 flex-wrap">
+                <button onclick="openSAModal('${u.id}')" class="xp-button text-[#0058e6] px-2 h-7" title="Edit Profil">Edit</button>
+                <button onclick="toggleSAUserStatus('${u.id}')" class="xp-button ${u.isActive ? 'text-orange-600' : 'text-green-600'} px-2 h-7 hidden sm:inline-flex" title="Tukar Status">
+                  ${u.isActive ? 'Gantung' : 'Aktif'}
                 </button>
-                <button onclick="deleteSAUser('${u.id}')" class="xp-button text-red-600 px-2" title="Padam Kekal">Padam</button>
+                <button onclick="deleteSAUser('${u.id}')" class="xp-button text-red-600 px-2 h-7" title="Padam Kekal">Padam</button>
               </div>
             </td>
           </tr>
         `).join('');
 
         container.innerHTML = `
-          <div class="bg-white p-6 rounded-lg shadow-sm border border-[#a9a9a9] min-h-[400px]">
-            <div class="flex justify-between items-center mb-4">
-              <p class="text-sm font-semibold text-[#555]">Senarai Profil Pengguna & Bahagian</p>
+          <div class="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-[#a9a9a9] min-h-[400px] overflow-x-auto">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+              <p class="text-xs md:text-sm font-semibold text-[#555]">Senarai Profil Pengguna & Bahagian</p>
               <button onclick="openSAModal(null)" class="xp-button h-8 px-4 font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000]">
                 <i data-lucide="user-plus" class="w-4 h-4"></i> Tambah Setiausaha
               </button>
             </div>
-            <table class="w-full border-collapse sa-table text-xs">
+            <table class="w-full border-collapse sa-table text-xs min-w-[500px]">
               <thead>
                 <tr>
-                  <th class="w-[20%]">Nama Pengguna (Ikon)</th>
-                  <th class="w-[25%]">Nama Bahagian</th>
-                  <th class="w-[15%]">Kata Laluan</th>
-                  <th class="w-[10%] text-center">Status</th>
+                  <th class="w-[25%] md:w-[20%]">Pengguna</th>
+                  <th class="w-[30%] md:w-[25%]">Bahagian</th>
+                  <th class="w-[15%] hidden md:table-cell">K. Laluan</th>
+                  <th class="w-[15%] md:w-[10%] text-center">Status</th>
                   <th class="w-[30%] text-center">Tindakan</th>
                 </tr>
               </thead>
@@ -1117,7 +1131,6 @@
         return;
       }
 
-      // LOGIK ADMIN / VIEWER BIASA
       const btnAdd = document.getElementById('btn-add-activity');
       const tabSettings = document.getElementById('tab-settings');
 
@@ -1134,7 +1147,7 @@
       const myActivities = activities.filter(a => a.userId === currentUserId);
 
       if (viewMode === 'weekly') {
-        let html = `<div class="flex flex-col p-1 bg-white overflow-hidden rounded-lg">`;
+        let html = `<div class="flex flex-col bg-white overflow-hidden rounded-lg">`;
         
         weekDays.forEach(dayObj => {
           const dayActivities = myActivities.filter(a => {
@@ -1150,12 +1163,12 @@
           const bgHeader = dayObj.isWeekend ? 'bg-[#d2cbbb]' : 'bg-[#ece9d8]';
           
           html += `
-            <div class="flex border-b border-[#a9a9a9] last:border-0 min-h-[100px] ${bgRow}">
-              <div class="w-40 p-3 flex flex-col justify-center border-r border-[#a9a9a9] ${bgHeader} shadow-inner-right">
+            <div class="flex flex-col md:flex-row border-b border-[#a9a9a9] last:border-0 min-h-[100px] ${bgRow}">
+              <div class="w-full md:w-40 p-2 md:p-3 flex md:flex-col justify-between md:justify-center border-b md:border-b-0 md:border-r border-[#a9a9a9] ${bgHeader} shadow-sm md:shadow-inner-right items-center md:items-start z-10">
                 <h3 class="font-bold text-black uppercase text-xs">${dayObj.dayName}</h3>
-                <p class="text-[#333] text-sm font-semibold">${dayObj.displayDate}</p>
+                <p class="text-[#333] text-xs md:text-sm font-semibold">${dayObj.displayDate}</p>
               </div>
-              <div class="flex-1 p-3 flex gap-3 overflow-x-auto items-start">
+              <div class="flex-1 p-3 flex gap-3 overflow-x-auto items-start snap-x scroll-smooth">
           `;
 
           if(dayActivities.length > 0) {
@@ -1165,10 +1178,10 @@
                 : '';
 
               html += `
-                <div class="min-w-[240px] max-w-[300px] p-3 bg-[#ffffe1] border border-[#a9a9a9] rounded-lg shadow-[1px_1px_4px_rgba(0,0,0,0.15)] flex flex-col">
-                  <div class="flex justify-between items-start mb-2">
-                    <span class="inline-flex items-center text-[10px] font-bold text-[#000080]">
-                      <i data-lucide="clock" class="w-3.5 h-3.5 mr-1.5"></i>
+                <div class="min-w-[220px] md:min-w-[240px] max-w-[280px] md:max-w-[300px] snap-center p-3 bg-[#ffffe1] border border-[#a9a9a9] rounded-lg shadow-[1px_1px_4px_rgba(0,0,0,0.15)] flex flex-col shrink-0">
+                  <div class="flex justify-between items-start mb-2 gap-2">
+                    <span class="inline-flex items-center text-[10px] font-bold text-[#000080] leading-tight">
+                      <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 shrink-0"></i>
                       ${getDisplayDateTime(act)}
                     </span>
                     ${editBtn}
@@ -1176,25 +1189,25 @@
                   <h4 class="font-bold text-black text-[13px] mb-2 line-clamp-2 leading-tight">${escapeHTML(act.program)}</h4>
                   <div class="mt-auto space-y-1">
                     <div class="flex items-start text-[11px] text-black">
-                      <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1.5 mt-0.5 text-[#555] flex-shrink-0"></i>
-                      <span class="line-clamp-1">${escapeHTML(act.location)}</span>
+                      <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1.5 mt-0.5 text-[#555] shrink-0"></i>
+                      <span class="line-clamp-2">${escapeHTML(act.location)}</span>
                     </div>
                     <div class="flex items-start text-[11px] text-black">
-                      <i data-lucide="users" class="w-3.5 h-3.5 mr-1.5 mt-0.5 text-[#555] flex-shrink-0"></i>
-                      <span class="line-clamp-1 whitespace-pre-line">${escapeHTML(act.officers).replace(/\n/g, ', ')}</span>
+                      <i data-lucide="users" class="w-3.5 h-3.5 mr-1.5 mt-0.5 text-[#555] shrink-0"></i>
+                      <span class="line-clamp-2 whitespace-pre-line">${escapeHTML(act.officers).replace(/\n/g, ', ')}</span>
                     </div>
                   </div>
                 </div>
               `;
             });
             if(currentUserRole === 'admin') {
-              html += `<div onclick="openModal(null, '${dayObj.dateStr}')" class="min-w-[48px] h-full border-2 border-dashed border-[#a9a9a9] rounded-lg flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors"><i data-lucide="plus" class="w-5 h-5"></i></div>`;
+              html += `<div onclick="openModal(null, '${dayObj.dateStr}')" class="min-w-[48px] h-full min-h-[120px] border-2 border-dashed border-[#a9a9a9] rounded-lg flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors shrink-0"><i data-lucide="plus" class="w-5 h-5"></i></div>`;
             }
           } else {
             if(currentUserRole === 'admin') {
-              html += `<div onclick="openModal(null, '${dayObj.dateStr}')" class="min-w-[200px] h-full flex-1 border-2 border-dashed border-[#a9a9a9] rounded-lg flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors"><i data-lucide="plus" class="w-5 h-5"></i></div>`;
+              html += `<div onclick="openModal(null, '${dayObj.dateStr}')" class="w-full flex-1 border-2 border-dashed border-[#a9a9a9] rounded-lg flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors min-h-[60px]"><i data-lucide="plus" class="w-5 h-5"></i></div>`;
             } else {
-               html += `<div class="w-full flex items-center justify-center text-[#888] italic text-xs font-semibold">Tiada Aktiviti Didaftarkan</div>`;
+               html += `<div class="w-full flex items-center justify-center text-[#888] italic text-xs font-semibold py-4">Tiada Aktiviti Didaftarkan</div>`;
             }
           }
           html += `</div></div>`;
@@ -1215,55 +1228,53 @@
         `).join('');
 
         container.innerHTML = `
-          <div class="bg-[#ece9d8] border border-[#a9a9a9] p-8 rounded-lg min-h-[400px]">
+          <div class="bg-[#ece9d8] border border-[#a9a9a9] p-4 md:p-8 rounded-lg min-h-[400px]">
             <div class="max-w-xl mx-auto space-y-6">
               
-              <div class="bg-white p-6 rounded-xl border border-[#a9a9a9] shadow-sm">
-                <h2 class="font-bold text-sm text-[#000080] border-b border-[#a9a9a9] pb-3 mb-5 flex items-center gap-2">
+              <div class="bg-white p-5 md:p-6 rounded-xl border border-[#a9a9a9] shadow-sm">
+                <h2 class="font-bold text-sm text-[#000080] border-b border-[#a9a9a9] pb-3 mb-4 flex items-center gap-2">
                   <i data-lucide="settings" class="w-4 h-4"></i> Tetapan Profil Anda
                 </h2>
                 <div class="flex flex-col gap-4">
                   <div>
                     <label class="font-bold text-xs text-black block mb-1">Nama Bahagian / Unit:</label>
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap md:flex-nowrap gap-2">
                        <input type="text" id="setting-dept" value="${escapeHTML(user.departmentName)}" class="xp-input text-sm w-full font-bold py-2" />
-                       <button onclick="updateDepartmentName()" class="xp-button text-[#000080] font-bold">Simpan</button>
+                       <button onclick="updateDepartmentName()" class="xp-button text-[#000080] font-bold shrink-0">Simpan</button>
                     </div>
-                    <p class="text-[10px] text-[#555] font-semibold mt-1">Ini akan mengubah tajuk di Laporan Matriks untuk kalendar anda.</p>
                   </div>
                   <div>
                     <label class="font-bold text-xs text-black block mb-1">Pilih Ikon Profil:</label>
                     <div class="flex flex-wrap gap-2 p-2 border border-slate-200 rounded-lg bg-slate-50" id="tenant-icon-grid">
                       ${iconHTML}
                     </div>
-                    <p class="text-[10px] text-[#555] font-semibold mt-1">Ikon ini akan membezakan profil anda di skrin log masuk.</p>
                   </div>
                 </div>
               </div>
 
-              <div class="bg-white p-6 rounded-xl border border-[#a9a9a9] shadow-sm">
-                <h2 class="font-bold text-sm text-[#e53935] border-b border-[#a9a9a9] pb-3 mb-5 flex items-center gap-2">
+              <div class="bg-white p-5 md:p-6 rounded-xl border border-[#a9a9a9] shadow-sm">
+                <h2 class="font-bold text-sm text-[#e53935] border-b border-[#a9a9a9] pb-3 mb-4 flex items-center gap-2">
                   <i data-lucide="key" class="w-4 h-4"></i> Keselamatan (Kata Laluan)
                 </h2>
                 <div class="flex flex-col gap-2">
-                  <label class="font-bold text-xs text-black">Kata Laluan Baharu:</label>
-                  <div class="flex gap-2">
+                  <label class="font-bold text-xs text-black block mb-1">Kata Laluan Baharu:</label>
+                  <div class="flex flex-wrap md:flex-nowrap gap-2">
                      <input type="password" id="setting-password" placeholder="Masukkan kata laluan baharu..." class="xp-input text-sm w-full font-bold py-2" />
-                     <button onclick="updatePassword()" class="xp-button text-[#000080] font-bold">Simpan</button>
+                     <button onclick="updatePassword()" class="xp-button text-[#000080] font-bold shrink-0">Simpan</button>
                   </div>
-                  <p class="text-[10px] text-[#555] font-semibold mt-1">Biarkan kosong jika tidak mahu menggunakan kata laluan (Bypass).</p>
+                  <p class="text-[10px] text-[#555] font-semibold mt-1 leading-tight">Biarkan kosong jika tidak mahu menggunakan kata laluan (Bypass).</p>
                 </div>
               </div>
 
-              <div class="bg-[#ffffe1] p-6 rounded-xl border border-[#a9a9a9] shadow-sm">
-                <h2 class="font-bold text-sm text-[#008000] border-b border-[#a9a9a9] pb-3 mb-5 flex items-center gap-2">
+              <div class="bg-[#ffffe1] p-5 md:p-6 rounded-xl border border-[#a9a9a9] shadow-sm">
+                <h2 class="font-bold text-sm text-[#008000] border-b border-[#a9a9a9] pb-3 mb-4 flex items-center gap-2">
                   <i data-lucide="file-text" class="w-4 h-4"></i> Laporan Bulanan
                 </h2>
                 <div class="flex flex-col gap-4">
                   <label class="font-bold text-xs text-black">Pilih Bulan & Tahun:</label>
-                  <div class="flex flex-wrap items-center gap-4">
-                    <input type="month" id="setting-month" value="${printMonth}" onchange="updatePrintMonth(this.value)" class="xp-input text-sm font-bold py-1.5" />
-                    <button onclick="handlePrintMonthly()" class="xp-button h-9 font-bold text-[#000080] shadow-sm px-4">
+                  <div class="flex flex-wrap md:flex-nowrap items-center gap-3">
+                    <input type="month" id="setting-month" value="${printMonth}" onchange="updatePrintMonth(this.value)" class="xp-input text-sm font-bold py-1.5 w-full md:w-auto" />
+                    <button onclick="handlePrintMonthly()" class="xp-button h-9 font-bold text-[#000080] shadow-sm px-4 w-full md:w-auto justify-center">
                       <i data-lucide="printer" class="w-4 h-4"></i> Jana Laporan PDF
                     </button>
                   </div>
@@ -1350,7 +1361,7 @@
 
     function showSAError(msg) {
       setAppStatus('Data gagal disimpan', 'error');
-      document.getElementById('sa-error-msg').innerText = msg;
+      document.getElementById('sa-error-msg').innerHTML = msg;
       document.getElementById('sa-error').classList.remove('hidden');
     }
 
@@ -1601,7 +1612,8 @@
 
     function showError(msg) {
       setAppStatus('Data gagal disimpan', 'error');
-      document.getElementById('conflict-error-msg').innerText = msg;
+      // Menggunakan innerHTML supaya tag HTML seperti <b> atau <br> boleh berfungsi
+      document.getElementById('conflict-error-msg').innerHTML = msg;
       document.getElementById('conflict-error').classList.remove('hidden');
     }
 
@@ -1623,7 +1635,7 @@
       
       if (locationDropdownValue === 'Lain-lain / Luar Kawasan') {
         locationVal = document.getElementById('form-custom-location').value.trim();
-        if (!locationVal) return showError('RALAT: Sila nyatakan lokasi!');
+        if (!locationVal) return showError('RALAT: Sila nyatakan lokasi terperinci!');
       }
       
       document.getElementById('conflict-error').classList.add('hidden');
@@ -1660,11 +1672,24 @@
         
         if (isOverlapping) {
            if (locationDropdownValue !== 'Lain-lain / Luar Kawasan' && act.location === locationVal) {
-              return showError(`RALAT: ${locationVal} telah ditempah pada waktu tersebut!`);
-           }
-           
-           if (act.userId === currentUserId) {
-              return showError('RALAT: Anda sudah mempunyai program lain yang bertindih pada waktu ini!');
+              const conflictUser = users.find(u => u.id === act.userId);
+              const deptName = conflictUser ? conflictUser.departmentName : 'Bahagian Lain';
+              
+              // Paparan Popup Slot Penuh Terperinci
+              return showError(`
+                <div class="flex flex-col gap-1 w-full">
+                  <span class="text-xs md:text-sm uppercase tracking-wider font-extrabold text-red-700">Slot Penuh!</span>
+                  <span class="text-[10px] md:text-xs leading-tight">Bilik mesyuarat ini telah pun ditempah.</span>
+                  <div class="bg-white p-2 rounded border border-red-200 mt-1 shadow-sm w-full">
+                    <p class="text-[9px] md:text-[10px] text-black font-semibold mb-1 border-b border-slate-100 pb-1">Butiran Tempahan Sedia Ada:</p>
+                    <ul class="text-[10px] md:text-[11px] text-slate-700 space-y-0.5">
+                      <li><b class="text-black">Oleh:</b> ${escapeHTML(deptName)}</li>
+                      <li><b class="text-black">Program:</b> ${escapeHTML(act.program)}</li>
+                      <li><b class="text-black">Waktu:</b> ${getDisplayDateTime(act)}</li>
+                    </ul>
+                  </div>
+                </div>
+              `);
            }
         }
       }
@@ -1673,7 +1698,7 @@
       const updatedData = {
         id: editingId,
         userId: currentUserId,
-        date: startDateVal, // fallback
+        date: startDateVal, // fallback untuk kod legacy matriks jika perlu
         startDate: startDateVal,
         endDate: endDateVal,
         day: dayNamesList[dateObj.getDay()],
