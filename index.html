@@ -337,49 +337,60 @@
 
   <!-- MODAL BORANG AKTIVITI -->
   <div id="modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print hidden">
-    <div class="xp-window w-full max-w-xl flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
+    <div class="xp-window w-full max-w-2xl flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
       <div class="xp-titlebar">
         <span class="text-sm flex items-center gap-2" id="modal-title"></span>
       </div>
       <div class="p-5 bg-[#ece9d8]">
         <div id="conflict-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-3 py-2 rounded text-xs font-bold mb-3 flex items-center gap-2 hidden">
-          <span class="w-4 h-4 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-[10px]">!</span>
+          <span class="w-4 h-4 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-[10px] flex-shrink-0">!</span>
           <span id="conflict-error-msg"></span>
         </div>
         <form id="activityForm" class="space-y-4">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="form-isAllDay" onchange="toggleTimeFields()" class="rounded" /> 
+            <label for="form-isAllDay" class="text-xs font-bold text-[#000080] cursor-pointer">Sepanjang Hari / Tiada Waktu Spesifik</label>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white p-3 rounded border border-[#a9a9a9] shadow-inner">
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-bold text-black flex justify-between">
-                Tarikh:
-                <label class="flex items-center gap-1 font-normal text-[10px] cursor-pointer text-[#000080]">
-                  <input type="checkbox" id="form-isAllDay" onchange="toggleTimeFields()" class="rounded" /> Sepanjang Hari
-                </label>
-              </label>
-              <input type="date" id="form-date" required class="xp-input text-xs w-full py-1.5" />
+              <label class="text-xs font-bold text-black">Tarikh Mula:</label>
+              <input type="date" id="form-startDate" required class="xp-input text-xs w-full py-1.5" />
             </div>
             <div class="flex flex-col gap-1">
               <label class="text-xs font-bold text-black">Masa Mula:</label>
               <input type="time" id="form-startTime" class="xp-input text-xs w-full py-1.5" />
             </div>
             <div class="flex flex-col gap-1">
+              <label class="text-xs font-bold text-black">Tarikh Tamat:</label>
+              <input type="date" id="form-endDate" required class="xp-input text-xs w-full py-1.5" />
+            </div>
+            <div class="flex flex-col gap-1">
               <label class="text-xs font-bold text-black">Masa Tamat:</label>
               <input type="time" id="form-endTime" class="xp-input text-xs w-full py-1.5" />
             </div>
           </div>
+
           <div class="flex flex-col gap-1">
             <label class="text-xs font-bold text-black">Mesyuarat / Program:</label>
             <input type="text" id="form-program" required class="xp-input text-xs w-full py-1.5" />
           </div>
+
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-bold text-black">Tempat:</label>
-            <input type="text" id="form-location" required class="xp-input text-xs w-full py-1.5" />
+            <label class="text-xs font-bold text-black">Tempat Lokasi:</label>
+            <select id="form-location" required class="xp-input text-xs w-full py-1.5 cursor-pointer">
+              <!-- Dijana oleh JS -->
+            </select>
           </div>
+
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-bold text-black">Pegawai:</label>
-            <textarea id="form-officers" rows="3" required class="xp-input text-xs w-full resize-none py-1.5"></textarea>
+            <label class="text-xs font-bold text-black">Pegawai / Staf:</label>
+            <textarea id="form-officers" rows="2" required class="xp-input text-xs w-full resize-none py-1.5"></textarea>
           </div>
+          
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-bold text-black">Catatan:</label>
+            <label class="text-xs font-bold text-black">Catatan Tambahan <span class="font-normal text-[#555]">(Pilihan)</span>:</label>
             <textarea id="form-notes" rows="2" class="xp-input text-xs w-full resize-none py-1.5"></textarea>
           </div>
         </form>
@@ -392,7 +403,7 @@
         </div>
         <div class="flex gap-3">
           <button type="button" onclick="closeModal()" class="xp-button h-8 w-24 justify-center">Batal</button>
-          <button type="button" onclick="saveActivity()" class="xp-button h-8 font-bold w-24 justify-center text-white bg-[#0058e6] border-[#003C74] hover:bg-[#0040cc]">OK</button>
+          <button type="button" onclick="saveActivity()" class="xp-button h-8 font-bold w-24 justify-center text-white bg-[#0058e6] border-[#003C74] hover:bg-[#0040cc]">Simpan</button>
         </div>
       </div>
     </div>
@@ -456,11 +467,9 @@
 
   <!-- FIREBASE INITIALIZATION & DB API -->
   <script type="module">
-    // Menggunakan CDN Firebase untuk Vanila HTML
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Konfigurasi Pangkalan Data Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyB8XX20lI2qvK4vcmTFR8Idk_YYr7c3VqA",
       authDomain: "pengurusan-kalendar-aktiviti.firebaseapp.com",
@@ -474,7 +483,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Dedahkan API Pangkalan Data untuk skrip logik utama
     window.dbAPI = {
       async getActivities() {
         const snap = await getDocs(collection(db, "activities"));
@@ -498,26 +506,41 @@
       }
     };
 
-    // Apabila modul siap dimuatkan, panggil fungsi permulaan dari skrip bawah
-    if(typeof window.initAppFromDB === 'function') {
-       window.initAppFromDB();
-    }
+    if(typeof window.initAppFromDB === 'function') window.initAppFromDB();
   </script>
 
   <!-- LOGIK APLIKASI -->
   <script>
     const availableIcons = ['user', 'users', 'briefcase', 'folder', 'monitor', 'hard-drive', 'building', 'clipboard-list', 'award'];
+    
+    // SENARAI BILIK MESYUARAT (LOKASI)
+    const meetingRooms = [
+      "Menara 1, Aras 17, Dewan Makan Eksekutif",
+      "Menara 1, Aras 17, Bilik Mesyuarat Kembang Semangkuk",
+      "Menara 1, Aras 17, Bilik Mesyuarat Jemaah Lembaga",
+      "Menara 1, Aras 16, Bilik Mesyuarat Ramin",
+      "Menara 1, Aras 16, Bilik Bincang",
+      "Menara 1, Aras 14, Surau MTIB",
+      "Menara 1, Aras 13, Bilik Mesyuarat Geronggang",
+      "Menara 1, Aras 13, Bilik Latihan ICT",
+      "Menara 1, Aras 13, Dewan Persidangan MTIB",
+      "Menara 2, Aras 12, Bilik Mesyuarat Meranti",
+      "Menara 2, Aras 10, Bilik Mesyuarat Nyatoh",
+      "Menara 2, Aras 10, Bilik Bincang Perdagangan",
+      "Menara 2, Aras 10, Bilik Bincang CB",
+      "Menara 2, Aras 09, Bilik Mesyuarat Kelampayan",
+      "Menara 2, Aras 09, Bilik Mesyuarat Chengal",
+      "Lain-lain / Luar Kawasan"
+    ];
 
-    // Data Lalai (Mockup) - Akan diganti oleh data pangkalan data
     let users = [
       { id: 'u1', username: 'Setiausaha BPS', departmentName: 'Bahagian Perancangan Strategik', password: '', isActive: true, icon: 'briefcase' },
       { id: 'u2', username: 'Setiausaha BTM', departmentName: 'Bahagian Teknologi Maklumat', password: '', isActive: true, icon: 'monitor' }
     ];
 
     let activities = [
-      { id: '1', userId: 'u1', date: '2024-12-23', day: 'Isnin', startTime: '09:30', endTime: '12:00', isAllDay: false, program: 'Perbincangan Bersama Pegawai', location: 'Bilik Pengarah PS', officers: 'En Nizam\nPn Normazmin\nPn Azora', notes: '' },
-      { id: '2', userId: 'u1', date: '2024-12-23', day: 'Isnin', startTime: '14:30', endTime: '16:30', isAllDay: false, program: 'Mesyuarat Panel Peperiksaan Bil.2/2024', location: 'Bilik Mesyuarat Kembang Semangkuk', officers: 'En Nizam', notes: 'Pengerusi: YBrs. Encik Mohd Amin Bin Kadir' },
-      { id: '4', userId: 'u2', date: '2024-12-24', day: 'Selasa', startTime: '14:30', endTime: '16:30', isAllDay: false, program: 'Taklimat Infrastruktur IT Terkini', location: 'Bilik Server', officers: 'En Hakim\nPn Siti', notes: 'Hanya staf teknikal' }
+      { id: '1', userId: 'u1', startDate: '2024-12-23', endDate: '2024-12-23', startTime: '09:30', endTime: '12:00', isAllDay: false, program: 'Perbincangan Bersama Pegawai', location: 'Menara 1, Aras 17, Bilik Mesyuarat Kembang Semangkuk', officers: 'En Nizam\nPn Normazmin\nPn Azora', notes: '' },
+      { id: '4', userId: 'u2', startDate: '2024-12-24', endDate: '2024-12-24', startTime: '14:30', endTime: '16:30', isAllDay: false, program: 'Taklimat Infrastruktur IT Terkini', location: 'Menara 1, Aras 13, Bilik Latihan ICT', officers: 'En Hakim\nPn Siti', notes: 'Hanya staf teknikal' }
     ];
 
     let currentUserRole = null; 
@@ -536,24 +559,25 @@
     const dayNamesList = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
     const monthNamesList = ['JAN', 'FEB', 'MAC', 'APR', 'MEI', 'JUN', 'JUL', 'OGO', 'SEP', 'OKT', 'NOV', 'DIS'];
 
-    // FUNGSI PERMULAAN YANG DIPANGGIL OLEH FIREBASE MODULE
     window.initAppFromDB = async () => {
       setAppStatus('Memuat turun data dari pangkalan...', 'normal');
+      populateLocationDropdown();
+
       try {
         if (window.dbAPI) {
           const dbUsers = await window.dbAPI.getUsers();
-          if (dbUsers && dbUsers.length > 0) {
-            users = dbUsers; // Pakai data DB jika ada
-          } else if (dbUsers && dbUsers.length === 0) {
-            // Jika DB kosong sama sekali, seed data lalai
-            for (const u of users) await window.dbAPI.saveUser(u);
-          }
+          if (dbUsers && dbUsers.length > 0) users = dbUsers; 
+          else if (dbUsers && dbUsers.length === 0) for (const u of users) await window.dbAPI.saveUser(u);
 
           const dbActs = await window.dbAPI.getActivities();
           if (dbActs && dbActs.length > 0) {
-            activities = dbActs; // Pakai data DB
+            // Pemetaan data lama untuk serasi dengan rekod berbilang tarikh
+            activities = dbActs.map(a => {
+              if(!a.startDate) a.startDate = a.date;
+              if(!a.endDate) a.endDate = a.date;
+              return a;
+            });
           } else if (dbActs && dbActs.length === 0) {
-             // Jika DB kosong, seed data aktiviti lalai
             for (const a of activities) await window.dbAPI.saveActivity(a);
           }
         }
@@ -567,6 +591,12 @@
       renderProfileGrid();
       lucide.createIcons();
     };
+
+    function populateLocationDropdown() {
+      const select = document.getElementById('form-location');
+      if(!select) return;
+      select.innerHTML = meetingRooms.map(r => `<option value="${r}">${r}</option>`).join('');
+    }
 
     function updateCurrentDateDisplay() {
       const d = new Date();
@@ -595,9 +625,7 @@
       lucide.createIcons();
 
       if(type !== 'normal') {
-        statusTimeout = setTimeout(() => {
-          setAppStatus('Sedia', 'normal');
-        }, 5000);
+        statusTimeout = setTimeout(() => { setAppStatus('Sedia', 'normal'); }, 5000);
       }
     }
 
@@ -755,7 +783,6 @@
       renderProfileGrid(); 
     }
 
-    // Fungsi Akses Terus Super-Admin Ke Profil Pengguna
     function impersonateUser(userId) {
       const user = users.find(u => u.id === userId);
       if(!user) return;
@@ -765,7 +792,6 @@
       impersonatingFromSA = true;
 
       document.getElementById('status-role-text').innerText = `Admin (${user.username}) - Pihak Super-Admin`;
-      
       document.getElementById('top-nav-controls').classList.remove('hidden');
       document.getElementById('superadmin-nav').classList.add('hidden');
       
@@ -792,13 +818,29 @@
       return `${h12}:${mStr} ${period}`;
     }
 
-    function getDisplayTime(start, end, isAllDay) {
-      if (isAllDay) return '-';
-      if (!start && !end) return '-';
-      const s = formatTimeDisplay(start);
-      const e = formatTimeDisplay(end);
-      if (s && e) return `${s} - ${e}`;
-      return s || e || '-';
+    function getShortDate(dStr) {
+        if(!dStr) return '';
+        const parts = dStr.split('-');
+        if(parts.length === 3) return `${parts[2]}/${parts[1]}`;
+        return dStr;
+    }
+
+    function getDisplayDateTime(act) {
+      let sDate = act.startDate || act.date;
+      let eDate = act.endDate || act.date;
+
+      if (act.isAllDay) {
+          if (sDate !== eDate) return `Spjng Hari (${getShortDate(sDate)} - ${getShortDate(eDate)})`;
+          return 'Sepanjang Hari';
+      }
+      
+      const s = formatTimeDisplay(act.startTime);
+      const e = formatTimeDisplay(act.endTime);
+      
+      if (sDate !== eDate) {
+          return `${s} (${getShortDate(sDate)}) - ${e} (${getShortDate(eDate)})`;
+      }
+      return `${s} - ${e}`;
     }
 
     function timeToMinutes(timeStr) {
@@ -845,7 +887,6 @@
 
     function changeView(mode) {
       viewMode = mode;
-      
       const tabs = ['weekly', 'matrix', 'settings'];
       tabs.forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
@@ -856,7 +897,6 @@
           btn.className = `tab-btn ${t === 'weekly' ? 'text-[#0058e6]' : t === 'matrix' ? 'text-[#008000]' : 'text-[#555]'}`;
         }
       });
-
       const weekControls = document.getElementById('week-controls');
       if(mode === 'settings') {
         weekControls.classList.add('opacity-50', 'pointer-events-none');
@@ -878,7 +918,17 @@
 
       const groupedData = {};
       days.forEach(day => { groupedData[day.dateStr] = { dayInfo: day, activities: [] }; });
-      actsData.forEach(act => { if(groupedData[act.date]) groupedData[act.date].activities.push(act); });
+      
+      // Susun aktiviti ke dalam kumpulan tarikh jika ia bertindih dengan julat tarikhnya
+      actsData.forEach(act => { 
+        for(let d in groupedData) {
+            let sDate = act.startDate || act.date;
+            let eDate = act.endDate || act.date;
+            if(d >= sDate && d <= eDate) {
+                groupedData[d].activities.push(act);
+            }
+        }
+      });
 
       let tbodyHTML = '';
       
@@ -912,8 +962,8 @@
             ` : '';
 
             tbodyHTML += `
-              <td class="border border-black p-3 text-center align-top whitespace-pre-line font-medium text-black">
-                ${getDisplayTime(act.startTime, act.endTime, act.isAllDay)}
+              <td class="border border-black p-3 text-center align-top whitespace-pre-line font-medium text-black text-xs">
+                ${getDisplayDateTime(act)}
               </td>
               <td class="border border-black p-3 align-top group relative">
                 <div class="font-bold text-black text-sm">${escapeHTML(act.program)}</div>
@@ -954,9 +1004,9 @@
           <table class="w-full border-collapse border border-black text-xs print-table">
             <thead>
               <tr class="bg-gradient-to-r from-gray-100 to-gray-200">
-                <th class="border border-black p-3 font-bold text-center w-[10%] uppercase text-black">TARIKH</th>
-                <th class="border border-black p-3 font-bold text-center w-[12%] uppercase text-black">MASA</th>
-                <th class="border border-black p-3 font-bold text-center w-[38%] uppercase text-black">MESYUARAT / PROGRAM</th>
+                <th class="border border-black p-3 font-bold text-center w-[12%] uppercase text-black">TARIKH</th>
+                <th class="border border-black p-3 font-bold text-center w-[15%] uppercase text-black">MASA</th>
+                <th class="border border-black p-3 font-bold text-center w-[33%] uppercase text-black">MESYUARAT / PROGRAM</th>
                 <th class="border border-black p-3 font-bold text-center w-[20%] uppercase text-black">TEMPAT</th>
                 <th class="border border-black p-3 font-bold text-center w-[20%] uppercase text-black">PEGAWAI</th>
               </tr>
@@ -972,20 +1022,17 @@
 
     function renderApp() {
       const container = document.getElementById('view-container');
-      
       const titleEl = document.getElementById('app-title-text');
+      
       if (currentUserRole === 'superadmin') {
         titleEl.innerText = "Pengurusan Kalendar Aktiviti (Super-Admin)";
       } else if (currentUserId) {
         const user = users.find(u => u.id === currentUserId);
-        if (user) {
-          titleEl.innerText = "Pengurusan Kalendar Aktiviti " + user.departmentName;
-        }
+        if (user) titleEl.innerText = "Pengurusan Kalendar Aktiviti " + user.departmentName;
       } else {
         titleEl.innerText = "Pengurusan Kalendar Aktiviti";
       }
 
-      // LOGIK SUPER ADMIN
       if (currentUserRole === 'superadmin') {
         let userRows = users.map(u => `
           <tr class="hover:bg-[#ffffe1]">
@@ -1027,7 +1074,6 @@
                 <i data-lucide="user-plus" class="w-4 h-4"></i> Tambah Setiausaha
               </button>
             </div>
-            
             <table class="w-full border-collapse sa-table text-xs">
               <thead>
                 <tr>
@@ -1038,9 +1084,7 @@
                   <th class="w-[30%] text-center">Tindakan</th>
                 </tr>
               </thead>
-              <tbody>
-                ${userRows}
-              </tbody>
+              <tbody>${userRows}</tbody>
             </table>
           </div>
         `;
@@ -1068,10 +1112,15 @@
         let html = `<div class="flex flex-col p-1 bg-white overflow-hidden rounded-lg">`;
         
         weekDays.forEach(dayObj => {
-          const dayActivities = myActivities.filter(a => a.date === dayObj.dateStr).sort((a,b) => {
+          const dayActivities = myActivities.filter(a => {
+            let sDate = a.startDate || a.date;
+            let eDate = a.endDate || a.date;
+            return dayObj.dateStr >= sDate && dayObj.dateStr <= eDate;
+          }).sort((a,b) => {
             if(a.isAllDay) return -1;
             return timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
           });
+          
           const bgRow = dayObj.isWeekend ? 'bg-[#e2dfd3]' : 'bg-white';
           const bgHeader = dayObj.isWeekend ? 'bg-[#d2cbbb]' : 'bg-[#ece9d8]';
           
@@ -1093,9 +1142,9 @@
               html += `
                 <div class="min-w-[240px] max-w-[300px] p-3 bg-[#ffffe1] border border-[#a9a9a9] rounded-lg shadow-[1px_1px_4px_rgba(0,0,0,0.15)] flex flex-col">
                   <div class="flex justify-between items-start mb-2">
-                    <span class="inline-flex items-center text-[11px] font-bold text-[#000080]">
+                    <span class="inline-flex items-center text-[10px] font-bold text-[#000080]">
                       <i data-lucide="clock" class="w-3.5 h-3.5 mr-1.5"></i>
-                      ${getDisplayTime(act.startTime, act.endTime, act.isAllDay)}
+                      ${getDisplayDateTime(act)}
                     </span>
                     ${editBtn}
                   </div>
@@ -1114,27 +1163,17 @@
               `;
             });
             if(currentUserRole === 'admin') {
-              html += `
-                <div onclick="openModal(null, '${dayObj.dateStr}')" class="min-w-[48px] h-full border-2 border-dashed border-[#a9a9a9] rounded-lg flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors">
-                  <i data-lucide="plus" class="w-5 h-5"></i>
-                </div>
-              `;
+              html += `<div onclick="openModal(null, '${dayObj.dateStr}')" class="min-w-[48px] h-full border-2 border-dashed border-[#a9a9a9] rounded-lg flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors"><i data-lucide="plus" class="w-5 h-5"></i></div>`;
             }
           } else {
             if(currentUserRole === 'admin') {
-              html += `
-                <div onclick="openModal(null, '${dayObj.dateStr}')" class="min-w-[200px] h-full flex-1 border-2 border-dashed border-[#a9a9a9] rounded-lg flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors">
-                  <i data-lucide="plus" class="w-5 h-5"></i>
-                </div>
-              `;
+              html += `<div onclick="openModal(null, '${dayObj.dateStr}')" class="min-w-[200px] h-full flex-1 border-2 border-dashed border-[#a9a9a9] rounded-lg flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors"><i data-lucide="plus" class="w-5 h-5"></i></div>`;
             } else {
                html += `<div class="w-full flex items-center justify-center text-[#888] italic text-xs font-semibold">Tiada Aktiviti Didaftarkan</div>`;
             }
           }
-          
           html += `</div></div>`;
         });
-        
         html += `</div>`;
         container.innerHTML = html;
         
@@ -1144,7 +1183,6 @@
 
       } else if (viewMode === 'settings') {
         const user = users.find(u => u.id === currentUserId);
-        
         const iconHTML = availableIcons.map(ic => `
           <div onclick="selectTenantIcon('${ic}')" class="icon-picker-btn w-10 h-10 flex items-center justify-center rounded cursor-pointer hover:bg-slate-100 ${user.icon === ic ? 'selected' : ''}" data-icon="${ic}">
              <i data-lucide="${ic}" class="w-6 h-6 text-[#555]"></i>
@@ -1168,7 +1206,6 @@
                     </div>
                     <p class="text-[10px] text-[#555] font-semibold mt-1">Ini akan mengubah tajuk di Laporan Matriks untuk kalendar anda.</p>
                   </div>
-                  
                   <div>
                     <label class="font-bold text-xs text-black block mb-1">Pilih Ikon Profil:</label>
                     <div class="flex flex-wrap gap-2 p-2 border border-slate-200 rounded-lg bg-slate-50" id="tenant-icon-grid">
@@ -1179,7 +1216,6 @@
                 </div>
               </div>
 
-              <!-- BAHAGIAN KESELAMATAN KATA LALUAN -->
               <div class="bg-white p-6 rounded-xl border border-[#a9a9a9] shadow-sm">
                 <h2 class="font-bold text-sm text-[#e53935] border-b border-[#a9a9a9] pb-3 mb-5 flex items-center gap-2">
                   <i data-lucide="key" class="w-4 h-4"></i> Keselamatan (Kata Laluan)
@@ -1213,7 +1249,6 @@
           </div>
         `;
       }
-
       lucide.createIcons();
     }
 
@@ -1441,7 +1476,8 @@
       
       document.getElementById('conflict-error').classList.add('hidden');
       
-      const formDate = document.getElementById('form-date');
+      const formStartDate = document.getElementById('form-startDate');
+      const formEndDate = document.getElementById('form-endDate');
       const formStartTime = document.getElementById('form-startTime');
       const formEndTime = document.getElementById('form-endTime');
       const formIsAllDay = document.getElementById('form-isAllDay');
@@ -1460,7 +1496,8 @@
         modalTitle.innerHTML = `<i data-lucide="edit" class="w-4 h-4"></i> Dialog Pindaan Rekod`;
         btnDelete.classList.remove('hidden');
 
-        formDate.value = act.date;
+        formStartDate.value = act.startDate || act.date;
+        formEndDate.value = act.endDate || act.date;
         formStartTime.value = act.startTime || '';
         formEndTime.value = act.endTime || '';
         formIsAllDay.checked = act.isAllDay;
@@ -1475,7 +1512,8 @@
         btnDelete.classList.add('hidden');
         
         const weekDays = getDaysOfWeek(baseDate);
-        formDate.value = specificDateStr || weekDays[0].dateStr;
+        formStartDate.value = specificDateStr || weekDays[0].dateStr;
+        formEndDate.value = specificDateStr || weekDays[0].dateStr;
         formStartTime.value = '09:00';
         formEndTime.value = '10:00';
         formIsAllDay.checked = false;
@@ -1536,44 +1574,74 @@
         return;
       }
 
-      const dateVal = document.getElementById('form-date').value;
+      const startDateVal = document.getElementById('form-startDate').value;
+      const endDateVal = document.getElementById('form-endDate').value;
       const isAllDay = document.getElementById('form-isAllDay').checked;
       const startVal = document.getElementById('form-startTime').value;
       const endVal = document.getElementById('form-endTime').value;
+      const locationVal = document.getElementById('form-location').value;
       
       document.getElementById('conflict-error').classList.add('hidden');
 
-      if (!isAllDay) {
-        const newStart = timeToMinutes(startVal);
-        const newEnd = timeToMinutes(endVal);
-        
-        if (newStart === null) return showError('RALAT: Sila masukkan masa mula!');
-        if (newEnd !== null && newEnd <= newStart) return showError('RALAT: Masa tamat mestilah LEPAS masa mula!');
+      if (!startDateVal || !endDateVal) return showError('RALAT: Sila masukkan tarikh mula dan tamat!');
+      if (startDateVal > endDateVal) return showError('RALAT: Tarikh tamat tidak boleh sebelum tarikh mula!');
 
-        const dateActivities = activities.filter(a => a.date === dateVal && a.id !== editingId && !a.isAllDay && a.userId === currentUserId);
-        
-        const hasConflict = dateActivities.some(act => {
-          const extStart = timeToMinutes(act.startTime);
-          const extEnd = timeToMinutes(act.endTime) || (extStart + 60);
-          if (extStart === null) return false;
-          const testEnd = newEnd || (newStart + 60);
-          return (newStart < extEnd && testEnd > extStart);
-        });
+      // Fungsi bantuan untuk tukar tarikh dan masa kepada nilai Timestamp matematik
+      const parseTS = (dStr, tStr, isEnd) => {
+        if (isEnd && (!tStr || tStr.trim() === '')) return new Date(`${dStr}T23:59:59`).getTime();
+        let t = tStr || '00:00';
+        if (t.split(':').length === 2) t += ':00'; // Tambah saat jika HH:MM sahaja
+        return new Date(`${dStr}T${t}`).getTime();
+      };
 
-        if (hasConflict) return showError('RALAT: Terdapat pertindihan masa dengan program lain pada tarikh ini!');
+      if (!isAllDay && !startVal) return showError('RALAT: Sila masukkan masa mula!');
+
+      // Kira titik permulaan dan tamat (Termasuk logik sepanjang hari)
+      const newStartTS = isAllDay ? parseTS(startDateVal, null, false) : parseTS(startDateVal, startVal, false);
+      const newEndTS = isAllDay ? parseTS(endDateVal, null, true) : parseTS(endDateVal, endVal, true);
+
+      if (!isAllDay && newStartTS >= newEndTS) {
+        return showError('RALAT: Masa tamat mestilah selepas masa mula!');
       }
 
-      const dateObj = new Date(dateVal);
+      // Semak rekod dari SEMUA profile untuk pertembungan Bilik termasuk program Sepanjang Hari
+      const otherActivities = activities.filter(a => a.id !== editingId);
+      
+      for (let act of otherActivities) {
+        const actStartD = act.startDate || act.date;
+        const actEndD = act.endDate || act.date;
+        
+        const extStartTS = act.isAllDay ? parseTS(actStartD, null, false) : parseTS(actStartD, act.startTime, false);
+        const extEndTS = act.isAllDay ? parseTS(actEndD, null, true) : parseTS(actEndD, act.endTime, true);
+        
+        const isOverlapping = (newStartTS < extEndTS) && (newEndTS > extStartTS);
+        
+        if (isOverlapping) {
+           // 1. Semakan Kekosongan Lokasi (Global, Semua Profil)
+           if (locationVal !== 'Lain-lain / Luar Kawasan' && act.location === locationVal) {
+              return showError(`RALAT: ${locationVal} telah ditempah pada waktu tersebut!`);
+           }
+           
+           // 2. Semakan Profil Sendiri (Tidak Boleh Double Booking diri sendiri)
+           if (act.userId === currentUserId) {
+              return showError('RALAT: Anda sudah mempunyai program lain yang bertindih pada waktu ini!');
+           }
+        }
+      }
+
+      const dateObj = new Date(startDateVal);
       const updatedData = {
         id: editingId,
         userId: currentUserId,
-        date: dateVal,
+        date: startDateVal, // fallback
+        startDate: startDateVal,
+        endDate: endDateVal,
         day: dayNamesList[dateObj.getDay()],
         startTime: isAllDay ? '' : startVal,
         endTime: isAllDay ? '' : endVal,
         isAllDay: isAllDay,
         program: document.getElementById('form-program').value,
-        location: document.getElementById('form-location').value,
+        location: locationVal,
         officers: document.getElementById('form-officers').value,
         notes: document.getElementById('form-notes').value
       };
@@ -1588,7 +1656,7 @@
           activities = activities.map(a => a.id === editingId ? updatedData : a);
         } else {
           activities.push(updatedData);
-          activities.sort((a, b) => new Date(a.date) - new Date(b.date));
+          activities.sort((a, b) => new Date(a.startDate || a.date) - new Date(b.startDate || b.date));
         }
         showToast('Data berjaya disimpan');
         closeModal();
