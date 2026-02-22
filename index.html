@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Kalendar BPS</title>
+  <title>Sistem Pengurusan Kalendar & Aktiviti</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -58,12 +58,16 @@
       font-family: 'Tahoma', sans-serif;
       transition: all 0.1s ease;
     }
-    .xp-button:active { 
+    .xp-button:active:not(:disabled) { 
       border-top: 2px solid #716F64; 
       border-left: 2px solid #716F64; 
       border-right: 2px solid #FFFFFF; 
       border-bottom: 2px solid #FFFFFF; 
       padding: 5px 11px 3px 13px; 
+    }
+    .xp-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
     
     .xp-button-mini { 
@@ -74,7 +78,7 @@
       border-bottom: 1px solid #716F64; 
       border-radius: 4px;
     }
-    .xp-button-mini:active { 
+    .xp-button-mini:active:not(:disabled) { 
       border-top: 1px solid #716F64; 
       border-left: 1px solid #716F64; 
       border-right: 1px solid #FFFFFF; 
@@ -101,7 +105,7 @@
       outline: none; 
     }
     .xp-input:focus { background-color: #ffffe1; }
-    .xp-input:disabled { background-color: #e2e8f0; color: #94a3b8; }
+    .xp-input:disabled { background-color: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
     
     .monthly-print-only { display: none; }
     
@@ -170,22 +174,29 @@
     }
 
     @media print {
+      @page { margin: 0; }
+      
       body * { visibility: hidden; }
-      body { background-color: white; }
+      body { background-color: white; margin: 0; }
       .xp-desktop { background-color: white; padding: 0; }
       .xp-window { border: none; box-shadow: none; background: white; }
       .xp-panel { border: none; background: white; }
       
       body:not(.printing-monthly) #print-area, body:not(.printing-monthly) #print-area * { visibility: visible; }
-      body:not(.printing-monthly) #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
+      body:not(.printing-monthly) #print-area { 
+        position: absolute; left: 0; top: 0; width: 100%; 
+        padding: 1.5cm 1cm !important; box-sizing: border-box;
+      }
       
       body.printing-monthly .hide-on-monthly-print { display: none !important; }
-      body.printing-monthly .monthly-print-only { display: block !important; position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
+      body.printing-monthly .monthly-print-only { 
+        display: block !important; position: absolute; left: 0; top: 0; width: 100%; 
+        padding: 1.5cm 1cm !important; box-sizing: border-box;
+      }
       body.printing-monthly .monthly-print-only * { visibility: visible; }
       
       .no-print { display: none !important; }
       .print-table th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
-      
       tr.bg-gradient-to-r.from-\\[\\#e2e8f0\\] { background-color: #e2e8f0 !important; background-image: none !important; -webkit-print-color-adjust: exact; }
       tr.bg-gradient-to-r.from-white { background-color: #ffffff !important; background-image: none !important; -webkit-print-color-adjust: exact; }
     }
@@ -201,10 +212,9 @@
 
   <!-- SKRIN LOG MASUK -->
   <div id="login-screen" class="w-full flex flex-col items-center justify-center min-h-[80vh] relative pt-8">
-    
     <div class="text-center mb-10">
       <div id="login-date-display" class="text-sm md:text-base font-bold text-yellow-300 drop-shadow-md mb-2 tracking-wide uppercase"></div>
-      <h1 class="text-2xl md:text-4xl font-bold text-white mb-3 leading-tight px-2" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">Pengurusan Kalendar Aktiviti Bahagian</h1>
+      <h1 class="text-2xl md:text-4xl font-bold text-white mb-3 leading-tight px-2" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">Sistem Pengurusan Kalendar & Aktiviti</h1>
       <h2 class="text-lg md:text-2xl text-slate-200 font-medium" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Pilih Profil Akses</h2>
     </div>
 
@@ -249,7 +259,6 @@
           <button onclick="executeLogin('viewer')" class="xp-button w-full justify-center font-bold text-[#000080] py-3 text-sm shadow-sm">
             <i data-lucide="eye" class="w-4 h-4"></i> Masuk sebagai Pelawat
           </button>
-          
           <div class="flex items-center gap-3 my-4">
             <div class="h-px bg-[#a9a9a9] flex-1"></div>
             <span class="text-[10px] font-bold text-[#777] uppercase">Kawasan Admin</span>
@@ -274,7 +283,7 @@
     <div class="xp-titlebar flex-wrap gap-2 md:gap-4">
       <div class="flex items-center gap-2 max-w-full overflow-hidden">
         <i data-lucide="calendar" class="w-4 h-4 text-white drop-shadow shrink-0"></i>
-        <span class="text-xs md:text-sm tracking-wide truncate" id="app-title-text">Pengurusan Kalendar Aktiviti</span>
+        <span class="text-xs md:text-sm tracking-wide truncate" id="app-title-text">Sistem Pengurusan Kalendar & Aktiviti</span>
       </div>
       <div class="text-[10px] md:text-xs font-medium text-white drop-shadow ml-auto shrink-0" id="current-date-display"></div>
     </div>
@@ -300,7 +309,7 @@
             <button onclick="handlePrevWeek()" class="xp-button h-8 w-10 p-0" title="Minggu Lepas">
               <i data-lucide="chevron-left" class="w-4 h-4 text-[#000080]"></i>
             </button>
-            <button onclick="handleCurrentWeek()" class="xp-button h-8 px-3 md:px-5 font-bold text-[#000080] text-[10px]">
+            <button onclick="handleCurrentWeek()" id="btn-current-week-label" class="xp-button h-8 px-3 md:px-5 font-bold text-[#000080] text-[10px] transition-colors">
               MINGGU SEMASA
             </button>
             <button onclick="handleNextWeek()" class="xp-button h-8 w-10 p-0" title="Minggu Depan">
@@ -325,8 +334,7 @@
       </div>
 
       <!-- Bekas Utama View -->
-      <div id="view-container" class="bg-white xp-panel p-1 md:p-2">
-      </div>
+      <div id="view-container" class="bg-white xp-panel p-1 md:p-2"></div>
     </div>
 
     <!-- Status bar bawah -->
@@ -357,10 +365,21 @@
       </div>
       <div class="p-4 md:p-5 bg-[#ece9d8] overflow-y-auto max-h-[75vh]">
         
-        <!-- Ralat Konflik yang Boleh Papar Multi-Baris -->
+        <!-- Ralat Konflik -->
         <div id="conflict-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-3 py-2 rounded mb-4 flex items-start gap-2 hidden shadow-sm">
           <span class="w-4 h-4 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-[10px] shrink-0 mt-0.5">!</span>
           <div id="conflict-error-msg" class="flex-1 w-full text-xs"></div>
+        </div>
+
+        <!-- Checkbox Override Jemputan (Hidden by default) -->
+        <div id="guest-override-container" class="hidden bg-[#fff8e1] border border-[#ffe082] px-3 py-2 rounded mb-4 shadow-sm">
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input type="checkbox" id="form-is-guest" class="mt-0.5 rounded w-4 h-4 text-[#f57f17] focus:ring-[#f57f17]" />
+            <div class="flex flex-col">
+              <span class="text-xs font-bold text-[#f57f17]">Teruskan sebagai Ahli Jemputan</span>
+              <span class="text-[10px] text-[#795548] leading-tight mt-0.5">Bilik ini telah ditempah. Tandakan ini jika anda adalah jemputan (Tempahan asal akan dianggap sebagai Hos/Urusetia bilik tersebut).</span>
+            </div>
+          </label>
         </div>
 
         <form id="activityForm" class="space-y-4">
@@ -375,17 +394,26 @@
               <label class="text-xs font-bold text-black">Tarikh Mula:</label>
               <input type="date" id="form-startDate" required class="xp-input text-xs w-full py-2 md:py-1.5" />
             </div>
+            
             <div class="flex flex-col gap-1">
               <label class="text-xs font-bold text-black">Masa Mula:</label>
-              <input type="time" id="form-startTime" class="xp-input text-xs w-full py-2 md:py-1.5" />
+              <div class="flex">
+                <input type="text" id="form-startTime" readonly onclick="openClockModal('form-startTime')" class="xp-input text-xs w-full py-2 md:py-1.5 cursor-pointer text-center bg-white rounded-r-none border-r-0" placeholder="--:--" />
+                <button type="button" id="btn-clock-start" onclick="openClockModal('form-startTime')" class="xp-button-mini px-3 rounded-l-none bg-[#ece9d8] border-l-0 clock-btn"><i data-lucide="clock" class="w-4 h-4 text-[#0058e6]"></i></button>
+              </div>
             </div>
+
             <div class="flex flex-col gap-1">
               <label class="text-xs font-bold text-black">Tarikh Tamat:</label>
               <input type="date" id="form-endDate" required class="xp-input text-xs w-full py-2 md:py-1.5" />
             </div>
+            
             <div class="flex flex-col gap-1">
               <label class="text-xs font-bold text-black">Masa Tamat:</label>
-              <input type="time" id="form-endTime" class="xp-input text-xs w-full py-2 md:py-1.5" />
+              <div class="flex">
+                <input type="text" id="form-endTime" readonly onclick="openClockModal('form-endTime')" class="xp-input text-xs w-full py-2 md:py-1.5 cursor-pointer text-center bg-white rounded-r-none border-r-0" placeholder="--:--" />
+                <button type="button" id="btn-clock-end" onclick="openClockModal('form-endTime')" class="xp-button-mini px-3 rounded-l-none bg-[#ece9d8] border-l-0 clock-btn"><i data-lucide="clock" class="w-4 h-4 text-[#0058e6]"></i></button>
+              </div>
             </div>
           </div>
 
@@ -426,6 +454,40 @@
           <button type="button" onclick="closeModal()" class="xp-button h-8 w-20 md:w-24 justify-center">Batal</button>
           <button type="button" onclick="saveActivity()" class="xp-button h-8 font-bold w-20 md:w-24 justify-center text-white bg-[#0058e6] border-[#003C74] hover:bg-[#0040cc]">Simpan</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL JAM ANALOG (TIME PICKER WIDGET) -->
+  <div id="clock-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden no-print">
+    <div class="xp-window w-full max-w-[280px] flex flex-col shadow-2xl">
+      <div class="xp-titlebar">
+        <span class="text-sm flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4"></i> Tetapkan Masa</span>
+        <button onclick="closeClockModal()" class="text-white hover:text-red-200 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="p-6 bg-[#ece9d8] flex flex-col items-center gap-5">
+        <!-- Visual Jam Analog -->
+        <div class="relative w-44 h-44 rounded-full border-[6px] border-[#003C74] bg-white shadow-inner flex items-center justify-center">
+           <div class="absolute inset-0" id="clock-markers"></div>
+           <!-- Jarum Jam -->
+           <div id="hand-h" class="absolute w-[4px] h-11 bg-black rounded-full origin-bottom z-10 transition-transform duration-300 ease-out" style="bottom: 50%; transform-origin: bottom center;"></div>
+           <!-- Jarum Minit -->
+           <div id="hand-m" class="absolute w-[3px] h-16 bg-[#0058e6] rounded-full origin-bottom z-20 transition-transform duration-300 ease-out" style="bottom: 50%; transform-origin: bottom center;"></div>
+           <!-- Titik Tengah -->
+           <div class="absolute w-3.5 h-3.5 bg-red-600 rounded-full z-30 shadow-sm border border-black"></div>
+        </div>
+        
+        <div class="w-full flex flex-col gap-2 text-center">
+           <label class="text-xs font-bold text-[#000080]">Pilih Masa:</label>
+           <!-- Native Time Input yang di-sync dengan jam visual -->
+           <input type="time" id="clock-time-input" class="xp-input text-xl font-bold p-2 text-center w-full shadow-inner border-[#003C74]" oninput="updateClockHands(this.value)" />
+        </div>
+      </div>
+      <div class="p-3 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between gap-2">
+        <button type="button" onclick="closeClockModal()" class="xp-button h-8 w-20 justify-center">Batal</button>
+        <button type="button" onclick="applyClockTime()" class="xp-button h-8 font-bold w-20 justify-center text-white bg-[#0058e6] border-[#003C74]">Pilih</button>
       </div>
     </div>
   </div>
@@ -571,6 +633,7 @@
     // MENDAPATKAN ISNIN MINGGU SEMASA SEBAGAI LALAI
     function getStartOfWeek(date) {
       const d = new Date(date);
+      d.setHours(0, 0, 0, 0); 
       const day = d.getDay();
       const diff = d.getDate() - day + (day === 0 ? -6 : 1); 
       return new Date(d.setDate(diff));
@@ -585,12 +648,14 @@
     let tempAuthUserId = null; 
     let impersonatingFromSA = false;
     let statusTimeout = null;
+    let currentClockTarget = null; // Menyimpan ID input form yang sedang mengubah masa
 
     const dayNamesList = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
     const monthNamesList = ['JAN', 'FEB', 'MAC', 'APR', 'MEI', 'JUN', 'JUL', 'OGO', 'SEP', 'OKT', 'NOV', 'DIS'];
 
     window.initAppFromDB = async () => {
-      setAppStatus('Memuat turun data...', 'normal');
+      setAppStatus('Memuat turun data dari pangkalan...', 'normal');
+      initClockMarkers();
       populateLocationDropdown();
 
       try {
@@ -601,6 +666,7 @@
 
           const dbActs = await window.dbAPI.getActivities();
           if (dbActs && dbActs.length > 0) {
+            // Pemetaan data lama untuk serasi dengan rekod berbilang tarikh
             activities = dbActs.map(a => {
               if(!a.startDate) a.startDate = a.date;
               if(!a.endDate) a.endDate = a.date;
@@ -613,7 +679,7 @@
         setAppStatus('Sedia', 'normal');
       } catch(e) {
         console.error("Firebase Error:", e);
-        setAppStatus('Mod Tempatan (Tiada DB)', 'error');
+        setAppStatus('Gagal menyambung ke Pelayan DB (Menggunakan Mod Tempatan)', 'error');
       }
       
       updateCurrentDateDisplay();
@@ -621,6 +687,93 @@
       lucide.createIcons();
     };
 
+    // --- FUNGSI JAM ANALOG ---
+    function initClockMarkers() {
+      const container = document.getElementById('clock-markers');
+      if(!container) return;
+      let html = '';
+      for(let i=1; i<=12; i++) {
+          const angle = i * 30;
+          html += `<div class="absolute inset-0 flex justify-center" style="transform: rotate(${angle}deg); padding-top: 6px;">
+                     <div style="transform: rotate(-${angle}deg); font-size: 13px; color: #003C74;" class="font-extrabold">${i}</div>
+                   </div>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function openClockModal(targetId) {
+      if (document.getElementById('form-isAllDay').checked) return; // Terbatal jika mod "Sepanjang Hari"
+
+      currentClockTarget = targetId;
+      let val = document.getElementById(targetId).value;
+      if(!val) {
+          const now = new Date();
+          val = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      }
+      document.getElementById('clock-time-input').value = val;
+      updateClockHands(val);
+      document.getElementById('clock-modal').classList.remove('hidden');
+    }
+
+    function closeClockModal() {
+      document.getElementById('clock-modal').classList.add('hidden');
+    }
+
+    function updateClockHands(timeStr) {
+      if(!timeStr) return;
+      const [h, m] = timeStr.split(':').map(Number);
+      const hAngle = (h % 12) * 30 + (m / 2);
+      const mAngle = m * 6;
+      document.getElementById('hand-h').style.transform = `rotate(${hAngle}deg)`;
+      document.getElementById('hand-m').style.transform = `rotate(${mAngle}deg)`;
+    }
+
+    function applyClockTime() {
+      const val = document.getElementById('clock-time-input').value;
+      if (!val) return alert("Sila masukkan masa yang sah.");
+      
+      document.getElementById(currentClockTarget).value = val;
+
+      // Logik automatik +2 Jam jika yang diset ialah Masa Mula
+      if (currentClockTarget === 'form-startTime') {
+         handleAutoEndTime(val);
+      }
+
+      closeClockModal();
+    }
+
+    function handleAutoEndTime(startTimeStr) {
+      if(!startTimeStr) return;
+      let [h, m] = startTimeStr.split(':').map(Number);
+      h += 2;
+      let addDay = false;
+      if (h >= 24) {
+          h %= 24;
+          addDay = true;
+      }
+      document.getElementById('form-endTime').value = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+
+      if (addDay) {
+          let sDate = document.getElementById('form-startDate').value;
+          if (sDate) {
+              let d = new Date(sDate);
+              d.setDate(d.getDate() + 1);
+              document.getElementById('form-endDate').value = d.toISOString().split('T')[0];
+          }
+      } else {
+          // Selaraskan endDate dengan startDate jika ia tidak merentasi hari (Midnight)
+          const sDate = document.getElementById('form-startDate').value;
+          const eDate = document.getElementById('form-endDate').value;
+          // Hanya override jika tiada eDate atau ia sama dgn hari sebelum ini
+          if(!eDate || eDate < sDate) {
+             document.getElementById('form-endDate').value = sDate;
+          }
+      }
+      
+      showToast("Masa tamat di set auto (+2 Jam)");
+    }
+
+    // --- FUNGSI LOKASI ---
     function populateLocationDropdown() {
       const select = document.getElementById('form-location');
       if(!select) return;
@@ -630,7 +783,6 @@
     function toggleCustomLocation() {
       const locSelect = document.getElementById('form-location');
       const customLocContainer = document.getElementById('form-custom-location-container');
-      
       if (locSelect.value === 'Lain-lain / Luar Kawasan') {
         customLocContainer.classList.remove('hidden');
       } else {
@@ -638,6 +790,7 @@
       }
     }
 
+    // --- FUNGSI UTAMA LAIN ---
     function updateCurrentDateDisplay() {
       const d = new Date();
       const dayStr = dayNamesList[d.getDay()];
@@ -860,22 +1013,32 @@
         return dStr;
     }
 
-    function getDisplayDateTime(act) {
+    function getDisplayDateTime(act, isMatrix = false) {
       let sDate = act.startDate || act.date;
       let eDate = act.endDate || act.date;
 
       if (act.isAllDay) {
-          if (sDate !== eDate) return `Spjng Hari (${getShortDate(sDate)} - ${getShortDate(eDate)})`;
+          if (sDate !== eDate) {
+              return isMatrix 
+                ? `Spjng Hari\n(${getShortDate(sDate)} - ${getShortDate(eDate)})` 
+                : `Spjng Hari (${getShortDate(sDate)} - ${getShortDate(eDate)})`;
+          }
           return 'Sepanjang Hari';
       }
       
       const s = formatTimeDisplay(act.startTime);
       const e = formatTimeDisplay(act.endTime);
       
+      const joiner = isMatrix ? ' -\n' : ' - ';
+
       if (sDate !== eDate) {
-          return `${s} (${getShortDate(sDate)}) - ${e} (${getShortDate(eDate)})`;
+          return `${s} (${getShortDate(sDate)})${joiner}${e} (${getShortDate(eDate)})`;
       }
-      return `${s} - ${e}`;
+      
+      if (s && e) {
+          return `${s}${joiner}${e}`;
+      }
+      return s || e || '-';
     }
 
     function timeToMinutes(timeStr) {
@@ -887,7 +1050,6 @@
     function getDaysOfWeek(startDate) {
       const days = [];
       const start = new Date(startDate);
-      // Betulkan ke Isnin minggu tersebut
       const day = start.getDay();
       const diff = start.getDate() - day + (day === 0 ? -6 : 1);
       start.setDate(diff);
@@ -1000,24 +1162,29 @@
               </button>
             ` : '';
 
+            // MENGALIHKAN 'whitespace-pre-line' ke dalam elemen <div> untuk mengelakkan margin HTML kosong
             tbodyHTML += `
-              <td class="border border-black p-2 md:p-3 text-center align-top whitespace-pre-line font-medium text-black text-[10px] md:text-xs">
-                ${getDisplayDateTime(act)}
+              <td class="border border-black p-2 md:p-3 text-center align-top text-black">
+                <div class="font-medium text-[10px] md:text-xs leading-normal whitespace-pre-line">${getDisplayDateTime(act, true)}</div>
               </td>
               <td class="border border-black p-2 md:p-3 align-top group relative">
-                <div class="font-bold text-black text-xs md:text-sm">${escapeHTML(act.program)}</div>
-                ${act.notes ? `<div class="mt-1 text-[9px] md:text-[10px] text-black whitespace-pre-line">${escapeHTML(act.notes)}</div>` : ''}
+                <div class="font-bold text-black text-[10px] md:text-xs leading-normal whitespace-pre-line">${escapeHTML(act.program)}</div>
+                ${act.notes ? `<div class="mt-1 text-[9px] md:text-[10px] text-black whitespace-pre-line leading-normal">${escapeHTML(act.notes)}</div>` : ''}
                 ${editBtnHTML}
               </td>
-              <td class="border border-black p-2 md:p-3 align-top text-center whitespace-pre-line text-black text-xs">${escapeHTML(act.location)}</td>
-              <td class="border border-black p-2 md:p-3 align-top whitespace-pre-line text-black text-xs">${escapeHTML(act.officers)}</td>
+              <td class="border border-black p-2 md:p-3 align-top text-center text-black">
+                <div class="text-[10px] md:text-xs leading-normal whitespace-pre-line">${escapeHTML(act.location)}</div>
+              </td>
+              <td class="border border-black p-2 md:p-3 align-top text-black">
+                 <div class="text-[10px] md:text-xs leading-normal whitespace-pre-line">${escapeHTML(act.officers)}</div>
+              </td>
             `;
           } else {
             tbodyHTML += `
-              <td class="border border-black p-2 md:p-3 text-center text-black text-xs">-</td>
-              <td class="border border-black p-2 md:p-3 text-center italic text-black font-semibold text-xs">Tiada Aktiviti</td>
-              <td class="border border-black p-2 md:p-3 text-center text-black text-xs">-</td>
-              <td class="border border-black p-2 md:p-3 text-center text-black text-xs">-</td>
+              <td class="border border-black p-2 md:p-3 text-center align-top text-black text-[10px] md:text-xs">-</td>
+              <td class="border border-black p-2 md:p-3 text-center align-top italic text-black font-semibold text-[10px] md:text-xs">Tiada Aktiviti</td>
+              <td class="border border-black p-2 md:p-3 text-center align-top text-black text-[10px] md:text-xs">-</td>
+              <td class="border border-black p-2 md:p-3 text-center align-top text-black text-[10px] md:text-xs">-</td>
             `;
           }
           tbodyHTML += `</tr>`;
@@ -1063,13 +1230,32 @@
       const container = document.getElementById('view-container');
       const titleEl = document.getElementById('app-title-text');
       
+      const weekDaysForLabel = getDaysOfWeek(baseDate);
+      const startLabel = weekDaysForLabel[0].displayDate.toUpperCase();
+      const endLabel = weekDaysForLabel[6].displayDate.toUpperCase();
+      const yearLabel = weekDaysForLabel[6].dateStr.substring(0,4);
+      
+      const isCurrentWeek = baseDate.getTime() === getStartOfWeek(new Date()).getTime();
+      const btnWeekLabel = document.getElementById('btn-current-week-label');
+      
+      if (btnWeekLabel) {
+        btnWeekLabel.innerText = `${startLabel} - ${endLabel} ${yearLabel}`;
+        if (isCurrentWeek) {
+           btnWeekLabel.className = "xp-button h-8 px-3 md:px-5 font-bold text-[#000080] text-[10px] transition-colors";
+           btnWeekLabel.title = "Ini adalah minggu semasa";
+        } else {
+           btnWeekLabel.className = "xp-button h-8 px-3 md:px-5 font-bold text-[#e53935] text-[10px] transition-colors";
+           btnWeekLabel.title = "Klik untuk kembali ke minggu semasa";
+        }
+      }
+
       if (currentUserRole === 'superadmin') {
         titleEl.innerText = "Sistem Super-Admin";
       } else if (currentUserId) {
         const user = users.find(u => u.id === currentUserId);
         if (user) titleEl.innerText = "Kalendar " + user.departmentName;
       } else {
-        titleEl.innerText = "Pengurusan Kalendar Aktiviti";
+        titleEl.innerText = "Sistem Pengurusan Kalendar & Aktiviti";
       }
 
       if (currentUserRole === 'superadmin') {
@@ -1511,6 +1697,8 @@
       if(currentUserRole !== 'admin') return; 
       
       document.getElementById('conflict-error').classList.add('hidden');
+      document.getElementById('guest-override-container').classList.add('hidden');
+      document.getElementById('form-is-guest').checked = false;
       
       const formStartDate = document.getElementById('form-startDate');
       const formEndDate = document.getElementById('form-endDate');
@@ -1562,7 +1750,7 @@
         formStartDate.value = specificDateStr || weekDays[0].dateStr;
         formEndDate.value = specificDateStr || weekDays[0].dateStr;
         formStartTime.value = '09:00';
-        formEndTime.value = '10:00';
+        formEndTime.value = '11:00';
         formIsAllDay.checked = false;
         formProgram.value = '';
         formLocation.value = meetingRooms[0];
@@ -1586,16 +1774,22 @@
       const isAllDay = document.getElementById('form-isAllDay').checked;
       const sTime = document.getElementById('form-startTime');
       const eTime = document.getElementById('form-endTime');
-      
-      sTime.disabled = isAllDay;
-      eTime.disabled = isAllDay;
+      const clockBtns = document.querySelectorAll('.clock-btn');
       
       if(isAllDay) {
+        sTime.disabled = true;
+        eTime.disabled = true;
         sTime.classList.add('bg-slate-200', 'text-slate-400');
         eTime.classList.add('bg-slate-200', 'text-slate-400');
+        sTime.value = '';
+        eTime.value = '';
+        clockBtns.forEach(b => b.disabled = true);
       } else {
+        sTime.disabled = false;
+        eTime.disabled = false;
         sTime.classList.remove('bg-slate-200', 'text-slate-400');
         eTime.classList.remove('bg-slate-200', 'text-slate-400');
+        clockBtns.forEach(b => b.disabled = false);
       }
     }
 
@@ -1615,6 +1809,7 @@
       // Menggunakan innerHTML supaya tag HTML seperti <b> atau <br> boleh berfungsi
       document.getElementById('conflict-error-msg').innerHTML = msg;
       document.getElementById('conflict-error').classList.remove('hidden');
+      document.getElementById('modal').scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function saveActivity() {
@@ -1623,6 +1818,8 @@
         form.reportValidity();
         return;
       }
+
+      const isGuestOverride = document.getElementById('form-is-guest').checked;
 
       const startDateVal = document.getElementById('form-startDate').value;
       const endDateVal = document.getElementById('form-endDate').value;
@@ -1672,24 +1869,28 @@
         
         if (isOverlapping) {
            if (locationDropdownValue !== 'Lain-lain / Luar Kawasan' && act.location === locationVal) {
-              const conflictUser = users.find(u => u.id === act.userId);
-              const deptName = conflictUser ? conflictUser.departmentName : 'Bahagian Lain';
-              
-              // Paparan Popup Slot Penuh Terperinci
-              return showError(`
-                <div class="flex flex-col gap-1 w-full">
-                  <span class="text-xs md:text-sm uppercase tracking-wider font-extrabold text-red-700">Slot Penuh!</span>
-                  <span class="text-[10px] md:text-xs leading-tight">Bilik mesyuarat ini telah pun ditempah.</span>
-                  <div class="bg-white p-2 rounded border border-red-200 mt-1 shadow-sm w-full">
-                    <p class="text-[9px] md:text-[10px] text-black font-semibold mb-1 border-b border-slate-100 pb-1">Butiran Tempahan Sedia Ada:</p>
-                    <ul class="text-[10px] md:text-[11px] text-slate-700 space-y-0.5">
-                      <li><b class="text-black">Oleh:</b> ${escapeHTML(deptName)}</li>
-                      <li><b class="text-black">Program:</b> ${escapeHTML(act.program)}</li>
-                      <li><b class="text-black">Waktu:</b> ${getDisplayDateTime(act)}</li>
-                    </ul>
-                  </div>
-                </div>
-              `);
+              if (!isGuestOverride) {
+                  const conflictUser = users.find(u => u.id === act.userId);
+                  const deptName = conflictUser ? conflictUser.departmentName : 'Bahagian Lain';
+                  
+                  // Tunjukkan amaran dan juga paparkan Checkbox Jemputan
+                  document.getElementById('guest-override-container').classList.remove('hidden');
+                  
+                  return showError(`
+                    <div class="flex flex-col gap-1 w-full">
+                      <span class="text-xs md:text-sm uppercase tracking-wider font-extrabold text-red-700">Slot Penuh!</span>
+                      <span class="text-[10px] md:text-xs leading-tight">Bilik mesyuarat ini telah ditempah. Jika anda hadir sebagai tetamu, tandakan amaran di bawah dan klik simpan semula.</span>
+                      <div class="bg-white p-2 rounded border border-red-200 mt-1 shadow-sm w-full">
+                        <p class="text-[9px] md:text-[10px] text-black font-semibold mb-1 border-b border-slate-100 pb-1">Tempahan Sedia Ada (Hos/Urusetia):</p>
+                        <ul class="text-[10px] md:text-[11px] text-slate-700 space-y-0.5">
+                          <li><b class="text-black">Oleh:</b> ${escapeHTML(deptName)}</li>
+                          <li><b class="text-black">Program:</b> ${escapeHTML(act.program)}</li>
+                          <li><b class="text-black">Waktu:</b> ${getDisplayDateTime(act)}</li>
+                        </ul>
+                      </div>
+                    </div>
+                  `);
+              }
            }
         }
       }
