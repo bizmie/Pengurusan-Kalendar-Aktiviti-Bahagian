@@ -423,6 +423,11 @@
           </div>
 
           <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-black">Nama Pengerusi <span class="font-normal text-[#555]">(Pilihan)</span>:</label>
+            <input type="text" id="form-chairman" class="xp-input text-xs w-full py-2 md:py-1.5" placeholder="Contoh: Pengarah Kanan..." />
+          </div>
+
+          <div class="flex flex-col gap-1">
             <label class="text-xs font-bold text-black">Tempat Lokasi:</label>
             <select id="form-location" required class="xp-input text-xs w-full py-2 md:py-1.5 cursor-pointer" onchange="toggleCustomLocation()">
               <!-- Dijana oleh JS -->
@@ -481,7 +486,6 @@
         
         <div class="w-full flex flex-col gap-2 text-center">
            <label class="text-xs font-bold text-[#000080]">Pilih Masa:</label>
-           <!-- Native Time Input yang di-sync dengan jam visual -->
            <input type="time" id="clock-time-input" class="xp-input text-xl font-bold p-2 text-center w-full shadow-inner border-[#003C74]" oninput="updateClockHands(this.value)" />
         </div>
       </div>
@@ -527,61 +531,6 @@
       <div class="p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-end gap-3">
         <button type="button" onclick="closeSAModal()" class="xp-button h-8 w-24 justify-center">Batal</button>
         <button type="button" onclick="saveSAUser()" class="xp-button h-8 font-bold w-24 justify-center text-white bg-[#008000] border-[#005000] hover:bg-[#006000]">Simpan</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL PENGESAHAN PADAM -->
-  <div id="confirm-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print hidden">
-    <div class="xp-window w-full max-w-sm flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
-      <div class="xp-titlebar">
-        <span class="text-sm flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-yellow-300"></i> Pengesahan Padam</span>
-      </div>
-      <div class="p-5 bg-[#ece9d8] text-center font-bold text-sm text-black">
-        <p id="confirm-modal-msg" class="mb-2">Adakah anda pasti?</p>
-        <p class="text-[10px] text-red-600 font-normal leading-tight">Amaran: Semua rekod aktiviti bagi profil ini juga akan dipadam secara kekal.</p>
-      </div>
-      <div class="p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-center gap-3">
-        <button type="button" onclick="cancelDelete()" class="xp-button h-8 w-24 justify-center">Batal</button>
-        <button type="button" onclick="executeDelete()" class="xp-button h-8 font-bold w-24 justify-center text-white bg-[#e53935] border-[#b71c1c] hover:bg-red-700">Ya, Padam</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL GEMINI AI (JANA MEMO) -->
-  <div id="gemini-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4 hidden no-print">
-    <div class="xp-window w-full max-w-2xl flex flex-col shadow-[4px_4px_25px_rgba(0,0,0,0.8)]">
-      <div class="xp-titlebar" style="background: linear-gradient(to bottom, #7e22ce 0%, #ab47bc 8%, #9c27b0 40%, #8e24aa 88%, #6a1b9a 100%); border-bottom-color: #4a148c;">
-        <span class="text-sm flex items-center gap-2 font-bold"><i data-lucide="sparkles" class="w-4 h-4 text-yellow-300"></i> Pembantu AI Gemini</span>
-        <button onclick="closeGeminiModal()" class="text-white hover:text-red-200 transition-colors">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-      <div class="p-5 bg-[#ece9d8] flex flex-col gap-3">
-        <div class="flex items-center gap-3 mb-2">
-           <div class="w-10 h-10 rounded-full bg-purple-200 flex items-center justify-center border-2 border-purple-600 shrink-0 shadow-sm">
-              <i data-lucide="bot" class="w-5 h-5 text-purple-800"></i>
-           </div>
-           <div>
-              <h3 class="text-sm font-bold text-purple-900">Draf Memo / Jemputan Rasmi</h3>
-              <p class="text-[10px] text-slate-600 leading-tight">Draf ini dijana secara automatik berdasarkan butiran mesyuarat. Anda boleh sunting atau terus salin.</p>
-           </div>
-        </div>
-        <div class="relative">
-           <textarea id="gemini-output" rows="12" class="xp-input w-full resize-y text-xs md:text-sm font-medium leading-relaxed p-3" readonly placeholder="Menganalisis maklumat..."></textarea>
-           
-           <!-- Loader -->
-           <div id="gemini-loader" class="absolute inset-0 bg-white/80 backdrop-blur-[1px] flex flex-col items-center justify-center rounded-md hidden">
-              <i data-lucide="loader-2" class="w-8 h-8 text-purple-600 animate-spin mb-2"></i>
-              <span class="text-xs font-bold text-purple-800 animate-pulse">Gemini sedang merangka draf... ✨</span>
-           </div>
-        </div>
-      </div>
-      <div class="p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-end gap-3">
-        <button type="button" onclick="closeGeminiModal()" class="xp-button h-8 w-24 justify-center">Tutup</button>
-        <button type="button" onclick="copyGeminiText()" class="xp-button h-8 font-bold px-4 justify-center text-white bg-purple-700 border-purple-900 hover:bg-purple-800 flex items-center gap-1.5">
-          <i data-lucide="copy" class="w-3.5 h-3.5"></i> Salin Teks
-        </button>
       </div>
     </div>
   </div>
@@ -660,8 +609,9 @@
     ];
 
     let activities = [
-      { id: '1', userId: 'u1', startDate: '2024-12-23', endDate: '2024-12-23', startTime: '09:30', endTime: '12:00', isAllDay: false, program: 'Perbincangan Bersama Pegawai', location: 'Menara 1, Aras 17, Bilik Mesyuarat Kembang Semangkuk', officers: 'En Nizam\nPn Normazmin\nPn Azora', notes: '' },
-      { id: '4', userId: 'u2', startDate: '2024-12-24', endDate: '2024-12-24', startTime: '14:30', endTime: '16:30', isAllDay: false, program: 'Taklimat Infrastruktur IT Terkini', location: 'Menara 1, Aras 13, Bilik Latihan ICT', officers: 'En Hakim\nPn Siti', notes: 'Hanya staf teknikal' }
+      { id: '1', userId: 'u1', startDate: '2024-12-23', endDate: '2024-12-23', startTime: '09:30', endTime: '12:00', isAllDay: false, program: 'Perbincangan Bersama Pegawai', chairman: 'Pengarah BPS', location: 'Menara 1, Aras 17, Bilik Mesyuarat Kembang Semangkuk', officers: 'En Nizam\nPn Normazmin\nPn Azora', notes: '' },
+      { id: '2', userId: 'u1', startDate: '2024-12-23', endDate: '2024-12-23', startTime: '14:30', endTime: '16:30', isAllDay: false, program: 'Mesyuarat Panel Peperiksaan Bil.2/2024', chairman: 'YBrs. Encik Mohd Amin Bin Kadir', location: 'Menara 1, Aras 17, Bilik Mesyuarat Jemaah Lembaga', officers: 'En Nizam', notes: 'Urusetia: Seksyen Pengurusan Sumber Manusia' },
+      { id: '4', userId: 'u2', startDate: '2024-12-24', endDate: '2024-12-24', startTime: '14:30', endTime: '16:30', isAllDay: false, program: 'Taklimat Infrastruktur IT Terkini', chairman: 'Pengarah BTM', location: 'Menara 1, Aras 13, Bilik Latihan ICT', officers: 'En Hakim\nPn Siti', notes: 'Hanya staf teknikal' }
     ];
 
     let currentUserRole = null; 
@@ -704,7 +654,6 @@
 
           const dbActs = await window.dbAPI.getActivities();
           if (dbActs && dbActs.length > 0) {
-            // Pemetaan data lama untuk serasi dengan rekod berbilang tarikh
             activities = dbActs.map(a => {
               if(!a.startDate) a.startDate = a.date;
               if(!a.endDate) a.endDate = a.date;
@@ -772,7 +721,6 @@
       
       document.getElementById(currentClockTarget).value = val;
 
-      // Logik automatik +2 Jam jika yang diset ialah Masa Mula
       if (currentClockTarget === 'form-startTime') {
          handleAutoEndTime(val);
       }
@@ -799,10 +747,8 @@
               document.getElementById('form-endDate').value = d.toISOString().split('T')[0];
           }
       } else {
-          // Selaraskan endDate dengan startDate jika ia tidak merentasi hari (Midnight)
           const sDate = document.getElementById('form-startDate').value;
           const eDate = document.getElementById('form-endDate').value;
-          // Hanya override jika tiada eDate atau ia sama dgn hari sebelum ini
           if(!eDate || eDate < sDate) {
              document.getElementById('form-endDate').value = sDate;
           }
@@ -1200,13 +1146,13 @@
               </button>
             ` : '';
 
-            // MENGALIHKAN 'whitespace-pre-line' ke dalam elemen <div> untuk mengelakkan margin HTML kosong
             tbodyHTML += `
               <td class="border border-black p-2 md:p-3 text-center align-top text-black">
                 <div class="font-medium text-[10px] md:text-xs leading-normal whitespace-pre-line">${getDisplayDateTime(act, true)}</div>
               </td>
               <td class="border border-black p-2 md:p-3 align-top group relative">
                 <div class="font-bold text-black text-[10px] md:text-xs leading-normal whitespace-pre-line">${escapeHTML(act.program)}</div>
+                ${act.chairman ? `<div class="mt-1 text-[9px] md:text-[10px] text-[#000080] font-semibold leading-normal">Pengerusi: ${escapeHTML(act.chairman)}</div>` : ''}
                 ${act.notes ? `<div class="mt-1 text-[9px] md:text-[10px] text-black whitespace-pre-line leading-normal">${escapeHTML(act.notes)}</div>` : ''}
                 ${editBtnHTML}
               </td>
@@ -1219,10 +1165,18 @@
             `;
           } else {
             tbodyHTML += `
-              <td class="border border-black p-2 md:p-3 text-center align-top text-black text-[10px] md:text-xs">-</td>
-              <td class="border border-black p-2 md:p-3 text-center align-top italic text-black font-semibold text-[10px] md:text-xs">Tiada Aktiviti</td>
-              <td class="border border-black p-2 md:p-3 text-center align-top text-black text-[10px] md:text-xs">-</td>
-              <td class="border border-black p-2 md:p-3 text-center align-top text-black text-[10px] md:text-xs">-</td>
+              <td class="border border-black p-2 md:p-3 text-center align-top text-black">
+                <div class="text-[10px] md:text-xs leading-normal">-</div>
+              </td>
+              <td class="border border-black p-2 md:p-3 text-center align-top italic text-black font-semibold">
+                <div class="text-[10px] md:text-xs leading-normal">Tiada Aktiviti</div>
+              </td>
+              <td class="border border-black p-2 md:p-3 text-center align-top text-black">
+                <div class="text-[10px] md:text-xs leading-normal">-</div>
+              </td>
+              <td class="border border-black p-2 md:p-3 text-center align-top text-black">
+                <div class="text-[10px] md:text-xs leading-normal">-</div>
+              </td>
             `;
           }
           tbodyHTML += `</tr>`;
@@ -1400,10 +1354,6 @@
               let editBtn = currentUserRole === 'admin' 
                 ? `<button onclick="openModal('${act.id}')" class="p-1 xp-button-mini text-black rounded ml-1" title="Pinda Maklumat"><i data-lucide="edit" class="w-3.5 h-3.5"></i></button>`
                 : '';
-                
-              let geminiBtn = currentUserRole === 'admin' 
-                ? `<button onclick="generateMemo('${act.id}')" class="p-1 xp-button-mini text-purple-700 bg-purple-50 rounded hover:bg-purple-100 border-purple-300" title="✨ Jana E-mel / Surat Jemputan"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i></button>`
-                : '';
 
               let actBgColor = 'bg-[#ffffe1]'; // Kuning (Lalai - Dalam Pejabat / Hos)
               let actBorderColor = 'border-[#a9a9a9]';
@@ -1430,11 +1380,11 @@
                       ${indicator}
                     </span>
                     <div class="flex shrink-0">
-                        ${geminiBtn}
                         ${editBtn}
                     </div>
                   </div>
-                  <h4 class="font-bold text-black text-[13px] mb-2 line-clamp-2 leading-tight">${escapeHTML(act.program)}</h4>
+                  <h4 class="font-bold text-black text-[13px] mb-0.5 line-clamp-2 leading-tight">${escapeHTML(act.program)}</h4>
+                  ${act.chairman ? `<div class="text-[10px] text-[#000080] font-semibold mb-2 line-clamp-1 leading-tight">Peng: ${escapeHTML(act.chairman)}</div>` : '<div class="mb-2"></div>'}
                   <div class="mt-auto space-y-1">
                     <div class="flex items-start text-[11px] text-black">
                       <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1.5 mt-0.5 text-[#555] shrink-0"></i>
@@ -1768,6 +1718,7 @@
       const formEndTime = document.getElementById('form-endTime');
       const formIsAllDay = document.getElementById('form-isAllDay');
       const formProgram = document.getElementById('form-program');
+      const formChairman = document.getElementById('form-chairman');
       const formLocation = document.getElementById('form-location');
       const formCustomLocation = document.getElementById('form-custom-location');
       const formOfficers = document.getElementById('form-officers');
@@ -1789,6 +1740,7 @@
         formEndTime.value = act.endTime || '';
         formIsAllDay.checked = act.isAllDay;
         formProgram.value = act.program;
+        formChairman.value = act.chairman || '';
         
         if (act.isGuest) {
             document.getElementById('guest-override-container').classList.remove('hidden');
@@ -1820,6 +1772,7 @@
         formEndTime.value = '11:00';
         formIsAllDay.checked = false;
         formProgram.value = '';
+        formChairman.value = '';
         formLocation.value = meetingRooms[0];
         formCustomLocation.value = '';
         document.getElementById('form-custom-location-container').classList.add('hidden');
@@ -1974,6 +1927,7 @@
         endTime: isAllDay ? '' : endVal,
         isAllDay: isAllDay,
         program: document.getElementById('form-program').value,
+        chairman: document.getElementById('form-chairman').value,
         location: locationVal,
         officers: document.getElementById('form-officers').value,
         notes: document.getElementById('form-notes').value,
@@ -2013,96 +1967,6 @@
         console.error("Delete Error:", e);
         setAppStatus('Gagal memadam dari pangkalan data', 'error');
       }
-    }
-
-    // --- INTEGRASI GEMINI API LLM ---
-    const geminiApiKey = ""; // Disediakan oleh environment pelaksanaan
-
-    async function fetchWithRetry(url, options, retries = 5, delay = 1000) {
-        for (let i = 0; i < retries; i++) {
-            try {
-                const res = await fetch(url, options);
-                if (!res.ok) throw new Error(`Ralat HTTP! Status: ${res.status}`);
-                return await res.json();
-            } catch (e) {
-                if (i === retries - 1) throw e;
-                await new Promise(resolve => setTimeout(resolve, delay));
-                delay *= 2; // Exponential backoff
-            }
-        }
-    }
-
-    async function generateMemo(actId) {
-        const act = activities.find(a => a.id === actId);
-        if (!act) return;
-
-        const modal = document.getElementById('gemini-modal');
-        const outputEl = document.getElementById('gemini-output');
-        const loader = document.getElementById('gemini-loader');
-        
-        modal.classList.remove('hidden');
-        outputEl.value = "";
-        loader.classList.remove('hidden');
-        lucide.createIcons();
-
-        // Arahan / Prompt Khas untuk Gemini
-        const promptText = `
-Sebagai seorang Setiausaha / Pentadbir yang sangat profesional di sebuah jabatan kerajaan di Malaysia, tugas anda adalah untuk merangka satu draf E-mel / Memo Jemputan rasmi berdasarkan maklumat mesyuarat di bawah.
-
-Maklumat Mesyuarat:
-- Tajuk Program: ${act.program}
-- Tarikh: ${getDisplayDateTime(act, false)}
-- Tempat: ${act.location}
-- Pegawai Terlibat / Senarai Edaran:
-${act.officers}
-- Catatan Tambahan: ${act.notes ? act.notes : 'Tiada'}
-
-Sila hasilkan draf yang mempunyai:
-1. Subjek E-mel / Tajuk Memo yang jelas.
-2. Pembukaan rasmi (contoh: Tuan/Puan,).
-3. Isi kandungan yang memaklumkan tarikh, masa, dan tempat dengan format 'bullet points' yang mudah dibaca.
-4. Penutup dan ruangan tandatangan (biarkan kosong untuk diisi oleh pengguna).
-
-Balas dengan format teks biasa (plain text) atau sedikit format supaya mudah disalin ke dalam e-mel.
-`;
-
-        const payload = {
-            contents: [{ parts: [{ text: promptText }] }],
-            systemInstruction: { parts: [{ text: "Anda adalah pembantu Setiausaha profesional yang sentiasa menggunakan Bahasa Melayu yang rasmi, sopan, dan mematuhi etika surat-menyurat jabatan." }] }
-        };
-
-        try {
-            const result = await fetchWithRetry(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                }
-            );
-
-            const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (generatedText) {
-                outputEl.value = generatedText;
-            } else {
-                outputEl.value = "Maaf, sistem AI gagal memberikan respons yang sah.";
-            }
-        } catch (error) {
-            outputEl.value = "Maaf, berlaku ralat sambungan ke pelayan Gemini API. Sila cuba lagi sebentar nanti.";
-        } finally {
-            loader.classList.add('hidden');
-        }
-    }
-
-    function closeGeminiModal() {
-        document.getElementById('gemini-modal').classList.add('hidden');
-    }
-
-    function copyGeminiText() {
-        const textarea = document.getElementById('gemini-output');
-        textarea.select();
-        document.execCommand('copy');
-        showToast("Teks berjaya disalin ke papan keratan!");
     }
 
   </script>
