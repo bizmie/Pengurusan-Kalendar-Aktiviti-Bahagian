@@ -195,8 +195,8 @@
         <p id="confirm-sub-msg" class="text-sm text-gray-700 font-semibold leading-snug">Tindakan ini tidak boleh dipulihkan selepas ia disahkan.</p>
       </div>
       <div class="p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between gap-3">
-        <button onclick="closeConfirmModal()" class="xp-button text-sm px-6 py-2 w-full justify-center">Batal</button>
-        <button onclick="executeConfirm()" id="confirm-action-btn" class="xp-button font-bold text-white bg-[#e53935] border-[#b71c1c] hover:bg-red-700 text-sm px-6 py-2 w-full justify-center shadow-sm">Ya, Teruskan</button>
+        <button onclick="closeConfirmModal()" class="xp-button text-sm px-6 py-2 w-full justify-center" title="Batal dan kembali">Batal</button>
+        <button onclick="executeConfirm()" id="confirm-action-btn" class="xp-button font-bold text-white bg-[#e53935] border-[#b71c1c] hover:bg-red-700 text-sm px-6 py-2 w-full justify-center shadow-sm" title="Teruskan dengan tindakan ini">Ya, Teruskan</button>
       </div>
     </div>
   </div>
@@ -204,7 +204,7 @@
   <!-- SKRIN LOG MASUK -->
   <div id="login-screen" class="w-full flex flex-col items-center justify-center min-h-[85vh] relative pt-8">
     <div class="text-center mb-12">
-      <div id="login-date-display" class="text-base md:text-lg font-bold text-yellow-300 drop-shadow-md mb-2 tracking-wide uppercase"></div>
+      <div id="login-date-display" class="text-base md:text-lg font-bold text-yellow-300 drop-shadow-md mb-2 tracking-wide uppercase" title="Tarikh Hari Ini"></div>
       <h1 class="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight px-4" style="text-shadow: 3px 3px 6px rgba(0,0,0,0.6);">Sistem Kalendar & Rekod Surat</h1>
       <h2 class="text-xl md:text-2xl text-slate-200 font-medium" style="text-shadow: 1px 1px 4px rgba(0,0,0,0.5);">Pilih Profil Akses</h2>
     </div>
@@ -214,7 +214,7 @@
     </div>
     
     <div class="mt-6 z-10">
-      <button onclick="openProfileMenu('superadmin')" class="flex items-center gap-2 text-slate-200 hover:text-white bg-black/30 hover:bg-black/50 px-6 py-3 rounded-full backdrop-blur-sm transition-all border border-transparent hover:border-slate-400 shadow-md">
+      <button onclick="openProfileMenu('superadmin')" class="flex items-center gap-2 text-slate-200 hover:text-white bg-black/30 hover:bg-black/50 px-6 py-3 rounded-full backdrop-blur-sm transition-all border border-transparent hover:border-slate-400 shadow-md" title="Log masuk ke panel konfigurasi Super Admin">
         <i data-lucide="shield" class="w-6 h-6 text-red-400"></i>
         <span class="text-base font-bold tracking-wide">Akses Super-Admin</span>
       </button>
@@ -224,7 +224,7 @@
   <!-- MODAL SUB-MENU LOGIN -->
   <div id="profile-auth-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="xp-window w-full max-w-sm flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.8)] relative animate-[slideIn_0.2s_ease-out]">
-      <button onclick="closeProfileMenu()" class="absolute top-2 right-2 text-white hover:text-red-200 z-10 transition-colors">
+      <button onclick="closeProfileMenu()" class="absolute top-2 right-2 text-white hover:text-red-200 z-10 transition-colors" title="Tutup paparan log masuk">
         <i data-lucide="x" class="w-6 h-6"></i>
       </button>
       <div class="xp-titlebar flex-wrap">
@@ -243,7 +243,7 @@
         </div>
 
         <div class="w-full" id="auth-pelawat-section">
-          <button onclick="executeLogin('viewer')" class="xp-button w-full justify-center font-bold text-[#000080] py-3 text-base shadow-sm">
+          <button onclick="executeLogin('viewer')" class="xp-button w-full justify-center font-bold text-[#000080] py-3 text-base shadow-sm" title="Log masuk untuk melihat rekod sahaja">
             <i data-lucide="eye" class="w-5 h-5"></i> Masuk sebagai Pelawat
           </button>
           <div class="flex items-center gap-3 my-5">
@@ -256,7 +256,7 @@
         <div class="w-full flex flex-col gap-2">
           <label class="text-sm font-bold text-black" id="auth-password-label">Kata Laluan <span class="text-[#888] font-normal">(Bypass dibenarkan)</span>:</label>
           <input type="password" id="auth-pass" placeholder="Taip kata laluan..." class="xp-input text-center text-lg" onkeypress="if(event.key === 'Enter') executeLogin('admin')" />
-          <button onclick="executeLogin('admin')" class="xp-button w-full justify-center font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] py-3 mt-2 shadow-sm text-base">
+          <button onclick="executeLogin('admin')" class="xp-button w-full justify-center font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] py-3 mt-2 shadow-sm text-base" title="Sahkan log masuk ke dalam sistem">
             <i data-lucide="unlock" class="w-5 h-5"></i> Log Masuk Mod Penuh
           </button>
         </div>
@@ -273,17 +273,17 @@
         <i data-lucide="layout" class="w-5 h-5 text-white drop-shadow shrink-0"></i>
         <span class="text-sm md:text-base tracking-wide truncate">Sistem Pengurusan Kalendar & Rekod Surat</span>
       </div>
-      <button onclick="handleLogout()" id="header-logout-btn" class="bg-[#e53935] text-white px-3 py-1.5 rounded flex items-center gap-2 hover:bg-red-600 transition-colors border border-red-800 shrink-0 text-xs md:text-sm font-bold shadow-sm">
+      <button onclick="handleLogout()" id="header-logout-btn" class="bg-[#e53935] text-white px-3 py-1.5 rounded flex items-center gap-2 hover:bg-red-600 transition-colors border border-red-800 shrink-0 text-xs md:text-sm font-bold shadow-sm" title="Log keluar dari sistem">
         <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
       </button>
     </div>
 
     <!-- Status Bar & Date (Top) -->
     <div class="bg-white border-b-2 border-[#a9a9a9] px-4 md:px-6 py-3 flex justify-between items-center text-sm md:text-base shadow-sm no-print relative z-20 flex-wrap gap-2">
-      <div class="text-[#0058e6] font-extrabold uppercase tracking-wide flex items-center gap-2">
+      <div class="text-[#0058e6] font-extrabold uppercase tracking-wide flex items-center gap-2" title="Tahap akses semasa anda">
           <i data-lucide="user-check" class="w-5 h-5"></i> AKSES: <span id="status-role-text" class="text-black font-black bg-[#ffffe1] px-3 py-1 rounded border border-[#0058e6]"></span>
       </div>
-      <div class="text-[#008000] font-extrabold flex items-center gap-2 bg-[#e6f0ff] px-3 py-1 rounded border border-[#0058e6]">
+      <div class="text-[#008000] font-extrabold flex items-center gap-2 bg-[#e6f0ff] px-3 py-1 rounded border border-[#0058e6]" title="Tarikh sistem semasa">
           <i data-lucide="calendar-check" class="w-5 h-5 text-[#0058e6]"></i> <span id="current-date-display"></span>
       </div>
     </div>
@@ -295,11 +295,11 @@
         
         <!-- Main Tabs -->
         <div class="flex gap-2 overflow-x-auto items-end pt-2 border-b-2 border-[#fff]" id="main-tabs-container">
-            <button onclick="switchMainTab('kalendar')" id="main-tab-kalendar" class="main-tab-btn active"><i data-lucide="calendar" class="w-5 h-5"></i> Rekod Kalendar</button>
-            <button onclick="switchMainTab('surat')" id="main-tab-surat" class="main-tab-btn relative"><i data-lucide="mail" class="w-5 h-5"></i> Surat Menyurat 
-               <span id="badge-surat-main" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full hidden border-2 border-white shadow-md font-black">0</span>
+            <button onclick="switchMainTab('kalendar')" id="main-tab-kalendar" class="main-tab-btn active" title="Papar dan urus kalendar aktiviti"><i data-lucide="calendar" class="w-5 h-5"></i> Rekod Kalendar</button>
+            <button onclick="switchMainTab('surat')" id="main-tab-surat" class="main-tab-btn relative" title="Urus dan jejak rekod surat menyurat"><i data-lucide="mail" class="w-5 h-5"></i> Surat Menyurat 
+               <span id="badge-surat-main" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full hidden border-2 border-white shadow-md font-black" title="Jumlah surat perlukan tindakan">0</span>
             </button>
-            <button onclick="switchMainTab('settings')" id="main-tab-settings" class="main-tab-btn"><i data-lucide="settings" class="w-5 h-5"></i> Tetapan</button>
+            <button onclick="switchMainTab('settings')" id="main-tab-settings" class="main-tab-btn" title="Tetapan profil dan sistem anda"><i data-lucide="settings" class="w-5 h-5"></i> Tetapan</button>
         </div>
 
         <!-- Sub Tabs Container -->
@@ -329,11 +329,10 @@
 
   <!-- Modal Aktiviti Kalendar -->
   <div id="modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden">
-    <!-- Kandungan Modal Kalendar -->
     <div class="xp-window w-full max-w-3xl flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
       <div class="xp-titlebar">
         <span class="text-base flex items-center gap-2" id="modal-title"></span>
-        <button onclick="closeModal()" class="text-white hover:text-red-200 transition-colors md:hidden"><i data-lucide="x" class="w-6 h-6"></i></button>
+        <button onclick="closeModal()" class="text-white hover:text-red-200 transition-colors md:hidden" title="Tutup paparan"><i data-lucide="x" class="w-6 h-6"></i></button>
       </div>
       <div class="p-5 md:p-6 bg-[#ece9d8] overflow-y-auto max-h-[75vh]">
         <div id="conflict-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-4 py-3 rounded mb-5 flex items-start gap-3 hidden shadow-sm">
@@ -341,7 +340,7 @@
           <div id="conflict-error-msg" class="flex-1 w-full text-sm font-semibold"></div>
         </div>
         <div id="guest-override-container" class="hidden bg-[#fff8e1] border border-[#ffe082] px-4 py-3 rounded mb-5 shadow-sm">
-          <label class="flex items-start gap-3 cursor-pointer">
+          <label class="flex items-start gap-3 cursor-pointer" title="Tandakan jika anda adalah tetamu di bilik ini">
             <input type="checkbox" id="form-is-guest" class="mt-1 rounded w-5 h-5 text-[#f57f17] focus:ring-[#f57f17]" />
             <div class="flex flex-col">
               <span class="text-sm font-bold text-[#f57f17]">Teruskan sebagai Ahli Jemputan</span>
@@ -351,45 +350,45 @@
         </div>
         <form id="activityForm" class="space-y-5">
           <div class="flex items-center gap-2">
-            <input type="checkbox" id="form-isAllDay" onchange="toggleTimeFields()" class="rounded w-5 h-5" /> 
-            <label for="form-isAllDay" class="text-sm font-bold text-[#000080] cursor-pointer">Sepanjang Hari / Tiada Waktu Spesifik</label>
+            <input type="checkbox" id="form-isAllDay" onchange="toggleTimeFields()" class="rounded w-5 h-5" title="Tandakan jika aktiviti berlangsung seharian" /> 
+            <label for="form-isAllDay" class="text-sm font-bold text-[#000080] cursor-pointer" title="Tandakan jika aktiviti berlangsung seharian">Sepanjang Hari / Tiada Waktu Spesifik</label>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-xl border border-[#a9a9a9] shadow-inner">
-            <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Tarikh Mula:</label><input type="date" id="form-startDate" required class="xp-input" /></div>
+            <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Tarikh Mula:</label><input type="date" id="form-startDate" required class="xp-input font-bold text-sm" title="Pilih tarikh mula aktiviti" /></div>
             <div class="flex flex-col gap-1.5">
               <label class="text-sm font-bold text-black">Masa Mula:</label>
               <div class="flex">
-                <input type="text" id="form-startTime" readonly onclick="openClockModal('form-startTime')" class="xp-input cursor-pointer text-center bg-white rounded-r-none border-r-0 font-bold text-base" placeholder="--:--" />
-                <button type="button" id="btn-clock-start" onclick="openClockModal('form-startTime')" class="xp-button-mini px-4 rounded-l-none bg-[#ece9d8] border-l-0 clock-btn"><i data-lucide="clock" class="w-5 h-5 text-[#0058e6]"></i></button>
+                <input type="text" id="form-startTime" readonly onclick="openClockModal('form-startTime')" class="xp-input cursor-pointer text-center bg-white rounded-r-none border-r-0 font-bold text-base" placeholder="--:--" title="Klik untuk pilih masa" />
+                <button type="button" id="btn-clock-start" onclick="openClockModal('form-startTime')" class="xp-button-mini px-4 rounded-l-none bg-[#ece9d8] border-l-0 clock-btn" title="Buka pemilih masa jam"><i data-lucide="clock" class="w-5 h-5 text-[#0058e6]"></i></button>
               </div>
             </div>
-            <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Tarikh Tamat:</label><input type="date" id="form-endDate" required class="xp-input" /></div>
+            <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Tarikh Tamat:</label><input type="date" id="form-endDate" required class="xp-input font-bold text-sm" title="Pilih tarikh tamat aktiviti" /></div>
             <div class="flex flex-col gap-1.5">
               <label class="text-sm font-bold text-black">Masa Tamat:</label>
               <div class="flex">
-                <input type="text" id="form-endTime" readonly onclick="openClockModal('form-endTime')" class="xp-input cursor-pointer text-center bg-white rounded-r-none border-r-0 font-bold text-base" placeholder="--:--" />
-                <button type="button" id="btn-clock-end" onclick="openClockModal('form-endTime')" class="xp-button-mini px-4 rounded-l-none bg-[#ece9d8] border-l-0 clock-btn"><i data-lucide="clock" class="w-5 h-5 text-[#0058e6]"></i></button>
+                <input type="text" id="form-endTime" readonly onclick="openClockModal('form-endTime')" class="xp-input cursor-pointer text-center bg-white rounded-r-none border-r-0 font-bold text-base" placeholder="--:--" title="Klik untuk pilih masa" />
+                <button type="button" id="btn-clock-end" onclick="openClockModal('form-endTime')" class="xp-button-mini px-4 rounded-l-none bg-[#ece9d8] border-l-0 clock-btn" title="Buka pemilih masa jam"><i data-lucide="clock" class="w-5 h-5 text-[#0058e6]"></i></button>
               </div>
             </div>
           </div>
-          <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Mesyuarat / Program:</label><input type="text" id="form-program" required class="xp-input" placeholder="Contoh: Mesyuarat Pengurusan" /></div>
-          <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Nama Pengerusi (Pilihan):</label><input type="text" id="form-chairman" class="xp-input" /></div>
+          <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Mesyuarat / Program:</label><input type="text" id="form-program" required class="xp-input font-bold text-sm" placeholder="Contoh: Mesyuarat Pengurusan" title="Taip nama program atau mesyuarat" /></div>
+          <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Nama Pengerusi (Pilihan):</label><input type="text" id="form-chairman" class="xp-input font-bold text-sm" title="Taip nama pengerusi sekiranya ada" /></div>
           <div class="flex flex-col gap-1.5">
             <label class="text-sm font-bold text-black">Tempat Lokasi:</label>
-            <select id="form-location" required class="xp-input cursor-pointer" onchange="toggleCustomLocation()"></select>
+            <select id="form-location" required class="xp-input cursor-pointer font-bold text-sm" onchange="toggleCustomLocation()" title="Pilih lokasi dari senarai"></select>
             <div id="form-custom-location-container" class="hidden mt-2">
-              <input type="text" id="form-custom-location" class="xp-input border-blue-500 bg-blue-50" placeholder="Sila nyatakan lokasi terperinci..." />
+              <input type="text" id="form-custom-location" class="xp-input border-blue-500 bg-blue-50 font-bold text-sm" placeholder="Sila nyatakan lokasi terperinci..." title="Taip lokasi luar atau khusus" />
             </div>
           </div>
-          <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Pegawai Terlibat (Barisan Baharu Setiap Nama):</label><textarea id="form-officers" rows="3" required class="xp-input resize-none"></textarea></div>
-          <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Catatan (Pilihan):</label><textarea id="form-notes" rows="2" class="xp-input resize-none"></textarea></div>
+          <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Pegawai Terlibat (Barisan Baharu Setiap Nama):</label><textarea id="form-officers" rows="3" required class="xp-input resize-none font-bold text-sm" title="Taipkan senarai nama pegawai yang terlibat"></textarea></div>
+          <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Catatan (Pilihan):</label><textarea id="form-notes" rows="2" class="xp-input resize-none font-bold text-sm" title="Masukkan sebarang maklumat tambahan atau nota penting"></textarea></div>
         </form>
       </div>
       <div class="p-4 md:p-5 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between items-center gap-3 flex-wrap">
-        <button type="button" id="btn-delete" onclick="handleDelete()" class="xp-button font-bold text-[#e53935] hidden text-sm px-5 py-2"><i data-lucide="trash-2" class="w-5 h-5"></i> Padam Rekod</button>
+        <button type="button" id="btn-delete" onclick="handleDelete()" class="xp-button font-bold text-[#e53935] hidden text-sm px-5 py-2" title="Padam rekod aktiviti ini sepenuhnya"><i data-lucide="trash-2" class="w-5 h-5"></i> Padam Rekod</button>
         <div class="flex gap-3 ml-auto">
-          <button type="button" onclick="closeModal()" class="xp-button text-sm px-6 py-2">Batal</button>
-          <button type="button" onclick="saveActivity()" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] text-sm px-8 py-2 shadow-sm"><i data-lucide="save" class="w-4 h-4"></i> Simpan</button>
+          <button type="button" onclick="closeModal()" class="xp-button text-sm px-6 py-2" title="Batal perubahan dan tutup">Batal</button>
+          <button type="button" onclick="saveActivity()" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] text-sm px-8 py-2 shadow-sm" title="Simpan rekod aktiviti ke pangkalan data"><i data-lucide="save" class="w-4 h-4"></i> Simpan</button>
         </div>
       </div>
     </div>
@@ -400,7 +399,7 @@
     <div class="xp-window w-full max-w-[320px] flex flex-col shadow-2xl">
       <div class="xp-titlebar">
         <span class="text-base flex items-center gap-2"><i data-lucide="clock" class="w-5 h-5"></i> Tetapkan Masa</span>
-        <button onclick="closeClockModal()" class="text-white hover:text-red-200 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+        <button onclick="closeClockModal()" class="text-white hover:text-red-200 transition-colors" title="Tutup jam"><i data-lucide="x" class="w-6 h-6"></i></button>
       </div>
       <div class="p-8 bg-[#ece9d8] flex flex-col items-center gap-6">
         <div class="relative w-52 h-52 rounded-full border-[8px] border-[#003C74] bg-white shadow-inner flex items-center justify-center">
@@ -415,8 +414,8 @@
         </div>
       </div>
       <div class="p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between gap-3">
-        <button type="button" onclick="closeClockModal()" class="xp-button text-sm px-6 py-2 w-full justify-center">Batal</button>
-        <button type="button" onclick="applyClockTime()" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] text-sm px-6 py-2 w-full justify-center shadow-sm">Pilih Masa</button>
+        <button type="button" onclick="closeClockModal()" class="xp-button text-sm px-6 py-2 w-full justify-center" title="Batal pemilihan">Batal</button>
+        <button type="button" onclick="applyClockTime()" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] text-sm px-6 py-2 w-full justify-center shadow-sm" title="Sahkan dan masukkan masa ini">Pilih Masa</button>
       </div>
     </div>
   </div>
@@ -475,7 +474,7 @@
         <div class="space-y-5">
           <div class="flex flex-col gap-1.5">
               <label class="text-sm font-bold text-black">Jenis Tindakan:</label>
-              <select id="tindakanPilihan" class="xp-input cursor-pointer" onchange="togglePegawaiSurat()">
+              <select id="tindakanPilihan" class="xp-input cursor-pointer font-bold" onchange="togglePegawaiSurat()" title="Pilih tindakan untuk surat ini">
                   <option value="kiv">Simpan Sementara (KIV)</option>
                   <option value="edar">Edar kepada Pegawai</option>
                   <option value="kembali">Kembalikan / Pulang Semula ke Penghantar</option>
@@ -484,17 +483,17 @@
           </div>
           <div id="divPegawai" class="flex flex-col gap-1.5 hidden">
               <label class="text-sm font-bold text-black">Masukkan Nama Pegawai (Dalaman):</label>
-              <input type="text" id="pegawaiPilihan" class="xp-input" placeholder="Nama Pegawai..."/>
+              <input type="text" id="pegawaiPilihan" class="xp-input font-semibold" placeholder="Nama Pegawai..." title="Taip nama pegawai penerima edaran"/>
           </div>
           <div class="flex flex-col gap-1.5">
               <label class="text-sm font-bold text-black">Catatan / Arahan (Pilihan):</label>
-              <textarea id="catatanTindakan" rows="3" class="xp-input resize-none" placeholder="Sila semak dokumen ini..."></textarea>
+              <textarea id="catatanTindakan" rows="3" class="xp-input resize-none" placeholder="Sila semak dokumen ini..." title="Masukkan arahan atau catatan khas tindakan"></textarea>
           </div>
         </div>
       </div>
       <div class="p-5 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-end gap-3">
-          <button onclick="tutupModalSuratTindakan()" class="xp-button text-sm px-6 py-2">Batal</button>
-          <button onclick="simpanTindakanSurat()" class="xp-button font-bold text-white bg-[#008000] border-[#005000] text-sm px-6 py-2 shadow-sm"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Simpan Tindakan</button>
+          <button onclick="tutupModalSuratTindakan()" class="xp-button text-sm px-6 py-2" title="Batal tindakan">Batal</button>
+          <button onclick="simpanTindakanSurat()" class="xp-button font-bold text-white bg-[#008000] border-[#005000] text-sm px-6 py-2 shadow-sm" title="Simpan rekod tindakan surat"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Simpan Tindakan</button>
       </div>
     </div>
   </div>
@@ -513,7 +512,7 @@
         <div class="space-y-5">
           <div class="flex flex-col gap-1.5">
               <label class="text-sm font-bold text-black">Tajuk Dokumen:</label>
-              <input type="text" id="editTajuk" class="xp-input font-bold text-sm">
+              <input type="text" id="editTajuk" class="xp-input font-bold text-sm" title="Ubah tajuk surat di sini">
           </div>
           <div class="flex flex-col gap-1.5" id="editDestinasiWrapper">
               <label class="text-sm font-bold text-black">Destinasi Baru (Boleh tambah/buang penerima):</label>
@@ -524,10 +523,10 @@
         </div>
       </div>
       <div class="p-5 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between items-center flex-wrap gap-3">
-          <button onclick="batalSuratKeluar()" class="xp-button font-bold text-white bg-[#e53935] border-[#b71c1c] hover:bg-red-700 text-sm px-5 py-2 shadow-sm"><i data-lucide="ban" class="w-4 h-4"></i> Batal Penghantaran</button>
+          <button onclick="batalSuratKeluar()" class="xp-button font-bold text-white bg-[#e53935] border-[#b71c1c] hover:bg-red-700 text-sm px-5 py-2 shadow-sm" title="Tarik balik dan batalkan surat ini"><i data-lucide="ban" class="w-4 h-4"></i> Batal Penghantaran</button>
           <div class="flex gap-3 ml-auto">
-            <button onclick="tutupModalSuratEdit()" class="xp-button text-sm px-6 py-2">Tutup</button>
-            <button onclick="simpanEditSurat()" class="xp-button font-bold text-white bg-[#e65c00] border-[#b34700] text-sm px-6 py-2 shadow-sm"><i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan</button>
+            <button onclick="tutupModalSuratEdit()" class="xp-button text-sm px-6 py-2" title="Tutup paparan pembetulan">Tutup</button>
+            <button onclick="simpanEditSurat()" class="xp-button font-bold text-white bg-[#e65c00] border-[#b34700] text-sm px-6 py-2 shadow-sm" title="Simpan perubahan dan kemaskini dokumen"><i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan</button>
           </div>
       </div>
     </div>
@@ -658,12 +657,12 @@
     let currentDept = null; 
     
     // TAB STATE LOGIC
-    let mainTab = 'surat'; 
+    // Set lalai kepada kalendar
+    let mainTab = 'kalendar'; 
     let subTabKalendar = 'weekly'; 
     let subTabSurat = 'surat-dashboard';
-    let viewMode = 'surat-dashboard'; 
+    let viewMode = 'weekly'; 
     
-    // Tarikh & State Navigation
     function getStartOfWeek(date) {
       const d = new Date(date);
       d.setHours(0, 0, 0, 0); 
@@ -734,7 +733,7 @@
         documents = [
             {
                 id: '1001', noRuj: 'SRS-2026-0001', tajuk: 'Laporan Perbelanjaan Januari', jenis: '1 - Surat', kategori: 'Edaran Dalaman',
-                aliran: 'Surat Keluar', klasifikasi: 'Sulit', tarikhDokumen: tSemalam.split('T')[0], tarikhEdar: tHariIni.split('T')[0], tarikhTerima: null,
+                aliran: 'Dokumen / Surat Keluar', klasifikasi: 'Sulit', tarikhDokumen: tSemalam.split('T')[0], tarikhEdar: tHariIni.split('T')[0], tarikhTerima: null,
                 pendaftar: 'Bahagian Teknologi Maklumat', lokasiSemasa: 'Bahagian Perancangan Strategik', status: 'Dihantar', tarikhDaftar: tHariIni,
                 timeline: [
                     { tarikh: tHariIni, tindakan: 'Didaftarkan', oleh: 'Setiausaha BTM', catatan: 'Didaftarkan sebagai Edaran Dalaman.' },
@@ -813,7 +812,7 @@
 
     function populateLocationDropdown() {
       const select = document.getElementById('form-location');
-      if(select) select.innerHTML = meetingRooms.map(r => `<option value="${r}">${r}</option>`).join('');
+      if(select) select.innerHTML = meetingRooms.map(r => `<option value="${r}" class="font-bold">${r}</option>`).join('');
     }
 
     function toggleCustomLocation() {
@@ -881,7 +880,7 @@
     function renderProfileGrid() {
       const grid = document.getElementById('profile-grid');
       grid.innerHTML = users.filter(u => u.isActive).map(u => `
-          <div onclick="openProfileMenu('${u.id}')" class="profile-card flex flex-col items-center gap-4 cursor-pointer group">
+          <div onclick="openProfileMenu('${u.id}')" class="profile-card flex flex-col items-center gap-4 cursor-pointer group" title="Log masuk sebagai ${escapeHTML(u.username)}">
             <div class="profile-img w-32 h-32 md:w-40 md:h-40 bg-[#ece9d8] border-[4px] border-[#003C74] rounded-3xl flex items-center justify-center shadow-xl transition-all">
                <i data-lucide="${u.icon || 'user'}" class="w-16 h-16 md:w-20 md:h-20 text-[#0058e6] drop-shadow-sm"></i>
             </div>
@@ -967,8 +966,9 @@
          document.getElementById('top-nav-controls').classList.remove('hidden');
          document.getElementById('superadmin-nav').classList.add('hidden');
          
-         mainTab = 'surat';
-         viewMode = 'surat-dashboard';
+         // Jadikan Rekod Kalendar sebagai lalai selepas login (Requirement 4)
+         mainTab = 'kalendar';
+         viewMode = subTabKalendar;
          updateMainTabUI();
       }
       updateBadges();
@@ -1107,8 +1107,8 @@
       document.getElementById('top-nav-controls').classList.remove('hidden');
       document.getElementById('superadmin-nav').classList.add('hidden');
       
-      mainTab = 'surat';
-      viewMode = 'surat-dashboard';
+      mainTab = 'kalendar';
+      viewMode = 'weekly';
       updateMainTabUI();
       renderApp();
     }
@@ -1180,7 +1180,7 @@
           <div class="bg-white p-4 md:p-6 rounded-lg border border-[#a9a9a9] min-h-[400px] overflow-x-auto">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
               <p class="text-sm md:text-base font-semibold text-[#555]">Senarai Profil Pengguna & Bahagian</p>
-              <button onclick="openSAModal(null)" class="xp-button h-10 px-5 font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] text-sm">
+              <button onclick="openSAModal(null)" class="xp-button h-10 px-5 font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] text-sm" title="Tambah akaun setiausaha baharu">
                 <i data-lucide="user-plus" class="w-5 h-5"></i> Tambah Setiausaha
               </button>
             </div>
@@ -1213,18 +1213,18 @@
 
         subNavContainer.innerHTML = `
           <div class="flex gap-2">
-              <button onclick="changeView('weekly')" class="xp-button text-sm h-10 ${viewMode==='weekly'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}"><i data-lucide="calendar-days" class="w-5 h-5"></i> Mingguan</button>
-              <button onclick="changeView('matrix')" class="xp-button text-sm h-10 ${viewMode==='matrix'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}"><i data-lucide="printer" class="w-5 h-5"></i> Laporan Cetakan</button>
+              <button onclick="changeView('weekly')" class="xp-button text-sm h-10 ${viewMode==='weekly'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Paparan kalendar mingguan"><i data-lucide="calendar-days" class="w-5 h-5"></i> Mingguan</button>
+              <button onclick="changeView('matrix')" class="xp-button text-sm h-10 ${viewMode==='matrix'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Paparan laporan cetakan kalendar"><i data-lucide="printer" class="w-5 h-5"></i> Laporan Cetakan</button>
           </div>
           ${viewMode === 'weekly' ? `
           <div class="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0 justify-between md:justify-end">
               <div class="flex items-center gap-1 xp-panel p-1 bg-white">
-                <button onclick="handlePrevWeek()" class="xp-button h-8 w-10 p-0"><i data-lucide="chevron-left" class="w-5 h-5 text-[#000080]"></i></button>
-                <button onclick="handleCurrentWeek()" class="${btnClass}">${startLabel} - ${endLabel} ${yearLabel}</button>
-                <button onclick="handleNextWeek()" class="xp-button h-8 w-10 p-0"><i data-lucide="chevron-right" class="w-5 h-5 text-[#000080]"></i></button>
+                <button onclick="handlePrevWeek()" class="xp-button h-8 w-10 p-0" title="Minggu Sebelumnya"><i data-lucide="chevron-left" class="w-5 h-5 text-[#000080]"></i></button>
+                <button onclick="handleCurrentWeek()" class="${btnClass}" title="Lompat ke minggu semasa">${startLabel} - ${endLabel} ${yearLabel}</button>
+                <button onclick="handleNextWeek()" class="xp-button h-8 w-10 p-0" title="Minggu Seterusnya"><i data-lucide="chevron-right" class="w-5 h-5 text-[#000080]"></i></button>
               </div>
               ${currentUserRole === 'admin' ? `
-              <button onclick="openModalCalendar()" class="xp-button h-9 px-5 font-bold text-white bg-[#008000] border-[#005000] shadow-sm text-sm">
+              <button onclick="openModalCalendar()" class="xp-button h-9 px-5 font-bold text-white bg-[#008000] border-[#005000] shadow-sm text-sm" title="Tambah Rekod Aktiviti Baru">
                 <i data-lucide="plus" class="w-4 h-4"></i> Tambah Aktiviti
               </button>` : ''}
           </div>` : ''}
@@ -1232,12 +1232,12 @@
       } else if (mainTab === 'surat') {
         subNavContainer.innerHTML = `
           <div class="flex flex-wrap gap-2 w-full items-center">
-              <button onclick="changeView('surat-dashboard')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-dashboard'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</button>
-              <button onclick="changeView('surat-inbox')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-inbox'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative"><i data-lucide="inbox" class="w-5 h-5"></i> Peti Masuk</button>
-              <button onclick="changeView('surat-outbox')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-outbox'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative"><i data-lucide="send" class="w-5 h-5"></i> Peti Keluar <span id="badge-outbox" class="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm font-bold">0</span></button>
-              <button onclick="changeView('surat-jejak')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-jejak'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}"><i data-lucide="route" class="w-5 h-5"></i> Jejak</button>
-              <button onclick="changeView('surat-trash')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-trash'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative"><i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i> Tong Sampah <span id="badge-trash" class="absolute -top-1.5 -right-1.5 bg-gray-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm font-bold">0</span></button>
-              <button onclick="changeView('surat-daftar')" class="xp-button text-sm h-10 w-full md:w-auto md:ml-auto font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] shadow-sm"><i data-lucide="mail-plus" class="w-5 h-5 text-white"></i> Daftar Surat Baru</button>
+              <button onclick="changeView('surat-dashboard')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-dashboard'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Papan pemuka ringkasan rekod surat"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</button>
+              <button onclick="changeView('surat-inbox')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-inbox'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative" title="Senarai dokumen masuk yang memerlukan tindakan anda"><i data-lucide="inbox" class="w-5 h-5"></i> Peti Masuk</button>
+              <button onclick="changeView('surat-outbox')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-outbox'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative" title="Senarai dokumen keluar yang belum selesai"><i data-lucide="send" class="w-5 h-5"></i> Peti Keluar <span id="badge-outbox" class="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm font-bold">0</span></button>
+              <button onclick="changeView('surat-jejak')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-jejak'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Jejak sejarah pergerakan setiap dokumen"><i data-lucide="route" class="w-5 h-5"></i> Jejak</button>
+              <button onclick="changeView('surat-trash')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-trash'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative" title="Senarai dokumen yang telah dibatalkan"><i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i> Tong Sampah <span id="badge-trash" class="absolute -top-1.5 -right-1.5 bg-gray-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm font-bold">0</span></button>
+              <button onclick="changeView('surat-daftar')" class="xp-button text-sm h-10 w-full md:w-auto md:ml-auto font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] shadow-sm" title="Borang mendaftar dan menghantar surat baharu"><i data-lucide="mail-plus" class="w-5 h-5 text-white"></i> Daftar Surat Baru</button>
           </div>
         `;
         updateBadges(); 
@@ -1373,7 +1373,7 @@
         if(dayActivities.length > 0) {
           dayActivities.forEach(act => {
             let editBtn = currentUserRole === 'admin' 
-              ? `<button onclick="openModalCalendar('${act.id}')" class="p-1.5 xp-button-mini text-black rounded ml-1" title="Pinda Maklumat"><i data-lucide="edit" class="w-4 h-4"></i></button>`
+              ? `<button onclick="openModalCalendar('${act.id}')" class="p-1.5 xp-button-mini text-black rounded ml-1" title="Pinda Rekod Aktiviti Ini"><i data-lucide="edit" class="w-4 h-4"></i></button>`
               : '';
 
             let actBgColor = 'bg-[#ffffe1]'; 
@@ -1384,11 +1384,11 @@
             if (act.isGuest) {
                 actBgColor = 'bg-[#f3e5f5]'; 
                 actBorderColor = 'border-[#ce93d8]';
-                indicator = `<span class="bg-[#ce93d8] text-[#4a148c] px-2 py-0.5 rounded text-[9px] font-bold uppercase ml-2 border border-[#ba68c8]">Jemputan</span>`;
+                indicator = `<span class="bg-[#ce93d8] text-[#4a148c] px-2 py-0.5 rounded text-[9px] font-bold uppercase ml-2 border border-[#ba68c8]" title="Status sebagai tetamu">Jemputan</span>`;
             } else if (isOutside) {
                 actBgColor = 'bg-[#e0f7fa]'; 
                 actBorderColor = 'border-[#80deea]';
-                indicator = `<span class="bg-[#80deea] text-[#006064] px-2 py-0.5 rounded text-[9px] font-bold uppercase ml-2 border border-[#4dd0e1]">Luar Kawasan</span>`;
+                indicator = `<span class="bg-[#80deea] text-[#006064] px-2 py-0.5 rounded text-[9px] font-bold uppercase ml-2 border border-[#4dd0e1]" title="Lokasi di luar kawasan rasmi">Luar Kawasan</span>`;
             }
 
             html += `
@@ -1415,11 +1415,11 @@
             `;
           });
           if(currentUserRole === 'admin') {
-            html += `<div onclick="openModalCalendar(null, '${dayObj.dateStr}')" class="min-w-[56px] h-full min-h-[140px] border-2 border-dashed border-[#a9a9a9] rounded-xl flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors shrink-0"><i data-lucide="plus" class="w-6 h-6"></i></div>`;
+            html += `<div onclick="openModalCalendar(null, '${dayObj.dateStr}')" class="min-w-[56px] h-full min-h-[140px] border-2 border-dashed border-[#a9a9a9] rounded-xl flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors shrink-0" title="Klik untuk tambah aktiviti pada hari ini"><i data-lucide="plus" class="w-6 h-6"></i></div>`;
           }
         } else {
           if(currentUserRole === 'admin') {
-            html += `<div onclick="openModalCalendar(null, '${dayObj.dateStr}')" class="w-full flex-1 border-2 border-dashed border-[#a9a9a9] rounded-xl flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors min-h-[80px]"><i data-lucide="plus" class="w-6 h-6 mr-2"></i> Tambah Aktiviti</div>`;
+            html += `<div onclick="openModalCalendar(null, '${dayObj.dateStr}')" class="w-full flex-1 border-2 border-dashed border-[#a9a9a9] rounded-xl flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors min-h-[80px]" title="Klik untuk tambah aktiviti pada hari ini"><i data-lucide="plus" class="w-6 h-6 mr-2"></i> Tambah Aktiviti</div>`;
           } else {
              html += `<div class="w-full flex items-center justify-center text-[#888] italic text-sm font-semibold py-6">Tiada Aktiviti Didaftarkan</div>`;
           }
@@ -1467,7 +1467,7 @@
 
           if (act) {
             let editBtnHTML = (includeOverlayBtn && currentUserRole === 'admin') ? `
-              <button onclick="openModalCalendar('${act.id}')" class="absolute top-1 right-1 xp-button-mini no-print opacity-0 group-hover:opacity-100 p-1.5 rounded"><i data-lucide="edit" class="w-4 h-4 text-black"></i></button>
+              <button onclick="openModalCalendar('${act.id}')" class="absolute top-1 right-1 xp-button-mini no-print opacity-0 group-hover:opacity-100 p-1.5 rounded" title="Edit aktiviti ini"><i data-lucide="edit" class="w-4 h-4 text-black"></i></button>
             ` : '';
 
             tbodyHTML += `
@@ -1501,7 +1501,7 @@
 
       let overlayBtn = includeOverlayBtn ? `
         <div class="absolute top-4 right-4 no-print">
-          <button onclick="window.print()" class="xp-button h-10 rounded-lg font-bold px-4 text-sm"><i data-lucide="printer" class="w-5 h-5 text-black"></i> <span class="hidden md:inline">Cetak / Jana PDF</span></button>
+          <button onclick="window.print()" class="xp-button h-10 rounded-lg font-bold px-4 text-sm" title="Papar dialog untuk cetak atau jana PDF laporan"><i data-lucide="printer" class="w-5 h-5 text-black"></i> <span class="hidden md:inline">Cetak / Jana PDF</span></button>
         </div>
       ` : '';
 
@@ -1756,7 +1756,7 @@
     function renderTetapan(container) {
         const user = users.find(u => u.id === currentUserId);
         const iconHTML = availableIcons.map(ic => `
-          <div onclick="selectTenantIcon('${ic}')" class="icon-picker-btn w-12 h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-100 ${user.icon === ic ? 'selected border-2 border-[#0058e6] bg-[#e6f0ff]' : 'border-2 border-transparent'}" data-icon="${ic}">
+          <div onclick="selectTenantIcon('${ic}')" class="icon-picker-btn w-12 h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-100 ${user.icon === ic ? 'selected border-2 border-[#0058e6] bg-[#e6f0ff]' : 'border-2 border-transparent'}" data-icon="${ic}" title="Pilih ikon ini">
              <i data-lucide="${ic}" class="w-7 h-7 text-[#000080]"></i>
           </div>
         `).join('');
@@ -1771,23 +1771,23 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div class="md:col-span-2 flex flex-col gap-1.5">
                       <label class="font-bold text-sm text-black">Nama Bahagian / Unit:</label>
-                      <input type="text" id="setting-dept" value="${escapeHTML(user.departmentName)}" class="xp-input text-base font-bold" />
+                      <input type="text" id="setting-dept" value="${escapeHTML(user.departmentName)}" class="xp-input text-base font-bold" title="Kemaskini nama bahagian anda" />
                     </div>
                     <div class="flex flex-col gap-1.5">
                       <label class="font-bold text-sm text-black">Nama Pengarah / Ketua Unit:</label>
-                      <input type="text" id="setting-director" value="${escapeHTML(user.directorName || '')}" class="xp-input text-base" placeholder="Cth: Pengarah Kanan..." />
+                      <input type="text" id="setting-director" value="${escapeHTML(user.directorName || '')}" class="xp-input text-base" placeholder="Cth: Pengarah Kanan..." title="Kemaskini nama Pengarah/Ketua anda" />
                     </div>
                     <div class="flex flex-col gap-1.5">
                       <label class="font-bold text-sm text-black">Nama Setiausaha / Admin:</label>
-                      <input type="text" id="setting-secretary" value="${escapeHTML(user.secretaryName || '')}" class="xp-input text-base" placeholder="Nama anda..." />
+                      <input type="text" id="setting-secretary" value="${escapeHTML(user.secretaryName || '')}" class="xp-input text-base" placeholder="Nama anda..." title="Kemaskini nama anda selaku pengguna sistem" />
                     </div>
                     <div class="flex flex-col gap-1.5">
                       <label class="font-bold text-sm text-black">No. Sambungan Telefon:</label>
-                      <input type="text" id="setting-phone" value="${escapeHTML(user.phoneExt || '')}" class="xp-input text-base" placeholder="Cth: 4321 / 03-88884321" />
+                      <input type="text" id="setting-phone" value="${escapeHTML(user.phoneExt || '')}" class="xp-input text-base" placeholder="Cth: 4321 / 03-88884321" title="Kemaskini nombor telefon bahagian" />
                     </div>
                   </div>
                   <div class="flex justify-end border-t border-[#a9a9a9] pt-4 mt-2">
-                     <button onclick="updateProfileDetails()" class="xp-button font-bold px-8 py-2 text-sm text-white bg-[#0058e6] border-[#003C74] shadow-sm"><i data-lucide="save" class="w-4 h-4"></i> Simpan Profil</button>
+                     <button onclick="updateProfileDetails()" class="xp-button font-bold px-8 py-2 text-sm text-white bg-[#0058e6] border-[#003C74] shadow-sm" title="Simpan perubahan tetapan profil"><i data-lucide="save" class="w-4 h-4"></i> Simpan Profil</button>
                   </div>
                   <div class="mt-4">
                     <label class="font-bold text-sm text-black block mb-2">Pilih Ikon Profil Visual:</label>
@@ -1801,8 +1801,8 @@
                 <div class="flex flex-col gap-2">
                   <label class="font-bold text-sm text-black">Kata Laluan Baharu:</label>
                   <div class="flex flex-wrap md:flex-nowrap gap-3">
-                     <input type="password" id="setting-password" placeholder="Masukkan kata laluan baharu..." class="xp-input text-base font-bold" />
-                     <button onclick="updatePassword()" class="xp-button font-bold shrink-0 text-sm px-6 h-10 border-[#a9a9a9]">Kemas Kini</button>
+                     <input type="password" id="setting-password" placeholder="Masukkan kata laluan baharu..." class="xp-input text-base font-bold" title="Taip kata laluan baru jika mahu ditukar" />
+                     <button onclick="updatePassword()" class="xp-button font-bold shrink-0 text-sm px-6 h-10 border-[#a9a9a9]" title="Kemaskini kata laluan profil anda">Kemas Kini</button>
                   </div>
                   <p class="text-xs text-[#555] font-semibold mt-1">Biarkan kosong jika tidak mahu menggunakan kata laluan (Bypass).</p>
                 </div>
@@ -1813,8 +1813,8 @@
                 <div class="flex flex-col gap-3">
                   <label class="font-bold text-sm text-black">Pilih Bulan & Tahun Cetakan:</label>
                   <div class="flex flex-wrap md:flex-nowrap items-center gap-3">
-                    <input type="month" id="setting-month" value="${printMonth}" onchange="updatePrintMonth(this.value)" class="xp-input text-base font-bold w-full md:w-auto" />
-                    <button onclick="handlePrintMonthly()" class="xp-button font-bold text-white bg-[#008000] border-[#005000] shadow-sm px-6 h-10 w-full md:w-auto justify-center text-sm">
+                    <input type="month" id="setting-month" value="${printMonth}" onchange="updatePrintMonth(this.value)" class="xp-input text-base font-bold w-full md:w-auto" title="Pilih tarikh untuk dicetak" />
+                    <button onclick="handlePrintMonthly()" class="xp-button font-bold text-white bg-[#008000] border-[#005000] shadow-sm px-6 h-10 w-full md:w-auto justify-center text-sm" title="Jana dan papar PDF laporan aktiviti bulanan ini">
                       <i data-lucide="printer" class="w-4 h-4"></i> Jana Laporan PDF
                     </button>
                   </div>
@@ -1957,7 +1957,7 @@
             const adaSurat = documents.some(d => checkSamaHari(new Date(d.tarikhDaftar), thisDate) && (d.lokasiSemasa === currentDept || d.pendaftar === currentDept) && d.status !== 'Dibatalkan');
             const dot = adaSurat ? `<div class="w-2 h-2 bg-red-600 rounded-full mt-1"></div>` : `<div class="w-2 h-2 mt-1"></div>`;
 
-            calHtml += `<div class="${classes}" onclick="setSuratDate(${year}, ${month}, ${i})"><span>${i}</span>${dot}</div>`;
+            calHtml += `<div class="${classes}" onclick="setSuratDate(${year}, ${month}, ${i})" title="Klik untuk papar surat pada tarikh ini"><span>${i}</span>${dot}</div>`;
         }
 
         const dMasuk = documents.filter(d => 
@@ -2018,12 +2018,12 @@
             }
 
             return `
-            <div class="border border-[#a9a9a9] bg-white rounded-lg p-3 mb-3 shadow-sm cursor-pointer hover:bg-[#e6f0ff] transition" onclick="jumpToSuratJejak('${d.noRuj}')">
+            <div class="border border-[#a9a9a9] bg-white rounded-lg p-3 mb-3 shadow-sm cursor-pointer hover:bg-[#e6f0ff] transition" onclick="jumpToSuratJejak('${d.noRuj}')" title="Klik untuk papar pergerakan dan butiran dokumen ini">
                 <div class="flex justify-between items-center mb-1.5">
                     <span class="font-bold text-[#000080] text-xs md:text-sm">${d.noRuj}</span>
                     <span class="text-[10px] font-bold px-2 py-1 rounded ${d.dipulangkan ? 'bg-orange-100 text-orange-800' : 'bg-gray-200 text-gray-800'}">${badgeStatus}</span>
                 </div>
-                <p class="text-sm text-black font-bold truncate" title="${escapeHTML(d.tajuk)}">${escapeHTML(d.tajuk)}</p>
+                <p class="text-sm text-black font-bold truncate">${escapeHTML(d.tajuk)}</p>
                 <div class="flex justify-between items-end mt-2 gap-2">
                     <p class="text-[11px] text-[#555] font-semibold truncate flex-1">${labelBawah}</p>
                     <span class="text-[9px] font-bold text-white px-1.5 py-0.5 rounded shrink-0 ${d.klasifikasi === 'Sulit' ? 'bg-red-600' : (d.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${d.klasifikasi || 'Biasa'}</span>
@@ -2048,9 +2048,9 @@
 
                 <div class="w-full lg:w-72 xl:w-80 xp-panel bg-white flex flex-col p-4 shadow-inner order-3 lg:order-3 shrink-0">
                     <div class="flex justify-between items-center mb-4 pb-3 border-b-2 border-[#a9a9a9]">
-                        <button onclick="ubahBulanSurat(-1)" class="xp-button px-3 py-1"><i data-lucide="chevron-left" class="w-4 h-4 text-[#0058e6]"></i></button>
+                        <button onclick="ubahBulanSurat(-1)" class="xp-button px-3 py-1" title="Bulan sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4 text-[#0058e6]"></i></button>
                         <span class="font-black text-[13px] text-[#000080] uppercase tracking-wide">${monthNamesList[month]} ${year}</span>
-                        <button onclick="ubahBulanSurat(1)" class="xp-button px-3 py-1"><i data-lucide="chevron-right" class="w-4 h-4 text-[#0058e6]"></i></button>
+                        <button onclick="ubahBulanSurat(1)" class="xp-button px-3 py-1" title="Bulan seterusnya"><i data-lucide="chevron-right" class="w-4 h-4 text-[#0058e6]"></i></button>
                     </div>
                     <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-[#555] mb-2 uppercase">
                         <div>Ahd</div><div>Isn</div><div>Sel</div><div>Rab</div><div>Kha</div><div>Jum</div><div>Sab</div>
@@ -2079,19 +2079,19 @@
             
             let actionBtn = '';
             if(isBaru) {
-                actionBtn = `<button onclick="terimaSurat('${doc.id}')" class="xp-button font-bold text-white bg-[#008000] border-[#005000] px-5 py-2 text-sm"><i data-lucide="check-square" class="w-4 h-4"></i> Sahkan Penerimaan</button>`;
+                actionBtn = `<button onclick="terimaSurat('${doc.id}')" class="xp-button font-bold text-white bg-[#008000] border-[#005000] px-5 py-2 text-sm" title="Klik untuk sahkan penerimaan dokumen ini"><i data-lucide="check-square" class="w-4 h-4"></i> Sahkan Penerimaan</button>`;
             } else if (['Diterima', 'KIV'].includes(doc.status)) {
                 actionBtn = `
                     <div class="flex flex-col items-end gap-1.5">
-                        <button onclick="bukaModalTindakanSurat('${doc.id}', false)" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] px-5 py-2 text-sm"><i data-lucide="file-check-2" class="w-4 h-4"></i> Ambil Tindakan</button>
-                        ${doc.status === 'KIV' ? `<button onclick="bukaModalTindakanSurat('${doc.id}', true)" class="text-[11px] font-bold text-[#0058e6] hover:text-[#e53935] hover:underline flex items-center gap-1 mt-1"><i data-lucide="edit-3" class="w-3 h-3"></i> Pinda KIV (Pembetulan)</button>` : ''}
+                        <button onclick="bukaModalTindakanSurat('${doc.id}', false)" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] px-5 py-2 text-sm" title="Rekod tindakan ke atas surat ini"><i data-lucide="file-check-2" class="w-4 h-4"></i> Ambil Tindakan</button>
+                        ${doc.status === 'KIV' ? `<button onclick="bukaModalTindakanSurat('${doc.id}', true)" class="text-[11px] font-bold text-[#0058e6] hover:text-[#e53935] hover:underline flex items-center gap-1 mt-1" title="Pinda status KIV"><i data-lucide="edit-3" class="w-3 h-3"></i> Pinda KIV (Pembetulan)</button>` : ''}
                     </div>
                 `;
             } else {
                 actionBtn = `
                     <div class="flex flex-col items-end gap-1.5">
                         <span class="text-xs font-bold text-[#555] bg-gray-200 px-3 py-1.5 rounded border border-[#a9a9a9]"><i data-lucide="check-circle" class="w-3 h-3 inline mr-1 text-green-600"></i> ${doc.status}</span>
-                        <button onclick="bukaModalTindakanSurat('${doc.id}', true)" class="text-[11px] font-bold text-[#0058e6] hover:text-[#e53935] hover:underline flex items-center gap-1 mt-1"><i data-lucide="edit-3" class="w-3 h-3"></i> Pinda Tindakan (Pembetulan)</button>
+                        <button onclick="bukaModalTindakanSurat('${doc.id}', true)" class="text-[11px] font-bold text-[#0058e6] hover:text-[#e53935] hover:underline flex items-center gap-1 mt-1" title="Ubah tindakan yang telah direkodkan"><i data-lucide="edit-3" class="w-3 h-3"></i> Pinda Tindakan (Pembetulan)</button>
                     </div>
                 `;
             }
@@ -2140,7 +2140,7 @@
             let statusHtml = group.allDocs.map(d => `<div class="text-[11px] font-bold mt-1 ${d.status === 'KIV' ? 'text-orange-600' : (d.status === 'Diterima' ? 'text-green-600' : 'text-blue-600')}"><span class="text-black">${d.lokasiSemasa}:</span> ${d.status}</div>`).join('');
 
             return `
-                <div class="xp-panel p-4 md:p-5 bg-white border-[#a9a9a9] shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer hover:bg-blue-50 transition" onclick="jumpToSuratJejak('${group.noRuj}')">
+                <div class="xp-panel p-4 md:p-5 bg-white border-[#a9a9a9] shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer hover:bg-blue-50 transition" onclick="jumpToSuratJejak('${group.noRuj}')" title="Klik untuk lihat paparan jejak bagi rekod ini">
                     <div class="flex-1">
                         <div class="flex items-center gap-3 mb-2">
                             <span class="font-black text-[#000080] text-sm bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${group.noRuj}</span>
@@ -2154,7 +2154,7 @@
                     </div>
                     <div class="mt-4 md:mt-0 flex flex-col md:items-end gap-2 shrink-0 border-t md:border-t-0 md:border-l border-[#a9a9a9] pt-3 md:pt-0 md:pl-5 w-full md:w-auto">
                         <span class="text-xs text-[#888] font-bold">Dihantar Pada: <span class="text-black block md:inline">${formatDateTime(group.tarikhDaftar)}</span></span>
-                        <button onclick="event.stopPropagation(); jumpToSuratJejak('${group.noRuj}')" class="xp-button font-bold text-[#000080] bg-[#e6f0ff] border-[#0058e6] px-5 py-2 text-xs mt-3 w-full justify-center"><i data-lucide="route" class="w-4 h-4"></i> Jejak Terperinci</button>
+                        <button onclick="event.stopPropagation(); jumpToSuratJejak('${group.noRuj}')" class="xp-button font-bold text-[#000080] bg-[#e6f0ff] border-[#0058e6] px-5 py-2 text-xs mt-3 w-full justify-center" title="Buka paparan terperinci jejak dokumen ini"><i data-lucide="route" class="w-4 h-4"></i> Jejak Terperinci</button>
                     </div>
                 </div>
             `;
@@ -2187,7 +2187,7 @@
                     </div>
                     <div class="mt-4 md:mt-0 flex flex-col md:items-end gap-2 shrink-0 border-t md:border-t-0 md:border-l border-red-200 pt-3 md:pt-0 md:pl-5 w-full md:w-auto">
                         <span class="text-xs text-[#888] font-bold">Asal Dihantar: <span class="text-black block md:inline">${formatDateTime(group.tarikhDaftar)}</span></span>
-                        <button onclick="pulihkanSuratKeluar('${group.noRuj}')" class="xp-button font-bold text-white bg-[#008000] border-[#005000] px-5 py-2 text-xs mt-2 w-full justify-center shadow-sm"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Pulihkan Rekod</button>
+                        <button onclick="pulihkanSuratKeluar('${group.noRuj}')" class="xp-button font-bold text-white bg-[#008000] border-[#005000] px-5 py-2 text-xs mt-2 w-full justify-center shadow-sm" title="Kembalikan dokumen ini sebagai aktif"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Pulihkan Rekod</button>
                     </div>
                 </div>
             `;
@@ -2241,7 +2241,7 @@
                 <div class="xp-panel bg-[#ece9d8] p-4 flex flex-col col-span-1 shadow-inner h-[60vh] md:h-auto">
                     <div class="flex items-center gap-2 mb-4">
                         <i data-lucide="search" class="w-5 h-5 text-[#000080]"></i>
-                        <input type="text" id="carianSurat" onkeyup="tapisSenaraiJejak()" placeholder="Cari No. Rujukan / Tajuk Surat..." class="xp-input flex-1 text-sm font-bold">
+                        <input type="text" id="carianSurat" onkeyup="tapisSenaraiJejak()" placeholder="Cari No. Rujukan / Tajuk Surat..." class="xp-input flex-1 text-sm font-bold" title="Taip carian untuk mengecilkan senarai">
                     </div>
                     <div id="senaraiSuratJejak" class="flex-1 overflow-y-auto pr-1 space-y-3"></div>
                 </div>
@@ -2261,7 +2261,7 @@
                         <!-- Second Row: Title & Edit Button -->
                         <div class="flex flex-col md:flex-row justify-between items-start border-b-2 border-[#a9a9a9] pb-4 mb-5 gap-3">
                             <h3 class="font-black text-lg md:text-xl text-black leading-tight" id="tajukTimeline">Tajuk Surat</h3>
-                            <button id="btnEditPembetulan" onclick="bukaModalEditSurat()" class="xp-button text-white bg-[#e65c00] border-[#b34700] hidden shrink-0 text-xs md:text-sm px-4"><i data-lucide="edit" class="w-4 h-4"></i> Edit Pembetulan</button>
+                            <button id="btnEditPembetulan" onclick="bukaModalEditSurat()" class="xp-button text-white bg-[#e65c00] border-[#b34700] hidden shrink-0 text-xs md:text-sm px-4" title="Pinda butiran surat ini sekiranya terdapat ralat"><i data-lucide="edit" class="w-4 h-4"></i> Pinda maklumat</button>
                         </div>
                         
                         <!-- Details Box -->
@@ -2317,7 +2317,7 @@
             let badgeClass = isMasuk ? 'text-red-800 bg-red-100 border-red-300' : 'text-[#000080] bg-blue-50 border-blue-200';
 
             return `
-            <div class="bg-white border-2 border-[#a9a9a9] rounded-lg p-3 cursor-pointer hover:bg-[#ffffe1] hover:border-[#0058e6] transition shadow-sm" onclick="paparkanJejakGroup('${group.noRuj}')">
+            <div class="bg-white border-2 border-[#a9a9a9] rounded-lg p-3 cursor-pointer hover:bg-[#ffffe1] hover:border-[#0058e6] transition shadow-sm" onclick="paparkanJejakGroup('${group.noRuj}')" title="Papar perincian dokumen">
                 <div class="flex justify-between items-start mb-1.5">
                    <span class="font-black text-xs px-2 py-0.5 rounded border ${badgeClass}">${group.noRuj}</span>
                    <span class="text-[9px] font-bold text-white px-1.5 py-0.5 rounded ${group.klasifikasi === 'Sulit' ? 'bg-red-600' : (group.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')} shrink-0">${group.klasifikasi || 'Biasa'}</span>
@@ -2442,8 +2442,8 @@
         
         let html = `
             <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-blue-100 rounded border border-transparent hover:border-blue-300 transition-colors col-span-1 sm:col-span-2">
-                <input type="checkbox" name="edit_destinasi" value="Fail / Simpanan Rekod" class="w-4 h-4 text-blue-600 rounded" ${currentDests.includes('Fail / Simpanan Rekod') ? 'checked' : ''}>
-                <span class="text-sm font-extrabold text-[#000080]">Fail / Simpanan Rekod (Tiada Penghantaran)</span>
+                <input type="checkbox" name="edit_destinasi" value="Simpanan Fail" class="w-4 h-4 text-blue-600 rounded" ${currentDests.includes('Simpanan Fail') ? 'checked' : ''}>
+                <span class="text-sm font-extrabold text-[#000080]">Simpanan Fail</span>
             </label>
         `;
         
@@ -2481,52 +2481,54 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 bg-white p-5 rounded-xl border border-[#a9a9a9] shadow-inner">
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-bold text-[#000080]">Aliran Surat:</label>
-                                <select id="sr-aliran" required class="xp-input cursor-pointer font-bold text-[#000080] border-[#0058e6]" onchange="toggleTarikhLabel()">
-                                    <option value="Dokumen / Surat Keluar">Dokumen / Surat Keluar</option>
-                                    <option value="Dokumen / Surat Masuk">Dokumen / Surat Masuk</option>
+                                <select id="sr-aliran" required class="xp-input cursor-pointer font-bold text-[#000080] border-[#0058e6]" onchange="toggleTarikhLabel()" title="Pilih aliran keluar atau masuk">
+                                    <option value="Dokumen / Surat Keluar" class="font-bold">Dokumen / Surat Keluar</option>
+                                    <option value="Dokumen / Surat Masuk" class="font-bold">Dokumen / Surat Masuk</option>
                                 </select>
                             </div>
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-bold text-black">Klasifikasi Dokumen:</label>
-                                <select id="sr-klasifikasi" required class="xp-input cursor-pointer font-bold">
-                                    <option value="Biasa" class="text-green-700">Biasa</option>
-                                    <option value="Sulit" class="text-red-700">Sulit</option>
-                                    <option value="Terperingkat" class="text-purple-700">Terperingkat</option>
+                                <select id="sr-klasifikasi" required class="xp-input cursor-pointer font-bold" title="Pilih status keselamatan dokumen">
+                                    <option value="Biasa" class="font-bold text-green-700">Biasa</option>
+                                    <option value="Sulit" class="font-bold text-red-700">Sulit</option>
+                                    <option value="Terperingkat" class="font-bold text-purple-700">Terperingkat</option>
                                 </select>
                             </div>
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-bold text-black">Tarikh Surat / Dokumen:</label>
-                                <input type="date" id="sr-tarikh-dokumen" required class="xp-input font-semibold text-sm">
+                                <input type="date" id="sr-tarikh-dokumen" required class="xp-input font-semibold text-sm" title="Tarikh yang tertera pada dokumen surat">
                             </div>
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-bold text-black" id="label-tarikh-edar">Tarikh Edaran Dibuat:</label>
-                                <input type="date" id="sr-tarikh-edar" required class="xp-input font-semibold text-sm">
+                                <input type="date" id="sr-tarikh-edar" required class="xp-input font-semibold text-sm" title="Tarikh tindakan/edaran direkodkan">
                             </div>
                         </div>
 
                         <div class="flex flex-col gap-1.5">
                             <label class="text-sm font-bold text-black">Tajuk Dokumen / Perkara Utama:</label>
-                            <input type="text" id="sr-tajuk" required class="xp-input text-sm font-bold" placeholder="Sila masukkan tajuk penuh surat...">
+                            <input type="text" id="sr-tajuk" required class="xp-input text-sm font-bold" placeholder="Sila masukkan tajuk penuh surat..." title="Tajuk atau maklumat penting surat">
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div class="flex flex-col gap-1.5">
                                 <label class="text-sm font-bold text-black">Jenis Dokumen:</label>
-                                <select id="sr-jenis" required class="xp-input cursor-pointer text-sm" onchange="document.getElementById('sr-lain-div').classList.toggle('hidden', this.value !== '4')">
-                                    <option value="1">Surat Rasmi</option><option value="2">Memo Dalaman</option>
-                                    <option value="3">Minit Mesyuarat</option><option value="4">Lain-lain Format</option>
+                                <select id="sr-jenis" required class="xp-input cursor-pointer text-sm font-bold" onchange="document.getElementById('sr-lain-div').classList.toggle('hidden', this.value !== '4')" title="Pilih kategori jenis format surat">
+                                    <option value="1" class="font-bold">Surat Rasmi</option>
+                                    <option value="2" class="font-bold">Memo Dalaman</option>
+                                    <option value="3" class="font-bold">Minit Mesyuarat</option>
+                                    <option value="4" class="font-bold">Lain-lain Format</option>
                                 </select>
                             </div>
                             <div class="flex flex-col gap-1.5 hidden" id="sr-lain-div">
                                 <label class="text-sm font-bold text-black">Nyatakan Jenis (Jika Lain-lain):</label>
-                                <input type="text" id="sr-lain" class="xp-input border-blue-400 text-sm" placeholder="Cth: Borang Cuti, Kertas Kerja">
+                                <input type="text" id="sr-lain" class="xp-input border-blue-400 text-sm font-bold" placeholder="Cth: Borang Cuti, Kertas Kerja" title="Nyatakan jenis khusus secara manual">
                             </div>
                             <div class="flex flex-col gap-1.5">
                                 <label class="text-sm font-bold text-black">Kategori Daftar:</label>
-                                <select id="sr-kategori" required class="xp-input cursor-pointer font-semibold text-sm">
-                                    <option value="Edaran Dalaman">Edaran Dalaman (Antara Bahagian)</option>
-                                    <option value="Surat Keluar">Surat Keluar Luar (Luar Agensi)</option>
-                                    <option value="Disimpan ke dalam fail">Disimpan ke dalam fail</option>
+                                <select id="sr-kategori" required class="xp-input cursor-pointer font-bold text-sm" title="Pilih kategori rekod simpanan">
+                                    <option value="Edaran Dalaman" class="font-bold">Edaran Dalaman</option>
+                                    <option value="Surat Keluar" class="font-bold">Surat Keluar Luar (Luar Agensi)</option>
+                                    <option value="Disimpan ke dalam fail" class="font-bold">Disimpan ke dalam fail</option>
                                 </select>
                             </div>
                             <div class="flex flex-col gap-1.5 md:col-span-2">
@@ -2537,11 +2539,11 @@
                             </div>
                             <div class="flex flex-col gap-1.5 md:col-span-2">
                                 <label class="text-sm font-bold text-black">Nota Tambahan / Arahan (Pilihan):</label>
-                                <textarea id="sr-nota" rows="3" class="xp-input resize-none text-sm" placeholder="Tinggalkan pesanan kepada penerima di sini..."></textarea>
+                                <textarea id="sr-nota" rows="3" class="xp-input resize-none text-sm font-bold" placeholder="Tinggalkan pesanan kepada penerima di sini..." title="Nota bantuan atau arahan khusus kepada pihak penerima"></textarea>
                             </div>
                         </div>
                         <div class="flex justify-end pt-5 border-t-2 border-[#a9a9a9] mt-4">
-                            <button type="submit" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] px-8 py-3 text-sm shadow-md hover:bg-[#0040cc]"><i data-lucide="send" class="w-5 h-5"></i> Daftar & Hantar Dokumen</button>
+                            <button type="submit" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] px-8 py-3 text-sm shadow-md hover:bg-[#0040cc]" title="Sahkan pendaftaran dan hantar sistem"><i data-lucide="send" class="w-5 h-5"></i> Daftar & Hantar Dokumen</button>
                         </div>
                     </div>
                 </form>
@@ -2559,16 +2561,16 @@
         const container = document.getElementById('sr-destinasi-container');
         if(container) {
             let html = `
-                <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-blue-200 rounded border border-transparent hover:border-blue-400 transition-colors col-span-1 sm:col-span-2">
-                    <input type="checkbox" name="destinasi" value="Fail / Simpanan Rekod" class="w-5 h-5 text-blue-600 rounded cursor-pointer">
-                    <span class="text-sm font-extrabold text-[#000080]">Fail / Simpanan Rekod (Tiada Penghantaran)</span>
+                <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-blue-200 rounded border border-transparent hover:border-blue-400 transition-colors col-span-1 sm:col-span-2" title="Pilih untuk simpanan rekod fail sendiri">
+                    <input type="checkbox" name="destinasi" value="Simpanan Fail" class="w-5 h-5 text-blue-600 rounded cursor-pointer">
+                    <span class="text-sm font-extrabold text-[#000080]">Simpanan Fail</span>
                 </label>
             `;
             
             const depts = users.filter(u => u.departmentName !== currentDept && u.id !== 'superadmin');
             depts.forEach(u => {
                 html += `
-                    <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-blue-200 rounded border border-transparent hover:border-blue-400 transition-colors">
+                    <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-blue-200 rounded border border-transparent hover:border-blue-400 transition-colors" title="Hantar surat ke bahagian ${u.departmentName}">
                         <input type="checkbox" name="destinasi" value="${u.departmentName}" class="w-5 h-5 text-blue-600 rounded cursor-pointer">
                         <span class="text-sm font-bold text-black">${u.departmentName}</span>
                     </label>
@@ -2699,7 +2701,6 @@
 
         let dikemaskini = false;
         
-        // 1. Semak rekod sedia ada: Kemaskini tajuk atau Batal jika Unchecked
         for (const doc of activeDocs) {
             let notes = [];
             let titleChanged = false;
@@ -2711,25 +2712,22 @@
             }
             
             if (!checkedDests.includes(doc.lokasiSemasa)) {
-                // Destinasi ini di uncheck, batalkan copy ini
                 doc.status = 'Dibatalkan';
                 doc.timeline.push({ tarikh: new Date().toISOString(), tindakan: 'Dibatalkan', oleh: currentDept, catatan: 'Penerima digugurkan semasa proses pembetulan.' });
                 if (window.dbAPI) await window.dbAPI.saveDocument(doc);
                 dikemaskini = true;
             } else if (titleChanged) {
-                // Kekal aktif, cuma tajuk berubah
                 doc.timeline.push({ tarikh: new Date().toISOString(), tindakan: 'Dikemaskini (Pembetulan)', oleh: currentDept, catatan: notes.join(' | ') });
                 if (window.dbAPI) await window.dbAPI.saveDocument(doc);
                 dikemaskini = true;
             }
         }
         
-        // 2. Semak jika ada Destinasi Baru ditambah
         const currentActiveDests = activeDocs.map(d => d.lokasiSemasa);
         const newDests = checkedDests.filter(dest => !currentActiveDests.includes(dest));
         
         if (newDests.length > 0) {
-            const baseDoc = allDocsForRuj[0]; // guna data asal
+            const baseDoc = allDocsForRuj[0]; 
             newDests.forEach(destinasi => {
                 const newDoc = {
                     id: Date.now().toString() + Math.floor(Math.random()*1000), 
@@ -2744,13 +2742,13 @@
                     tarikhTerima: baseDoc.aliran === 'Dokumen / Surat Masuk' ? baseDoc.tarikhEdar : null,
                     pendaftar: currentDept, 
                     lokasiSemasa: destinasi, 
-                    status: destinasi === 'Fail / Simpanan Rekod' ? 'Selesai' : 'Dihantar', 
+                    status: destinasi === 'Simpanan Fail' ? 'Selesai' : 'Dihantar', 
                     tarikhDaftar: new Date().toISOString(), 
                     timeline: []
                 };
 
                 newDoc.timeline.push({ tarikh: new Date().toISOString(), tindakan: 'Didaftarkan', oleh: currentDept, catatan: `Dokumen didaftarkan (Tambahan penerima baharu).` });
-                if (destinasi === 'Fail / Simpanan Rekod') {
+                if (destinasi === 'Simpanan Fail') {
                     newDoc.timeline.push({ tarikh: new Date().toISOString(), tindakan: 'Selesai & Direkodkan', oleh: currentDept, catatan: "Disimpan ke dalam fail rekod bahagian." });
                 } else {
                     newDoc.timeline.push({ tarikh: new Date().toISOString(), tindakan: 'Dihantar', oleh: currentDept, kepada: destinasi, catatan: "Ditambah semasa proses pembetulan." });
@@ -2811,14 +2809,14 @@
                 tarikhTerima: aliran === 'Dokumen / Surat Masuk' ? tarikhEdar : null,
                 pendaftar: currentDept, 
                 lokasiSemasa: destinasi, 
-                status: destinasi === 'Fail / Simpanan Rekod' ? 'Selesai' : 'Dihantar', 
+                status: destinasi === 'Simpanan Fail' ? 'Selesai' : 'Dihantar', 
                 tarikhDaftar: new Date().toISOString(), 
                 timeline: []
             };
 
             newDoc.timeline.push({ tarikh: new Date().toISOString(), tindakan: 'Didaftarkan', oleh: currentDept, catatan: `Dokumen didaftarkan sebagai ${kategori} (${klasifikasi}).` });
             
-            if (destinasi === 'Fail / Simpanan Rekod') {
+            if (destinasi === 'Simpanan Fail') {
                 newDoc.timeline.push({ tarikh: new Date().toISOString(), tindakan: 'Selesai & Direkodkan', oleh: currentDept, catatan: nota || "Disimpan ke dalam fail rekod bahagian." });
             } else {
                 newDoc.timeline.push({ tarikh: new Date().toISOString(), tindakan: 'Dihantar', oleh: currentDept, kepada: destinasi, catatan: nota || "Sila ambil maklum dan sahkan penerimaan." });
