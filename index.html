@@ -658,11 +658,12 @@
     let currentDept = null; 
     
     // TAB STATE LOGIC
-    let mainTab = 'kalendar'; 
+    let mainTab = 'surat'; 
     let subTabKalendar = 'weekly'; 
     let subTabSurat = 'surat-dashboard';
-    let viewMode = 'weekly'; 
+    let viewMode = 'surat-dashboard'; 
     
+    // Tarikh & State Navigation
     function getStartOfWeek(date) {
       const d = new Date(date);
       d.setHours(0, 0, 0, 0); 
@@ -966,8 +967,8 @@
          document.getElementById('top-nav-controls').classList.remove('hidden');
          document.getElementById('superadmin-nav').classList.add('hidden');
          
-         mainTab = 'kalendar';
-         viewMode = subTabKalendar;
+         mainTab = 'surat';
+         viewMode = 'surat-dashboard';
          updateMainTabUI();
       }
       updateBadges();
@@ -1106,8 +1107,8 @@
       document.getElementById('top-nav-controls').classList.remove('hidden');
       document.getElementById('superadmin-nav').classList.add('hidden');
       
-      mainTab = 'kalendar';
-      viewMode = 'weekly';
+      mainTab = 'surat';
+      viewMode = 'surat-dashboard';
       updateMainTabUI();
       renderApp();
     }
@@ -1230,16 +1231,16 @@
         `;
       } else if (mainTab === 'surat') {
         subNavContainer.innerHTML = `
-          <div class="flex flex-wrap gap-2 w-full">
+          <div class="flex flex-wrap gap-2 w-full items-center">
               <button onclick="changeView('surat-dashboard')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-dashboard'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</button>
               <button onclick="changeView('surat-inbox')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-inbox'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative"><i data-lucide="inbox" class="w-5 h-5"></i> Peti Masuk</button>
               <button onclick="changeView('surat-outbox')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-outbox'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative"><i data-lucide="send" class="w-5 h-5"></i> Peti Keluar <span id="badge-outbox" class="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm font-bold">0</span></button>
               <button onclick="changeView('surat-jejak')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-jejak'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}"><i data-lucide="route" class="w-5 h-5"></i> Jejak</button>
-              <button onclick="changeView('surat-daftar')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-daftar'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}"><i data-lucide="mail-plus" class="w-5 h-5"></i> Pendaftaran Surat</button>
               <button onclick="changeView('surat-trash')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-trash'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative"><i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i> Tong Sampah <span id="badge-trash" class="absolute -top-1.5 -right-1.5 bg-gray-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm font-bold">0</span></button>
+              <button onclick="changeView('surat-daftar')" class="xp-button text-sm h-10 w-full md:w-auto md:ml-auto font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] shadow-sm"><i data-lucide="mail-plus" class="w-5 h-5 text-white"></i> Daftar Surat Baru</button>
           </div>
         `;
-        updateBadges(); // Call to populate sub-tab badges
+        updateBadges(); 
       } else if (mainTab === 'settings') {
           subNavContainer.innerHTML = `<div class="text-sm font-bold text-[#555] px-2 py-1"><i data-lucide="settings-2" class="w-5 h-5 inline mb-0.5"></i> Tetapan & Konfigurasi Profil Pengguna</div>`;
       }
@@ -2250,28 +2251,33 @@
                         <p class="text-base font-bold">Sila pilih rekod surat di senarai kiri untuk melihat pergerakan.</p>
                     </div>
                     <div id="kandunganTimeline" class="hidden">
+                        
+                        <!-- Top Row: No Ruj & Klasifikasi -->
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="text-xs md:text-sm font-bold text-gray-500 uppercase tracking-wider">No Rujukan: <span id="infoNoRuj"></span></div>
+                            <div id="infoKlasifikasiContainer"></div>
+                        </div>
+                        
+                        <!-- Second Row: Title & Edit Button -->
                         <div class="flex flex-col md:flex-row justify-between items-start border-b-2 border-[#a9a9a9] pb-4 mb-5 gap-3">
-                            <h3 class="font-black text-lg md:text-xl text-[#000080] leading-tight" id="tajukTimeline">Tajuk Surat</h3>
+                            <h3 class="font-black text-lg md:text-xl text-black leading-tight" id="tajukTimeline">Tajuk Surat</h3>
                             <button id="btnEditPembetulan" onclick="bukaModalEditSurat()" class="xp-button text-white bg-[#e65c00] border-[#b34700] hidden shrink-0 text-xs md:text-sm px-4"><i data-lucide="edit" class="w-4 h-4"></i> Edit Pembetulan</button>
                         </div>
                         
-                        <div class="bg-[#e6f0ff] p-4 rounded-xl border-2 border-[#0058e6] mb-6 shadow-sm">
-                            <div class="flex justify-between items-center border-b-2 border-[#0058e6] pb-3 mb-3">
-                                <div class="text-sm md:text-base font-bold text-[#000080]">No Rujukan: <span id="infoNoRuj" class="font-black bg-white px-3 py-1 rounded-md border border-blue-300 ml-1 text-base md:text-lg"></span></div>
-                                <div id="infoKlasifikasiContainer"></div>
-                            </div>
+                        <!-- Details Box -->
+                        <div id="detailInfoBox" class="p-4 rounded-xl border-2 mb-6 shadow-sm">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6 text-xs md:text-sm font-bold text-black">
-                                <div class="flex justify-between border-b border-blue-200 pb-1 flex-col sm:flex-row">
-                                    <span class="text-[#000080]">Status Terkini:</span> <div id="infoStatus" class="flex flex-col items-end text-right"></div>
+                                <div class="flex justify-between border-b border-black/10 pb-1 flex-col sm:flex-row">
+                                    <span class="text-gray-600">Status Terkini:</span> <div id="infoStatus" class="flex flex-col items-end text-right"></div>
                                 </div>
-                                <div class="flex justify-between border-b border-blue-200 pb-1">
-                                    <span class="text-[#000080]">Tarikh Dokumen:</span> <span id="infoTrhDokumen" class="font-semibold"></span>
+                                <div class="flex justify-between border-b border-black/10 pb-1">
+                                    <span class="text-gray-600">Tarikh Dokumen:</span> <span id="infoTrhDokumen" class="font-semibold text-black"></span>
                                 </div>
-                                <div class="flex justify-between border-b border-blue-200 pb-1">
-                                    <span class="text-[#000080]" id="label-info-edar">Tarikh Edaran Dibuat:</span> <span id="infoTrhEdar" class="font-semibold"></span>
+                                <div class="flex justify-between border-b border-black/10 pb-1">
+                                    <span class="text-gray-600" id="label-info-edar">Tarikh Edaran Dibuat:</span> <span id="infoTrhEdar" class="font-semibold text-black"></span>
                                 </div>
-                                <div class="flex justify-between border-b border-blue-200 pb-1 flex-col sm:flex-row">
-                                    <span class="text-[#000080]">Tarikh Diterima:</span> <div id="infoTrhTerima" class="flex flex-col items-end text-right"></div>
+                                <div class="flex justify-between border-b border-black/10 pb-1 flex-col sm:flex-row">
+                                    <span class="text-gray-600">Tarikh Diterima:</span> <div id="infoTrhTerima" class="flex flex-col items-end text-right"></div>
                                 </div>
                             </div>
                         </div>
@@ -2305,14 +2311,18 @@
 
         container.innerHTML = sortedGrouped.length === 0 ? `<div class="text-xs italic text-center text-[#888] mt-6">Tiada rekod padanan.</div>` : sortedGrouped.map(group => {
             let statusHtml = group.allDocs.map(d => `<span class="bg-gray-200 px-1.5 py-0.5 rounded text-black mr-1 mt-1 inline-block border border-[#ccc]">${d.lokasiSemasa}: ${d.status}</span>`).join('');
+            
+            // Logik pewarnaan (Merah utk Masuk, Biru utk Keluar)
+            let isMasuk = group.aliran === 'Dokumen / Surat Masuk' || group.pendaftar !== currentDept;
+            let badgeClass = isMasuk ? 'text-red-800 bg-red-100 border-red-300' : 'text-[#000080] bg-blue-50 border-blue-200';
 
             return `
             <div class="bg-white border-2 border-[#a9a9a9] rounded-lg p-3 cursor-pointer hover:bg-[#ffffe1] hover:border-[#0058e6] transition shadow-sm" onclick="paparkanJejakGroup('${group.noRuj}')">
                 <div class="flex justify-between items-start mb-1.5">
-                   <span class="font-black text-[#000080] text-xs bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">${group.noRuj}</span>
+                   <span class="font-black text-xs px-2 py-0.5 rounded border ${badgeClass}">${group.noRuj}</span>
                    <span class="text-[9px] font-bold text-white px-1.5 py-0.5 rounded ${group.klasifikasi === 'Sulit' ? 'bg-red-600' : (group.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')} shrink-0">${group.klasifikasi || 'Biasa'}</span>
                 </div>
-                <div class="text-xs text-black font-bold truncate mb-2" title="${escapeHTML(group.tajuk)}">${escapeHTML(group.tajuk)}</div>
+                <div class="text-xs text-black font-bold truncate mb-2 mt-2" title="${escapeHTML(group.tajuk)}">${escapeHTML(group.tajuk)}</div>
                 <div class="text-[9px] text-[#555] font-semibold border-t border-[#eee] pt-1.5 flex flex-wrap">
                     ${statusHtml}
                 </div>
@@ -2330,12 +2340,25 @@
         document.getElementById('editDocId').value = noRuj; 
         
         document.getElementById('tajukTimeline').innerText = baseDoc.tajuk;
-        document.getElementById('infoNoRuj').innerText = baseDoc.noRuj;
+        
+        // Logik pewarnaan dalam Jejak
+        const isMasuk = baseDoc.aliran === 'Dokumen / Surat Masuk' || baseDoc.pendaftar !== currentDept;
+        const noRujEl = document.getElementById('infoNoRuj');
+        const detailBox = document.getElementById('detailInfoBox');
+        
+        noRujEl.innerText = baseDoc.noRuj;
+        if(isMasuk) {
+            noRujEl.className = 'font-black ml-1 text-sm md:text-lg px-3 py-1 rounded-md border-2 bg-red-50 text-red-700 border-red-300';
+            detailBox.className = 'bg-[#fff5f5] p-4 rounded-xl border-2 border-red-600 mb-6 shadow-sm';
+        } else {
+            noRujEl.className = 'font-black ml-1 text-sm md:text-lg px-3 py-1 rounded-md border-2 bg-blue-50 text-[#000080] border-blue-300';
+            detailBox.className = 'bg-[#e6f0ff] p-4 rounded-xl border-2 border-[#0058e6] mb-6 shadow-sm';
+        }
         
         const klasColor = baseDoc.klasifikasi === 'Sulit' ? 'bg-red-600' : (baseDoc.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600');
         document.getElementById('infoKlasifikasiContainer').innerHTML = `<span class="text-xs md:text-sm font-black text-white px-3 py-1.5 rounded-md shadow-sm tracking-wide ${klasColor}">${baseDoc.klasifikasi || 'Biasa'}</span>`;
         
-        let statusHtml = docs.map(d => `<div class="mb-1"><span class="font-bold text-[#000080]">${d.lokasiSemasa}:</span> <span class="${d.status === 'Diterima' ? 'text-green-600' : (d.status === 'Dikembalikan' ? 'text-orange-600' : 'text-red-600')} font-black uppercase">${d.status}</span></div>`).join('');
+        let statusHtml = docs.map(d => `<div class="mb-1"><span class="font-bold text-black">${d.lokasiSemasa}:</span> <span class="${d.status === 'Diterima' ? 'text-green-600' : (d.status === 'Dikembalikan' ? 'text-orange-600' : 'text-red-600')} font-black uppercase">${d.status}</span></div>`).join('');
         document.getElementById('infoStatus').innerHTML = statusHtml;
 
         document.getElementById('infoTrhDokumen').innerText = formatDateOnly(baseDoc.tarikhDokumen);
@@ -2343,7 +2366,7 @@
         
         document.getElementById('label-info-edar').innerText = baseDoc.aliran === 'Dokumen / Surat Masuk' ? 'Tarikh Surat Diterima:' : 'Tarikh Edaran Dibuat:';
         
-        let trhTerimaHtml = docs.map(d => `<div class="mb-1"><span class="font-bold text-[#000080]">${d.lokasiSemasa}:</span> <span class="font-semibold text-green-700">${d.tarikhTerima ? formatDateOnly(d.tarikhTerima) : 'Belum'}</span></div>`).join('');
+        let trhTerimaHtml = docs.map(d => `<div class="mb-1"><span class="font-bold text-black">${d.lokasiSemasa}:</span> <span class="font-semibold text-green-700">${d.tarikhTerima ? formatDateOnly(d.tarikhTerima) : 'Belum'}</span></div>`).join('');
         document.getElementById('infoTrhTerima').innerHTML = trhTerimaHtml;
 
         const btnEdit = document.getElementById('btnEditPembetulan');
