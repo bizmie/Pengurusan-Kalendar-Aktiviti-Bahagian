@@ -657,12 +657,14 @@
     let currentDept = null; 
     
     // TAB STATE LOGIC
-    // Set lalai kepada kalendar
     let mainTab = 'kalendar'; 
     let subTabKalendar = 'weekly'; 
     let subTabSurat = 'surat-dashboard';
     let viewMode = 'weekly'; 
     
+    let suratReportMode = 'weekly';
+    let suratReportDate = new Date();
+
     function getStartOfWeek(date) {
       const d = new Date(date);
       d.setHours(0, 0, 0, 0); 
@@ -966,7 +968,6 @@
          document.getElementById('top-nav-controls').classList.remove('hidden');
          document.getElementById('superadmin-nav').classList.add('hidden');
          
-         // Jadikan Rekod Kalendar sebagai lalai selepas login (Requirement 4)
          mainTab = 'kalendar';
          viewMode = subTabKalendar;
          updateMainTabUI();
@@ -1134,7 +1135,7 @@
       viewMode = mode;
       
       if(['weekly', 'matrix'].includes(mode)) subTabKalendar = mode;
-      if(['surat-dashboard', 'surat-inbox', 'surat-outbox', 'surat-jejak', 'surat-daftar', 'surat-trash'].includes(mode)) subTabSurat = mode;
+      if(['surat-dashboard', 'surat-inbox', 'surat-outbox', 'surat-jejak', 'surat-daftar', 'surat-trash', 'surat-laporan'].includes(mode)) subTabSurat = mode;
       
       renderApp();
     }
@@ -1216,7 +1217,7 @@
               <button onclick="changeView('weekly')" class="xp-button text-sm h-10 ${viewMode==='weekly'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Paparan kalendar mingguan"><i data-lucide="calendar-days" class="w-5 h-5"></i> Mingguan</button>
               <button onclick="changeView('matrix')" class="xp-button text-sm h-10 ${viewMode==='matrix'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Paparan laporan cetakan kalendar"><i data-lucide="printer" class="w-5 h-5"></i> Laporan Cetakan</button>
           </div>
-          ${viewMode === 'weekly' ? `
+          ${['weekly', 'matrix'].includes(viewMode) ? `
           <div class="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0 justify-between md:justify-end">
               <div class="flex items-center gap-1 xp-panel p-1 bg-white">
                 <button onclick="handlePrevWeek()" class="xp-button h-8 w-10 p-0" title="Minggu Sebelumnya"><i data-lucide="chevron-left" class="w-5 h-5 text-[#000080]"></i></button>
@@ -1232,12 +1233,13 @@
       } else if (mainTab === 'surat') {
         subNavContainer.innerHTML = `
           <div class="flex flex-wrap gap-2 w-full items-center">
-              <button onclick="changeView('surat-dashboard')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-dashboard'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Papan pemuka ringkasan rekod surat"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</button>
+              <button onclick="changeView('surat-dashboard')" class="xp-button text-sm h-10 px-4 ${viewMode==='surat-dashboard'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Papan pemuka ringkasan rekod surat"><i data-lucide="home" class="w-5 h-5"></i></button>
               <button onclick="changeView('surat-inbox')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-inbox'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative" title="Senarai dokumen masuk yang memerlukan tindakan anda"><i data-lucide="inbox" class="w-5 h-5"></i> Peti Masuk</button>
               <button onclick="changeView('surat-outbox')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-outbox'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative" title="Senarai dokumen keluar yang belum selesai"><i data-lucide="send" class="w-5 h-5"></i> Peti Keluar <span id="badge-outbox" class="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm font-bold">0</span></button>
               <button onclick="changeView('surat-jejak')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-jejak'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Jejak sejarah pergerakan setiap dokumen"><i data-lucide="route" class="w-5 h-5"></i> Jejak</button>
-              <button onclick="changeView('surat-trash')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-trash'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative" title="Senarai dokumen yang telah dibatalkan"><i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i> Tong Sampah <span id="badge-trash" class="absolute -top-1.5 -right-1.5 bg-gray-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm font-bold">0</span></button>
-              <button onclick="changeView('surat-daftar')" class="xp-button text-sm h-10 w-full md:w-auto md:ml-auto font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] shadow-sm" title="Borang mendaftar dan menghantar surat baharu"><i data-lucide="mail-plus" class="w-5 h-5 text-white"></i> Daftar Surat Baru</button>
+              <button onclick="changeView('surat-laporan')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-laporan'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Cetak Laporan Surat"><i data-lucide="printer" class="w-5 h-5"></i> Laporan Cetakan</button>
+              <button onclick="changeView('surat-trash')" class="xp-button text-sm h-10 px-4 ${viewMode==='surat-trash'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative" title="Senarai dokumen yang telah dibatalkan"><i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i><span id="badge-trash" class="absolute -top-1.5 -right-1.5 bg-gray-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm font-bold">0</span></button>
+              <button onclick="changeView('surat-daftar')" class="xp-button text-sm h-10 w-full md:w-auto ml-auto font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] shadow-sm" title="Borang mendaftar dan menghantar surat baharu"><i data-lucide="mail-plus" class="w-5 h-5 text-white"></i> Daftar Surat Baru</button>
           </div>
         `;
         updateBadges(); 
@@ -1253,6 +1255,7 @@
       else if (viewMode === 'surat-outbox') renderSuratOutbox(container);
       else if (viewMode === 'surat-trash') renderSuratTrash(container);
       else if (viewMode === 'surat-jejak') renderSuratJejak(container);
+      else if (viewMode === 'surat-laporan') renderSuratLaporan(container);
       else if (viewMode === 'surat-daftar') renderSuratDaftar(container);
 
       lucide.createIcons();
@@ -1445,22 +1448,29 @@
       });
 
       let tbodyHTML = '';
+      let dayIndex = 0;
+      
       Object.values(groupedData).forEach((group) => {
         const acts = group.activities.sort((a,b) => {
            if(a.isAllDay) return -1;
            return timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
         });
         const rowActs = acts.length > 0 ? acts : [null];
-        const rowClass = group.dayInfo.isWeekend ? 'bg-gradient-to-r from-[#e2e8f0] to-[#cbd5e1]' : 'bg-gradient-to-r from-white to-[#f1f5f9] hover:from-[#f8fafc] hover:to-[#e2e8f0]';
+        const isWeekend = group.dayInfo.isWeekend;
+        
+        // Tema warna lembut untuk baris (selang-seli)
+        const rowBg = isWeekend ? 'bg-[#fff5f5]' : (dayIndex % 2 === 0 ? 'bg-white' : 'bg-[#f4f9ff]');
         
         rowActs.forEach((act, idx) => {
-          tbodyHTML += `<tr class="${rowClass}">`;
+          tbodyHTML += `<tr class="${rowBg}" style="print-color-adjust: exact; -webkit-print-color-adjust: exact;">`;
           if(idx === 0) {
+            // Latar sel tarikh lebih menonjol sedikit
+            const dateBg = isWeekend ? 'bg-[#ffebeb]' : 'bg-[#e6f0ff]';
             tbodyHTML += `
-              <td class="border border-black p-3 text-center align-top font-bold text-black" rowspan="${rowActs.length}">
-                ${group.dayInfo.dayName}<br/>
-                <span class="text-sm md:text-base text-black">${group.dayInfo.displayDate.split(' ')[0]}</span><br/>
-                <span class="text-[10px] md:text-xs uppercase text-black">${group.dayInfo.displayDate.split(' ')[1]}</span>
+              <td class="border border-[#a9a9a9] p-3 text-center align-top text-black ${dateBg}" rowspan="${rowActs.length}">
+                <div class="font-bold text-gray-600 text-xs md:text-sm mb-1">${group.dayInfo.dayName}</div>
+                <div class="text-lg md:text-xl text-[#000080] font-black leading-none">${group.dayInfo.displayDate.split(' ')[0]}</div>
+                <div class="text-[10px] md:text-xs uppercase text-gray-500 font-bold mt-1 tracking-wider">${group.dayInfo.displayDate.split(' ')[1]}</div>
               </td>
             `;
           }
@@ -1471,32 +1481,33 @@
             ` : '';
 
             tbodyHTML += `
-              <td class="border border-black p-3 text-center align-top text-black">
-                <div class="font-medium text-xs md:text-sm leading-normal whitespace-pre-line">${getDisplayDateTime(act, true)}</div>
+              <td class="border border-[#a9a9a9] p-3 text-center align-top text-black">
+                <div class="font-bold text-[#0058e6] text-xs md:text-sm leading-normal whitespace-pre-line">${getDisplayDateTime(act, true)}</div>
               </td>
-              <td class="border border-black p-3 align-top group relative">
-                <div class="font-bold text-black text-xs md:text-sm leading-normal whitespace-pre-line">${escapeHTML(act.program)}</div>
-                ${act.chairman ? `<div class="mt-2 text-[10px] md:text-xs text-[#000080] font-semibold leading-normal">Pengerusi: ${escapeHTML(act.chairman)}</div>` : ''}
-                ${act.notes ? `<div class="mt-2 text-[10px] md:text-xs text-black whitespace-pre-line leading-normal">${escapeHTML(act.notes)}</div>` : ''}
+              <td class="border border-[#a9a9a9] p-3 align-top group relative">
+                <div class="font-black text-black text-sm leading-normal whitespace-pre-line">${escapeHTML(act.program)}</div>
+                ${act.chairman ? `<div class="mt-2 text-[10px] md:text-xs text-[#000080] font-bold leading-normal"><i data-lucide="user" class="w-3 h-3 inline text-gray-500 mr-1"></i>Pengerusi: ${escapeHTML(act.chairman)}</div>` : ''}
+                ${act.notes ? `<div class="mt-2 text-[10px] md:text-xs text-gray-700 font-bold whitespace-pre-line leading-normal bg-white/60 p-1.5 rounded border border-gray-200 shadow-sm">${escapeHTML(act.notes)}</div>` : ''}
                 ${editBtnHTML}
               </td>
-              <td class="border border-black p-3 align-top text-center text-black">
-                <div class="text-xs md:text-sm leading-normal whitespace-pre-line">${escapeHTML(act.location)}</div>
+              <td class="border border-[#a9a9a9] p-3 align-top text-center text-black">
+                <div class="text-xs md:text-sm font-bold leading-normal whitespace-pre-line">${escapeHTML(act.location)}</div>
               </td>
-              <td class="border border-black p-3 align-top text-black">
-                 <div class="text-xs md:text-sm leading-normal whitespace-pre-line">${escapeHTML(act.officers)}</div>
+              <td class="border border-[#a9a9a9] p-3 align-top text-black">
+                 <div class="text-xs md:text-sm font-bold leading-normal whitespace-pre-line">${escapeHTML(act.officers)}</div>
               </td>
             `;
           } else {
             tbodyHTML += `
-              <td class="border border-black p-3 text-center align-top text-black"><div class="text-xs md:text-sm leading-normal">-</div></td>
-              <td class="border border-black p-3 text-center align-top italic text-black font-semibold"><div class="text-xs md:text-sm leading-normal">Tiada Aktiviti</div></td>
-              <td class="border border-black p-3 text-center align-top text-black"><div class="text-xs md:text-sm leading-normal">-</div></td>
-              <td class="border border-black p-3 text-center align-top text-black"><div class="text-xs md:text-sm leading-normal">-</div></td>
+              <td class="border border-[#a9a9a9] p-3 text-center align-top text-gray-400"><div class="text-xs md:text-sm font-bold leading-normal">-</div></td>
+              <td class="border border-[#a9a9a9] p-3 text-center align-top italic text-gray-400 font-bold"><div class="text-xs md:text-sm font-bold leading-normal">Tiada Aktiviti</div></td>
+              <td class="border border-[#a9a9a9] p-3 text-center align-top text-gray-400"><div class="text-xs md:text-sm font-bold leading-normal">-</div></td>
+              <td class="border border-[#a9a9a9] p-3 text-center align-top text-gray-400"><div class="text-xs md:text-sm font-bold leading-normal">-</div></td>
             `;
           }
           tbodyHTML += `</tr>`;
         });
+        dayIndex++;
       });
 
       let overlayBtn = includeOverlayBtn ? `
@@ -1509,23 +1520,23 @@
         <div class="bg-white p-5 md:p-10 overflow-x-auto relative border border-[#a9a9a9] shadow-inner printable-container rounded-xl" id="print-area">
           ${overlayBtn}
           <div class="text-center mb-8 md:mb-10 mt-6 md:mt-0">
-            <h2 class="font-black text-xl md:text-2xl uppercase text-black tracking-wide">${title}</h2>
+            <h2 class="font-black text-xl md:text-2xl uppercase text-[#000080] tracking-wide">${title}</h2>
             <h3 class="font-bold text-lg md:text-xl uppercase text-black mt-1" id="matrix-dept-name">${escapeHTML(deptName)}</h3>
-            <p class="mt-2 text-black font-semibold text-sm md:text-base">${dateRangeText}</p>
+            <p class="mt-2 text-gray-700 font-bold text-sm md:text-base bg-gray-100 inline-block px-4 py-1.5 rounded-full border border-gray-300 shadow-sm">${dateRangeText}</p>
           </div>
-          <table class="w-full border-collapse border border-black text-sm print-table">
+          <table class="w-full border-collapse border border-[#a9a9a9] text-sm print-table shadow-sm">
             <thead>
-              <tr class="bg-gradient-to-r from-gray-100 to-gray-200">
-                <th class="border border-black p-3 font-extrabold text-center w-[12%] uppercase text-black">TARIKH</th>
-                <th class="border border-black p-3 font-extrabold text-center w-[15%] uppercase text-black">MASA</th>
-                <th class="border border-black p-3 font-extrabold text-center w-[33%] uppercase text-black">MESYUARAT / PROGRAM</th>
-                <th class="border border-black p-3 font-extrabold text-center w-[20%] uppercase text-black">TEMPAT</th>
-                <th class="border border-black p-3 font-extrabold text-center w-[20%] uppercase text-black">PEGAWAI</th>
+              <tr class="bg-[#cce0ff]" style="print-color-adjust: exact; -webkit-print-color-adjust: exact;">
+                <th class="border border-[#a9a9a9] p-3 font-black text-center w-[12%] uppercase text-[#000080]">TARIKH</th>
+                <th class="border border-[#a9a9a9] p-3 font-black text-center w-[15%] uppercase text-[#000080]">MASA</th>
+                <th class="border border-[#a9a9a9] p-3 font-black text-center w-[33%] uppercase text-[#000080]">MESYUARAT / PROGRAM</th>
+                <th class="border border-[#a9a9a9] p-3 font-black text-center w-[20%] uppercase text-[#000080]">TEMPAT</th>
+                <th class="border border-[#a9a9a9] p-3 font-black text-center w-[20%] uppercase text-[#000080]">PEGAWAI</th>
               </tr>
             </thead>
             <tbody>${tbodyHTML}</tbody>
           </table>
-          <p class="mt-4 text-[10px] md:text-xs italic text-black font-semibold">* (Tertakluk kepada sebarang pindaan)</p>
+          <p class="mt-4 text-[10px] md:text-xs italic text-gray-500 font-semibold text-center md:text-left">* (Tertakluk kepada sebarang pindaan)</p>
         </div>
       `;
     }
@@ -1807,20 +1818,6 @@
                   <p class="text-xs text-[#555] font-semibold mt-1">Biarkan kosong jika tidak mahu menggunakan kata laluan (Bypass).</p>
                 </div>
               </div>
-
-              <div class="bg-[#ffffe1] p-5 md:p-6 rounded-xl border border-green-300 shadow-sm">
-                <h2 class="font-black text-base text-[#008000] border-b-2 border-green-200 pb-3 mb-5 flex items-center gap-2"><i data-lucide="file-bar-chart" class="w-5 h-5"></i> Cetakan Laporan Kalendar Bulanan</h2>
-                <div class="flex flex-col gap-3">
-                  <label class="font-bold text-sm text-black">Pilih Bulan & Tahun Cetakan:</label>
-                  <div class="flex flex-wrap md:flex-nowrap items-center gap-3">
-                    <input type="month" id="setting-month" value="${printMonth}" onchange="updatePrintMonth(this.value)" class="xp-input text-base font-bold w-full md:w-auto" title="Pilih tarikh untuk dicetak" />
-                    <button onclick="handlePrintMonthly()" class="xp-button font-bold text-white bg-[#008000] border-[#005000] shadow-sm px-6 h-10 w-full md:w-auto justify-center text-sm" title="Jana dan papar PDF laporan aktiviti bulanan ini">
-                      <i data-lucide="printer" class="w-4 h-4"></i> Jana Laporan PDF
-                    </button>
-                  </div>
-                </div>
-              </div>
-
             </div>
           </div>
         `;
@@ -1876,23 +1873,190 @@
       }
     }
 
-    function updatePrintMonth(val) { printMonth = val; }
+    // --- FUNGSI PELAPORAN SURAT MENYURAT ---
+    function setSuratReportMode(mode) {
+        suratReportMode = mode;
+        renderApp();
+    }
 
-    function handlePrintMonthly() {
-      const printContainer = document.getElementById('monthly-print-container');
-      const [yStr, mStr] = printMonth.split('-');
-      const year = parseInt(yStr, 10);
-      const monthIndex = parseInt(mStr, 10) - 1;
-      const daysInMonth = getDaysOfMonth(year, monthIndex);
-      
-      const rangeText = `BULAN ${['JANUARI', 'FEBRUARI', 'MAC', 'APRIL', 'MEI', 'JUN', 'JULAI', 'OGOS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DISEMBER'][monthIndex]} ${year}`;
-      const myActivities = activities.filter(a => a.userId === currentUserId);
+    function ubahSuratReportDate(step) {
+        if (suratReportMode === 'weekly') {
+            suratReportDate = new Date(suratReportDate.getTime() + step * 7 * 24 * 60 * 60 * 1000);
+        } else {
+            suratReportDate.setMonth(suratReportDate.getMonth() + step);
+        }
+        renderApp();
+    }
 
-      printContainer.innerHTML = buildMatrixHTML(daysInMonth, myActivities, "Laporan Aktiviti Bulanan", rangeText, false);
-      
-      document.body.classList.add('printing-monthly');
-      lucide.createIcons();
-      setTimeout(() => { window.print(); document.body.classList.remove('printing-monthly'); }, 400);
+    function renderSuratLaporan(container) {
+        let titleText = '';
+        let startD, endD;
+        let filteredDocs = [];
+
+        if (suratReportMode === 'weekly') {
+            const weekStart = getStartOfWeek(suratReportDate);
+            const weekDays = getDaysOfWeek(weekStart);
+            startD = weekDays[0].dateStr;
+            endD = weekDays[6].dateStr;
+            titleText = `Laporan Pendaftaran Surat Mingguan (${weekDays[0].displayDate} - ${weekDays[6].displayDate} ${startD.substring(0,4)})`;
+            
+            filteredDocs = documents.filter(d => {
+                const dDate = d.tarikhDaftar.split('T')[0];
+                return dDate >= startD && dDate <= endD;
+            });
+        } else {
+            const y = suratReportDate.getFullYear();
+            const m = suratReportDate.getMonth();
+            titleText = `Laporan Pendaftaran Surat Bulanan (${monthNamesList[m]} ${y})`;
+            
+            filteredDocs = documents.filter(d => {
+                const dDate = new Date(d.tarikhDaftar);
+                return dDate.getFullYear() === y && dDate.getMonth() === m;
+            });
+        }
+
+        // Tapis Surat Masuk
+        const dMasuk = filteredDocs.filter(d => 
+            d.status !== 'Dibatalkan' &&
+            ((d.lokasiSemasa === currentDept && d.pendaftar !== currentDept) || 
+            (d.pendaftar === currentDept && d.aliran === 'Dokumen / Surat Masuk'))
+        ).map(d => ({ ...d, reportType: 'masuk' }));
+
+        // Tapis Surat Keluar (dan gabungkan rekod berkelompok)
+        const dKeluarMap = {};
+        filteredDocs.filter(d => d.status !== 'Dibatalkan' && d.pendaftar === currentDept && d.aliran !== 'Dokumen / Surat Masuk').forEach(d => {
+            if(!dKeluarMap[d.noRuj]) {
+                dKeluarMap[d.noRuj] = { ...d, allDestinasi: [d.lokasiSemasa], reportType: 'keluar' };
+            } else {
+                if(!dKeluarMap[d.noRuj].allDestinasi.includes(d.lokasiSemasa)) {
+                    dKeluarMap[d.noRuj].allDestinasi.push(d.lokasiSemasa);
+                }
+            }
+        });
+        const dKeluar = Object.values(dKeluarMap);
+
+        // Gabungkan Masuk dan Keluar ke dalam 1 senarai, susun mengikut tarikh pendaftaran
+        const allDocs = [...dMasuk, ...dKeluar].sort((a,b) => new Date(b.tarikhDaftar) - new Date(a.tarikhDaftar));
+
+        // Group dokumen mengikut Hari (Tarikh)
+        const groupedByDate = {};
+        allDocs.forEach(d => {
+            const dateStr = d.tarikhDaftar.split('T')[0];
+            if(!groupedByDate[dateStr]) groupedByDate[dateStr] = [];
+            groupedByDate[dateStr].push(d);
+        });
+
+        let tbodyHtml = '';
+        const sortedDates = Object.keys(groupedByDate).sort((a,b) => new Date(b) - new Date(a));
+        
+        if (sortedDates.length === 0) {
+            tbodyHtml = `<tr><td colspan="5" class="border border-[#a9a9a9] p-5 text-center font-semibold italic text-gray-500">Tiada sebarang rekod didaftarkan pada tempoh ini.</td></tr>`;
+        } else {
+            sortedDates.forEach(dateStr => {
+                const docsForDate = groupedByDate[dateStr];
+                const dObj = new Date(dateStr);
+                const dayName = dayNamesList[dObj.getDay()];
+                const displayDate = formatDateOnly(dateStr); 
+                
+                docsForDate.forEach((d, idx) => {
+                    const isMasuk = d.reportType === 'masuk';
+                    const bgClass = isMasuk ? 'bg-red-50' : 'bg-blue-50';
+                    const borderClass = isMasuk ? 'border-red-300' : 'border-blue-300';
+                    const textTypeClass = isMasuk ? 'text-red-700' : 'text-blue-700';
+                    const typeLabel = isMasuk ? 'SURAT MASUK / DITERIMA' : 'SURAT KELUAR / EDARAN';
+                    
+                    let destLabel = '';
+                    let destVal = '';
+                    if (isMasuk) {
+                        destLabel = 'DARI PENGHANTAR:';
+                        destVal = d.pendaftar === currentDept ? currentDept : d.pendaftar;
+                    } else {
+                        destLabel = 'DIEDAR KEPADA:';
+                        destVal = d.allDestinasi ? d.allDestinasi.join(', ') : d.lokasiSemasa;
+                    }
+                    
+                    const statusVal = isMasuk ? d.status : (d.allDestinasi && d.allDestinasi.length > 1 ? 'Berkelompok' : d.status);
+                    
+                    let dateCell = '';
+                    if (idx === 0) {
+                        dateCell = `<td class="border border-[#a9a9a9] p-3 text-center text-sm font-black align-top bg-gray-100" rowspan="${docsForDate.length}">
+                            <div class="uppercase text-[11px] text-gray-500 mb-0.5 font-bold tracking-wider">${dayName}</div>
+                            <div>${displayDate}</div>
+                        </td>`;
+                    }
+                    
+                    // Untuk memastikan warna latar & border dicetak (Print mode)
+                    const trStyle = `print-color-adjust: exact; -webkit-print-color-adjust: exact;`;
+                    
+                    tbodyHtml += `
+                        <tr style="${trStyle}">
+                            ${dateCell}
+                            <td class="p-3 align-top border-b-[2px] border-t-[2px] border-l-[2px] ${borderClass} ${bgClass}">
+                                <div class="font-black text-[10px] ${textTypeClass} mb-1 uppercase tracking-wider">${typeLabel}</div>
+                                <div class="font-bold text-black text-xs mb-1.5">${d.noRuj}</div>
+                                <div class="text-[9px] font-bold px-1.5 py-0.5 rounded inline-block text-white ${d.klasifikasi === 'Sulit' ? 'bg-red-600' : (d.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${d.klasifikasi || 'Biasa'}</div>
+                            </td>
+                            <td class="p-3 align-top border-b-[2px] border-t-[2px] ${borderClass} ${bgClass}">
+                                <div class="font-bold text-sm text-black">${escapeHTML(d.tajuk)}</div>
+                            </td>
+                            <td class="p-3 align-top border-b-[2px] border-t-[2px] ${borderClass} ${bgClass}">
+                                <div class="text-[10px] text-gray-600 uppercase font-bold">${destLabel}</div>
+                                <div class="text-xs font-semibold text-black">${destVal}</div>
+                            </td>
+                            <td class="p-3 text-center align-top font-bold text-xs border-b-[2px] border-t-[2px] border-r-[2px] ${borderClass} ${bgClass}">
+                                ${statusVal}
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        container.innerHTML = `
+            <div class="flex flex-col gap-4 no-print mb-6 border-b-2 border-[#a9a9a9] pb-5">
+                <div class="flex items-center gap-4 flex-wrap">
+                    <span class="font-bold text-sm text-[#000080] bg-blue-50 px-3 py-1.5 rounded border border-blue-200">Format Paparan:</span>
+                    <div class="flex gap-2">
+                        <button onclick="setSuratReportMode('weekly')" class="xp-button text-sm h-10 ${suratReportMode==='weekly'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}">Mingguan</button>
+                        <button onclick="setSuratReportMode('monthly')" class="xp-button text-sm h-10 ${suratReportMode==='monthly'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}">Bulanan</button>
+                    </div>
+                    <div class="w-px h-8 bg-[#a9a9a9] mx-2 hidden md:block"></div>
+                    <div class="flex items-center gap-1 xp-panel p-1 bg-white">
+                        <button onclick="ubahSuratReportDate(-1)" class="xp-button h-8 w-10 p-0" title="Tempoh Sebelumnya"><i data-lucide="chevron-left" class="w-5 h-5 text-[#000080]"></i></button>
+                        <span class="font-bold text-[#000080] text-xs px-4 min-w-[200px] text-center">${titleText.split('(')[1].replace(')','')}</span>
+                        <button onclick="ubahSuratReportDate(1)" class="xp-button h-8 w-10 p-0" title="Tempoh Seterusnya"><i data-lucide="chevron-right" class="w-5 h-5 text-[#000080]"></i></button>
+                    </div>
+                    <button onclick="window.print()" class="xp-button font-bold text-black ml-auto h-10 px-6 shadow-sm"><i data-lucide="printer" class="w-5 h-5 text-black"></i> Cetak / Jana PDF</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 md:p-10 overflow-x-auto relative shadow-inner printable-container rounded-xl border border-[#a9a9a9]" id="print-area">
+                <div class="text-center mb-8">
+                    <h2 class="font-black text-xl md:text-2xl uppercase text-black tracking-wide">Rekod Pendaftaran Surat Keluar & Masuk</h2>
+                    <h3 class="font-bold text-lg md:text-xl uppercase text-black mt-1">${escapeHTML(currentDept)}</h3>
+                    <p class="mt-2 text-black font-semibold text-sm">${titleText}</p>
+                </div>
+
+                <div class="mb-8">
+                    <table class="w-full border-collapse border border-[#a9a9a9] text-sm print-table border-spacing-y-2" style="border-spacing: 0 4px;">
+                        <thead>
+                            <tr class="bg-gray-300" style="print-color-adjust: exact; -webkit-print-color-adjust: exact;">
+                                <th class="border border-[#a9a9a9] p-3 font-extrabold text-center w-[12%]">TARIKH</th>
+                                <th class="border border-[#a9a9a9] p-3 font-extrabold text-left w-[20%]">JENIS & NO. RUJUKAN</th>
+                                <th class="border border-[#a9a9a9] p-3 font-extrabold text-left w-[35%]">TAJUK SURAT / PERKARA</th>
+                                <th class="border border-[#a9a9a9] p-3 font-extrabold text-left w-[20%]">DARI / KEPADA</th>
+                                <th class="border border-[#a9a9a9] p-3 font-extrabold text-center w-[13%]">STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tbodyHtml}</tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-8 pt-4 border-t border-dashed border-gray-400 text-xs text-center text-gray-500 italic">
+                    Laporan ini dijana oleh Sistem Pengurusan Kalendar & Rekod Surat pada ${formatDateTime(new Date().toISOString())}
+                </div>
+            </div>
+        `;
     }
 
     function updateBadges() {
