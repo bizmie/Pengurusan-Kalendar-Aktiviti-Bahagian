@@ -2,7 +2,7 @@
 <html lang="ms">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Sistem Pengurusan Kalendar & Rekod Surat</title>
   
   <!-- Tailwind CSS -->
@@ -21,7 +21,6 @@
     .xp-window { 
       background-color: #ECE9D8; 
       border: 1px solid #003C74; 
-      border-radius: 12px; 
       box-shadow: 2px 2px 12px rgba(0,0,0,0.4); 
       overflow: hidden;
       display: flex;
@@ -149,7 +148,7 @@
     .profile-card:hover { transform: scale(1.08); }
     .profile-card:hover .profile-img { border-color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
 
-    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .toast-anim { animation: slideIn 0.3s ease-out forwards; }
 
     .sa-table th { background-color: #d2cbbb; border: 1px solid #716f64; padding: 10px; text-align: left; }
@@ -166,7 +165,6 @@
       @page { margin: 1.5cm; size: auto; }
       body, html { background-color: white !important; margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; min-height: auto !important; }
       
-      /* Pembuangan had saiz skrol UI untuk membolehkan cetakan multi-halaman */
       body.xp-desktop, .xp-window, #main-app-window, #view-container, #print-area {
         display: block !important;
         max-height: none !important;
@@ -182,7 +180,6 @@
         max-width: none !important;
       }
       
-      /* Pembuangan sifat flexbox pembungkus tengah */
       #main-app-window > div {
          display: block !important;
          overflow: visible !important;
@@ -192,23 +189,32 @@
          background: white !important;
       }
 
-      /* Sembunyikan elemen UI yang tidak perlu dicetak */
       .no-print { display: none !important; }
-      .print-table th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
+      
+      body.printing-monthly #main-app-window { display: none !important; }
+      body.printing-monthly .monthly-print-only { display: block !important; position: static !important; width: 100% !important; padding: 0 !important; }
+      body:not(.printing-monthly) .monthly-print-only { display: none !important; }
+      
+      .print-table { width: 100% !important; border-collapse: collapse !important; page-break-inside: auto; }
+      .print-table tr { page-break-inside: avoid !important; page-break-after: auto; }
+      .print-table thead { display: table-header-group; }
+      .print-table tfoot { display: table-footer-group; }
+      
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     }
   </style>
 </head>
-<body class="xp-desktop p-2 md:p-6 flex justify-center items-start overflow-x-hidden">
+<body class="xp-desktop p-0 sm:p-2 md:p-4 flex justify-center items-start sm:items-center overflow-hidden w-full h-full bg-[#3A6EA5]">
 
   <!-- Toast Notifikasi -->
-  <div id="toast" class="fixed top-4 right-4 z-[100] bg-[#008000] text-white px-5 py-4 rounded-lg border-2 border-white shadow-lg flex items-center font-bold text-sm md:text-base no-print hidden toast-anim max-w-[90vw]">
+  <div id="toast" class="fixed bottom-4 right-4 sm:top-4 sm:bottom-auto z-[100] bg-[#008000] text-white px-5 py-4 rounded-lg border-2 border-white shadow-lg flex items-center font-bold text-sm md:text-base no-print hidden toast-anim max-w-[90vw]">
     <i data-lucide="check-circle-2" class="w-6 h-6 mr-3 shrink-0" id="toast-icon"></i>
     <span id="toast-msg">Mesej Berjaya</span>
   </div>
 
   <!-- Custom Konfirmasi Popup Modal -->
   <div id="custom-confirm-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
-    <div class="xp-window w-full max-w-sm flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.8)] animate-[slideIn_0.2s_ease-out]">
+    <div class="xp-window w-full max-w-sm flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.8)] animate-[slideIn_0.2s_ease-out] rounded-[12px]">
       <div class="xp-titlebar bg-gradient-to-b from-red-500 to-red-700 border-red-800">
         <span class="text-base flex items-center gap-2 text-white"><i data-lucide="alert-triangle" class="w-5 h-5"></i> Pengesahan Tindakan</span>
       </div>
@@ -225,28 +231,28 @@
   </div>
 
   <!-- SKRIN LOG MASUK -->
-  <div id="login-screen" class="w-full flex flex-col items-center justify-center min-h-[85vh] relative pt-8">
-    <div class="text-center mb-12">
-      <div id="login-date-display" class="text-base md:text-lg font-bold text-yellow-300 drop-shadow-md mb-2 tracking-wide uppercase" title="Tarikh Hari Ini"></div>
-      <h1 class="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight px-4" style="text-shadow: 3px 3px 6px rgba(0,0,0,0.6);">Sistem Kalendar & Rekod Surat</h1>
-      <h2 class="text-xl md:text-2xl text-slate-200 font-medium" style="text-shadow: 1px 1px 4px rgba(0,0,0,0.5);">Pilih Profil Akses</h2>
+  <div id="login-screen" class="w-full flex flex-col items-center justify-center min-h-[100dvh] relative pt-8 pb-10">
+    <div class="text-center mb-10 sm:mb-12">
+      <div id="login-date-display" class="text-sm sm:text-base md:text-lg font-bold text-yellow-300 drop-shadow-md mb-2 tracking-wide uppercase" title="Tarikh Hari Ini"></div>
+      <h1 class="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4 leading-tight px-4" style="text-shadow: 3px 3px 6px rgba(0,0,0,0.6);">Sistem Kalendar & Rekod Surat</h1>
+      <h2 class="text-lg sm:text-xl md:text-2xl text-slate-200 font-medium" style="text-shadow: 1px 1px 4px rgba(0,0,0,0.5);">Pilih Profil Akses</h2>
     </div>
 
-    <div id="profile-grid" class="flex flex-wrap justify-center gap-8 md:gap-14 max-w-6xl px-4 z-10 mb-10">
+    <div id="profile-grid" class="flex flex-wrap justify-center gap-6 sm:gap-8 md:gap-14 max-w-6xl px-4 z-10 mb-10">
       <!-- Dijana oleh JS -->
     </div>
     
-    <div class="mt-6 z-10">
+    <div class="mt-4 sm:mt-6 z-10">
       <button onclick="openProfileMenu('superadmin')" class="flex items-center gap-2 text-slate-200 hover:text-white bg-black/30 hover:bg-black/50 px-6 py-3 rounded-full backdrop-blur-sm transition-all border border-transparent hover:border-slate-400 shadow-md" title="Log masuk ke panel konfigurasi Super Admin">
-        <i data-lucide="shield" class="w-6 h-6 text-red-400"></i>
-        <span class="text-base font-bold tracking-wide">Akses Super-Admin</span>
+        <i data-lucide="shield" class="w-5 h-5 sm:w-6 sm:h-6 text-red-400"></i>
+        <span class="text-sm sm:text-base font-bold tracking-wide">Akses Super-Admin</span>
       </button>
     </div>
   </div>
 
   <!-- MODAL SUB-MENU LOGIN -->
   <div id="profile-auth-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="xp-window w-[95%] sm:w-full max-w-sm flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.8)] relative animate-[slideIn_0.2s_ease-out]">
+    <div class="xp-window w-[95%] sm:w-full max-w-sm flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.8)] relative animate-[slideIn_0.2s_ease-out] rounded-[12px]">
       <button onclick="closeProfileMenu()" class="absolute top-2 right-2 text-white hover:text-red-200 z-10 transition-colors" title="Tutup paparan log masuk">
         <i data-lucide="x" class="w-6 h-6"></i>
       </button>
@@ -254,11 +260,11 @@
         <span class="text-base flex items-center gap-2"><i data-lucide="lock" class="w-5 h-5"></i> Pengesahan Akses</span>
       </div>
       <div class="p-8 bg-[#ece9d8] rounded-b-[12px] flex flex-col items-center max-h-[85vh] overflow-y-auto">
-        <div class="w-20 h-20 rounded-xl border-2 border-[#003C74] bg-white flex items-center justify-center mb-4 shadow-md shrink-0" id="auth-profile-icon-container">
-           <i data-lucide="user" class="w-10 h-10 text-[#000080]" id="auth-profile-icon"></i>
+        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl border-2 border-[#003C74] bg-white flex items-center justify-center mb-4 shadow-md shrink-0" id="auth-profile-icon-container">
+           <i data-lucide="user" class="w-8 h-8 sm:w-10 sm:h-10 text-[#000080]" id="auth-profile-icon"></i>
         </div>
-        <h3 class="text-xl font-bold text-[#000080] text-center mb-1" id="auth-profile-name">Nama Profil</h3>
-        <p class="text-sm text-[#555] mb-6 text-center px-4 font-semibold" id="auth-profile-dept">Bahagian Profil</p>
+        <h3 class="text-lg sm:text-xl font-bold text-[#000080] text-center mb-1" id="auth-profile-name">Nama Profil</h3>
+        <p class="text-xs sm:text-sm text-[#555] mb-6 text-center px-4 font-semibold" id="auth-profile-dept">Bahagian Profil</p>
 
         <div id="login-error" class="w-full bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-4 py-3 rounded text-sm font-bold flex items-start gap-2 hidden mb-5 shadow-sm">
           <span class="w-5 h-5 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-xs shrink-0 mt-0.5">!</span>
@@ -271,15 +277,15 @@
           </button>
           <div class="flex items-center gap-3 my-5">
             <div class="h-px bg-[#a9a9a9] flex-1"></div>
-            <span class="text-xs font-bold text-[#777] uppercase tracking-wider">Kawasan Admin</span>
+            <span class="text-[10px] sm:text-xs font-bold text-[#777] uppercase tracking-wider">Kawasan Admin</span>
             <div class="h-px bg-[#a9a9a9] flex-1"></div>
           </div>
         </div>
 
         <div class="w-full flex flex-col gap-2">
-          <label class="text-sm font-bold text-black" id="auth-password-label">Kata Laluan <span class="text-[#888] font-normal">(Bypass dibenarkan)</span>:</label>
-          <input type="password" id="auth-pass" placeholder="Taip kata laluan..." class="xp-input text-center text-lg" onkeypress="if(event.key === 'Enter') executeLogin('admin')" />
-          <button onclick="executeLogin('admin')" class="xp-button w-full justify-center font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] py-3 mt-2 shadow-sm text-base" title="Sahkan log masuk ke dalam sistem">
+          <label class="text-xs sm:text-sm font-bold text-black" id="auth-password-label">Kata Laluan <span class="text-[#888] font-normal">(Bypass dibenarkan)</span>:</label>
+          <input type="password" id="auth-pass" placeholder="Taip kata laluan..." class="xp-input text-center text-base sm:text-lg" onkeypress="if(event.key === 'Enter') executeLogin('admin')" />
+          <button onclick="executeLogin('admin')" class="xp-button w-full justify-center font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] py-3 mt-2 shadow-sm text-sm sm:text-base" title="Sahkan log masuk ke dalam sistem">
             <i data-lucide="unlock" class="w-5 h-5"></i> Log Masuk Mod Penuh
           </button>
         </div>
@@ -288,60 +294,60 @@
   </div>
 
   <!-- TETINGKAP UTAMA APLIKASI -->
-  <div class="xp-window w-full max-w-7xl flex flex-col hide-on-monthly-print hidden max-h-[96vh]" id="main-app-window">
+  <div class="xp-window w-full h-[100dvh] sm:h-[96vh] sm:max-w-[98%] 2xl:max-w-[1600px] flex flex-col hide-on-monthly-print hidden sm:rounded-[12px] border-none sm:border-solid border-[#003C74]" id="main-app-window">
     
     <!-- Titlebar Aplikasi -->
-    <div class="xp-titlebar flex-wrap gap-2 md:gap-4 no-print">
+    <div class="xp-titlebar flex-wrap gap-2 md:gap-4 no-print shrink-0">
       <div class="flex items-center gap-3 max-w-full overflow-hidden">
         <i data-lucide="layout" class="w-5 h-5 text-white drop-shadow shrink-0"></i>
-        <span class="text-sm md:text-base tracking-wide truncate">Sistem Pengurusan Kalendar & Rekod Surat</span>
+        <span class="text-xs sm:text-sm md:text-base tracking-wide truncate">Sistem Pengurusan Kalendar & Rekod Surat</span>
       </div>
-      <button onclick="handleLogout()" id="header-logout-btn" class="bg-[#e53935] text-white px-3 py-1.5 rounded flex items-center gap-2 hover:bg-red-600 transition-colors border border-red-800 shrink-0 text-xs md:text-sm font-bold shadow-sm" title="Log keluar dari sistem">
+      <button onclick="handleLogout()" id="header-logout-btn" class="bg-[#e53935] text-white px-3 py-1.5 rounded flex items-center gap-2 hover:bg-red-600 transition-colors border border-red-800 shrink-0 text-[10px] sm:text-xs md:text-sm font-bold shadow-sm" title="Log keluar dari sistem">
         <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
       </button>
     </div>
 
     <!-- Status Bar & Date (Top) -->
-    <div id="status-bar-top" class="bg-white border-b-2 border-[#a9a9a9] px-4 md:px-6 py-3 flex justify-between items-center text-sm md:text-base shadow-sm no-print relative z-20 flex-wrap gap-2">
-      <div class="text-[#0058e6] font-extrabold uppercase tracking-wide flex items-center gap-2" title="Tahap akses semasa anda">
-          <i data-lucide="user-check" class="w-5 h-5"></i> AKSES: <span id="status-role-text" class="text-black font-black bg-[#ffffe1] px-3 py-1 rounded border border-[#0058e6]"></span>
+    <div id="status-bar-top" class="bg-white border-b-2 border-[#a9a9a9] px-3 sm:px-4 md:px-6 py-2 sm:py-3 flex justify-between items-center text-[10px] sm:text-sm md:text-base shadow-sm no-print relative z-20 flex-wrap gap-2 shrink-0">
+      <div class="text-[#0058e6] font-extrabold uppercase tracking-wide flex items-center gap-1.5 sm:gap-2" title="Tahap akses semasa anda">
+          <i data-lucide="user-check" class="w-4 h-4 sm:w-5 sm:h-5"></i> AKSES: <span id="status-role-text" class="text-black font-black bg-[#ffffe1] px-2 sm:px-3 py-0.5 sm:py-1 rounded border border-[#0058e6]"></span>
       </div>
-      <div class="text-[#008000] font-extrabold flex items-center gap-2 bg-[#e6f0ff] px-3 py-1 rounded border border-[#0058e6]" title="Tarikh sistem semasa">
-          <i data-lucide="calendar-check" class="w-5 h-5 text-[#0058e6]"></i> <span id="current-date-display"></span>
+      <div class="text-[#008000] font-extrabold flex items-center gap-1.5 sm:gap-2 bg-[#e6f0ff] px-2 sm:px-3 py-0.5 sm:py-1 rounded border border-[#0058e6]" title="Tarikh sistem semasa">
+          <i data-lucide="calendar-check" class="w-4 h-4 sm:w-5 sm:h-5 text-[#0058e6]"></i> <span id="current-date-display"></span>
       </div>
     </div>
 
-    <div class="p-2 md:p-4 bg-[#ece9d8] flex-1 overflow-y-auto flex flex-col relative z-10 w-full">
+    <div class="p-2 md:p-4 bg-[#ece9d8] flex-1 overflow-hidden flex flex-col relative z-10 w-full min-h-0">
       
       <!-- NAVIGASI TAB UTAMA -->
-      <div id="top-nav-controls" class="flex flex-col mb-4 no-print w-full">
+      <div id="top-nav-controls" class="flex flex-col mb-3 sm:mb-4 no-print w-full shrink-0">
         
         <!-- Main Tabs -->
-        <div class="flex gap-2 overflow-x-auto items-end pt-2 border-b-2 border-[#fff] w-full hide-scrollbar" id="main-tabs-container">
-            <button onclick="switchMainTab('kalendar')" id="main-tab-kalendar" class="main-tab-btn active" title="Papar dan urus kalendar aktiviti"><i data-lucide="calendar" class="w-5 h-5"></i> Rekod Kalendar</button>
-            <button onclick="switchMainTab('surat')" id="main-tab-surat" class="main-tab-btn relative" title="Urus dan jejak rekod surat menyurat"><i data-lucide="mail" class="w-5 h-5"></i> Surat Menyurat 
-               <span id="badge-surat-main" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full hidden border-2 border-white shadow-md font-black" title="Jumlah surat perlukan tindakan">0</span>
+        <div class="flex gap-1.5 sm:gap-2 overflow-x-auto items-end pt-1 sm:pt-2 border-b-2 border-[#fff] w-full hide-scrollbar px-1 sm:px-0" id="main-tabs-container">
+            <button onclick="switchMainTab('kalendar')" id="main-tab-kalendar" class="main-tab-btn text-xs sm:text-sm active" title="Papar dan urus kalendar aktiviti"><i data-lucide="calendar" class="w-4 h-4 sm:w-5 sm:h-5"></i> Rekod Kalendar</button>
+            <button onclick="switchMainTab('surat')" id="main-tab-surat" class="main-tab-btn text-xs sm:text-sm relative" title="Urus dan jejak rekod surat menyurat"><i data-lucide="mail" class="w-4 h-4 sm:w-5 sm:h-5"></i> Surat Menyurat 
+               <span id="badge-surat-main" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full hidden border sm:border-2 border-white shadow-md font-black" title="Jumlah surat perlukan tindakan">0</span>
             </button>
-            <button onclick="switchMainTab('settings')" id="main-tab-settings" class="main-tab-btn" title="Tetapan profil dan sistem anda"><i data-lucide="settings" class="w-5 h-5"></i> Tetapan</button>
+            <button onclick="switchMainTab('settings')" id="main-tab-settings" class="main-tab-btn text-xs sm:text-sm" title="Tetapan profil dan sistem anda"><i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5"></i> Tetapan</button>
         </div>
 
         <!-- Sub Tabs Container -->
-        <div class="bg-white p-2 md:p-3 border border-[#a9a9a9] rounded-b-lg rounded-tr-lg shadow-sm flex flex-wrap items-center justify-between gap-3" id="sub-tabs-container">
+        <div class="bg-white p-2 border border-[#a9a9a9] rounded-b-lg rounded-tr-lg shadow-sm flex flex-wrap items-center justify-between gap-2 overflow-x-auto hide-scrollbar" id="sub-tabs-container">
            <!-- Diisi dinamik berdasarkan Main Tab -->
         </div>
       </div>
 
       <!-- Super Admin Header -->
-      <div id="superadmin-nav" class="hidden pb-4 border-b border-[#a9a9a9] mb-4 no-print">
+      <div id="superadmin-nav" class="hidden pb-3 border-b border-[#a9a9a9] mb-3 no-print shrink-0">
         <div class="flex flex-wrap justify-between items-center gap-3">
-          <h2 class="font-bold text-lg md:text-xl text-[#000080] flex items-center gap-2">
-            <i data-lucide="shield-alert" class="w-6 h-6 text-red-600 shrink-0"></i> <span class="truncate">Panel Super-Admin Sistem</span>
+          <h2 class="font-bold text-base sm:text-lg md:text-xl text-[#000080] flex items-center gap-2">
+            <i data-lucide="shield-alert" class="w-5 h-5 sm:w-6 sm:h-6 text-red-600 shrink-0"></i> <span class="truncate">Panel Super-Admin Sistem</span>
           </h2>
         </div>
       </div>
 
       <!-- Bekas Utama View -->
-      <div id="view-container" class="bg-white xp-panel p-3 md:p-5 flex-1 relative shadow-md overflow-hidden flex flex-col"></div>
+      <div id="view-container" class="bg-white xp-panel p-2 sm:p-3 md:p-5 flex-1 relative shadow-md overflow-hidden flex flex-col w-full min-h-0"></div>
     </div>
   </div>
 
@@ -351,67 +357,67 @@
   <!-- SEMUA MODAL POPUP DILETAKKAN DI SINI -->
 
   <!-- Modal Aktiviti Kalendar -->
-  <div id="modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden">
-    <div class="xp-window w-[95%] sm:w-full max-w-3xl flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
-      <div class="xp-titlebar">
-        <span class="text-base flex items-center gap-2" id="modal-title"></span>
-        <button onclick="closeModal()" class="text-white hover:text-red-200 transition-colors md:hidden" title="Tutup paparan"><i data-lucide="x" class="w-6 h-6"></i></button>
+  <div id="modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-2 sm:p-4 hidden">
+    <div class="xp-window w-full max-w-3xl flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)] rounded-[12px] max-h-[95dvh]">
+      <div class="xp-titlebar shrink-0">
+        <span class="text-sm sm:text-base flex items-center gap-2" id="modal-title"></span>
+        <button onclick="closeModal()" class="text-white hover:text-red-200 transition-colors" title="Tutup paparan"><i data-lucide="x" class="w-5 h-5 sm:w-6 sm:h-6"></i></button>
       </div>
-      <div class="p-5 md:p-6 bg-[#ece9d8] overflow-y-auto max-h-[75vh]">
+      <div class="p-4 sm:p-5 md:p-6 bg-[#ece9d8] overflow-y-auto flex-1">
         <div id="conflict-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-4 py-3 rounded mb-5 flex items-start gap-3 hidden shadow-sm">
           <span class="w-5 h-5 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-xs shrink-0 mt-0.5">!</span>
-          <div id="conflict-error-msg" class="flex-1 w-full text-sm font-semibold"></div>
+          <div id="conflict-error-msg" class="flex-1 w-full text-xs sm:text-sm font-semibold"></div>
         </div>
         <div id="guest-override-container" class="hidden bg-[#fff8e1] border border-[#ffe082] px-4 py-3 rounded mb-5 shadow-sm">
           <label class="flex items-start gap-3 cursor-pointer" title="Tandakan jika anda adalah tetamu di bilik ini">
-            <input type="checkbox" id="form-is-guest" class="mt-1 rounded w-5 h-5 text-[#f57f17] focus:ring-[#f57f17]" />
+            <input type="checkbox" id="form-is-guest" class="mt-1 rounded w-4 h-4 sm:w-5 sm:h-5 text-[#f57f17] focus:ring-[#f57f17]" />
             <div class="flex flex-col">
-              <span class="text-sm font-bold text-[#f57f17]">Teruskan sebagai Ahli Jemputan</span>
-              <span class="text-xs text-[#795548] leading-tight mt-1">Bilik ini telah ditempah. Tandakan ini jika anda hadir sebagai jemputan (Tempahan asal akan dianggap sebagai Hos bilik tersebut).</span>
+              <span class="text-xs sm:text-sm font-bold text-[#f57f17]">Teruskan sebagai Ahli Jemputan</span>
+              <span class="text-[10px] sm:text-xs text-[#795548] leading-tight mt-1">Bilik ini telah ditempah. Tandakan ini jika anda hadir sebagai jemputan.</span>
             </div>
           </label>
         </div>
-        <form id="activityForm" class="space-y-5">
+        <form id="activityForm" class="space-y-4 sm:space-y-5">
           <div class="flex items-center gap-2">
-            <input type="checkbox" id="form-isAllDay" onchange="toggleTimeFields()" class="rounded w-5 h-5" title="Tandakan jika aktiviti berlangsung seharian" /> 
-            <label for="form-isAllDay" class="text-sm font-bold text-[#000080] cursor-pointer" title="Tandakan jika aktiviti berlangsung seharian">Sepanjang Hari / Tiada Waktu Spesifik</label>
+            <input type="checkbox" id="form-isAllDay" onchange="toggleTimeFields()" class="rounded w-4 h-4 sm:w-5 sm:h-5" title="Tandakan jika aktiviti berlangsung seharian" /> 
+            <label for="form-isAllDay" class="text-xs sm:text-sm font-bold text-[#000080] cursor-pointer" title="Tandakan jika aktiviti berlangsung seharian">Sepanjang Hari / Tiada Waktu Spesifik</label>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-xl border border-[#a9a9a9] shadow-inner w-full">
-            <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Tarikh Mula:</label><input type="date" id="form-startDate" required class="xp-input font-bold text-sm w-full" title="Pilih tarikh mula aktiviti" /></div>
-            <div class="flex flex-col gap-1.5">
-              <label class="text-sm font-bold text-black">Masa Mula:</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 bg-white p-3 sm:p-4 rounded-xl border border-[#a9a9a9] shadow-inner w-full">
+            <div class="flex flex-col gap-1 sm:gap-1.5"><label class="text-xs sm:text-sm font-bold text-black">Tarikh Mula:</label><input type="date" id="form-startDate" required class="xp-input font-bold text-xs sm:text-sm w-full" title="Pilih tarikh mula aktiviti" /></div>
+            <div class="flex flex-col gap-1 sm:gap-1.5">
+              <label class="text-xs sm:text-sm font-bold text-black">Masa Mula:</label>
               <div class="flex w-full">
-                <input type="text" id="form-startTime" readonly onclick="openClockModal('form-startTime')" class="xp-input cursor-pointer text-center bg-white rounded-r-none border-r-0 font-bold text-base w-full" placeholder="--:--" title="Klik untuk pilih masa" />
-                <button type="button" id="btn-clock-start" onclick="openClockModal('form-startTime')" class="xp-button-mini px-4 rounded-l-none bg-[#ece9d8] border-l-0 clock-btn shrink-0" title="Buka pemilih masa jam"><i data-lucide="clock" class="w-5 h-5 text-[#0058e6]"></i></button>
+                <input type="text" id="form-startTime" readonly onclick="openClockModal('form-startTime')" class="xp-input cursor-pointer text-center bg-white rounded-r-none border-r-0 font-bold text-sm sm:text-base w-full" placeholder="--:--" title="Klik untuk pilih masa" />
+                <button type="button" id="btn-clock-start" onclick="openClockModal('form-startTime')" class="xp-button-mini px-3 sm:px-4 rounded-l-none bg-[#ece9d8] border-l-0 clock-btn shrink-0" title="Buka pemilih masa jam"><i data-lucide="clock" class="w-4 h-4 sm:w-5 sm:h-5 text-[#0058e6]"></i></button>
               </div>
             </div>
-            <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Tarikh Tamat:</label><input type="date" id="form-endDate" required class="xp-input font-bold text-sm w-full" title="Pilih tarikh tamat aktiviti" /></div>
-            <div class="flex flex-col gap-1.5">
-              <label class="text-sm font-bold text-black">Masa Tamat:</label>
+            <div class="flex flex-col gap-1 sm:gap-1.5"><label class="text-xs sm:text-sm font-bold text-black">Tarikh Tamat:</label><input type="date" id="form-endDate" required class="xp-input font-bold text-xs sm:text-sm w-full" title="Pilih tarikh tamat aktiviti" /></div>
+            <div class="flex flex-col gap-1 sm:gap-1.5">
+              <label class="text-xs sm:text-sm font-bold text-black">Masa Tamat:</label>
               <div class="flex w-full">
-                <input type="text" id="form-endTime" readonly onclick="openClockModal('form-endTime')" class="xp-input cursor-pointer text-center bg-white rounded-r-none border-r-0 font-bold text-base w-full" placeholder="--:--" title="Klik untuk pilih masa" />
-                <button type="button" id="btn-clock-end" onclick="openClockModal('form-endTime')" class="xp-button-mini px-4 rounded-l-none bg-[#ece9d8] border-l-0 clock-btn shrink-0" title="Buka pemilih masa jam"><i data-lucide="clock" class="w-5 h-5 text-[#0058e6]"></i></button>
+                <input type="text" id="form-endTime" readonly onclick="openClockModal('form-endTime')" class="xp-input cursor-pointer text-center bg-white rounded-r-none border-r-0 font-bold text-sm sm:text-base w-full" placeholder="--:--" title="Klik untuk pilih masa" />
+                <button type="button" id="btn-clock-end" onclick="openClockModal('form-endTime')" class="xp-button-mini px-3 sm:px-4 rounded-l-none bg-[#ece9d8] border-l-0 clock-btn shrink-0" title="Buka pemilih masa jam"><i data-lucide="clock" class="w-4 h-4 sm:w-5 sm:h-5 text-[#0058e6]"></i></button>
               </div>
             </div>
           </div>
-          <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Mesyuarat / Program:</label><input type="text" id="form-program" required class="xp-input font-bold text-sm w-full" placeholder="Contoh: Mesyuarat Pengurusan" title="Taip nama program atau mesyuarat" /></div>
-          <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Nama Pengerusi (Pilihan):</label><input type="text" id="form-chairman" class="xp-input font-bold text-sm w-full" title="Taip nama pengerusi sekiranya ada" /></div>
+          <div class="flex flex-col gap-1.5"><label class="text-xs sm:text-sm font-bold text-black">Mesyuarat / Program:</label><input type="text" id="form-program" required class="xp-input font-bold text-xs sm:text-sm w-full" placeholder="Contoh: Mesyuarat Pengurusan" title="Taip nama program atau mesyuarat" /></div>
+          <div class="flex flex-col gap-1.5"><label class="text-xs sm:text-sm font-bold text-black">Nama Pengerusi (Pilihan):</label><input type="text" id="form-chairman" class="xp-input font-bold text-xs sm:text-sm w-full" title="Taip nama pengerusi sekiranya ada" /></div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-bold text-black">Tempat Lokasi:</label>
-            <select id="form-location" required class="xp-input cursor-pointer font-bold text-sm w-full" onchange="toggleCustomLocation()" title="Pilih lokasi dari senarai"></select>
+            <label class="text-xs sm:text-sm font-bold text-black">Tempat Lokasi:</label>
+            <select id="form-location" required class="xp-input cursor-pointer font-bold text-xs sm:text-sm w-full" onchange="toggleCustomLocation()" title="Pilih lokasi dari senarai"></select>
             <div id="form-custom-location-container" class="hidden mt-2">
-              <input type="text" id="form-custom-location" class="xp-input border-blue-500 bg-blue-50 font-bold text-sm w-full" placeholder="Sila nyatakan lokasi terperinci..." title="Taip lokasi luar atau khusus" />
+              <input type="text" id="form-custom-location" class="xp-input border-blue-500 bg-blue-50 font-bold text-xs sm:text-sm w-full" placeholder="Sila nyatakan lokasi terperinci..." title="Taip lokasi luar atau khusus" />
             </div>
           </div>
-          <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Pegawai Terlibat (Barisan Baharu Setiap Nama):</label><textarea id="form-officers" rows="3" required class="xp-input resize-none font-bold text-sm w-full" title="Taipkan senarai nama pegawai yang terlibat"></textarea></div>
-          <div class="flex flex-col gap-1.5"><label class="text-sm font-bold text-black">Catatan (Pilihan):</label><textarea id="form-notes" rows="2" class="xp-input resize-none font-bold text-sm w-full" title="Masukkan sebarang maklumat tambahan atau nota penting"></textarea></div>
+          <div class="flex flex-col gap-1.5"><label class="text-xs sm:text-sm font-bold text-black">Pegawai Terlibat (Barisan Baharu Setiap Nama):</label><textarea id="form-officers" rows="3" required class="xp-input resize-none font-bold text-xs sm:text-sm w-full" title="Taipkan senarai nama pegawai yang terlibat"></textarea></div>
+          <div class="flex flex-col gap-1.5"><label class="text-xs sm:text-sm font-bold text-black">Catatan (Pilihan):</label><textarea id="form-notes" rows="2" class="xp-input resize-none font-bold text-xs sm:text-sm w-full" title="Masukkan sebarang maklumat tambahan atau nota penting"></textarea></div>
         </form>
       </div>
-      <div class="p-4 md:p-5 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between items-center gap-3 flex-wrap">
-        <button type="button" id="btn-delete" onclick="handleDelete()" class="xp-button font-bold text-[#e53935] hidden text-sm px-5 py-2" title="Padam rekod aktiviti ini sepenuhnya"><i data-lucide="trash-2" class="w-5 h-5"></i> Padam Rekod</button>
-        <div class="flex gap-3 ml-auto flex-wrap sm:flex-nowrap">
-          <button type="button" onclick="closeModal()" class="xp-button text-sm px-6 py-2" title="Batal perubahan dan tutup">Batal</button>
-          <button type="button" onclick="saveActivity()" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] text-sm px-8 py-2 shadow-sm" title="Simpan rekod aktiviti ke pangkalan data"><i data-lucide="save" class="w-4 h-4"></i> Simpan</button>
+      <div class="p-3 sm:p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between items-center gap-2 sm:gap-3 flex-wrap shrink-0">
+        <button type="button" id="btn-delete" onclick="handleDelete()" class="xp-button font-bold text-[#e53935] hidden text-xs sm:text-sm px-4 sm:px-5 py-2 w-full sm:w-auto" title="Padam rekod aktiviti ini sepenuhnya"><i data-lucide="trash-2" class="w-4 h-4 sm:w-5 sm:h-5"></i> Padam Rekod</button>
+        <div class="flex gap-2 sm:gap-3 ml-auto w-full sm:w-auto flex-wrap sm:flex-nowrap">
+          <button type="button" onclick="closeModal()" class="xp-button text-xs sm:text-sm px-4 sm:px-6 py-2 flex-1 sm:flex-none justify-center" title="Batal perubahan dan tutup">Batal</button>
+          <button type="button" onclick="saveActivity()" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] text-xs sm:text-sm px-6 sm:px-8 py-2 shadow-sm flex-1 sm:flex-none justify-center" title="Simpan rekod aktiviti ke pangkalan data"><i data-lucide="save" class="w-4 h-4"></i> Simpan</button>
         </div>
       </div>
     </div>
@@ -419,137 +425,137 @@
 
   <!-- MODAL JAM ANALOG (TIME PICKER WIDGET) -->
   <div id="clock-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4 hidden no-print">
-    <div class="xp-window w-full max-w-[320px] flex flex-col shadow-2xl">
+    <div class="xp-window w-full max-w-[320px] flex flex-col shadow-2xl rounded-[12px]">
       <div class="xp-titlebar">
-        <span class="text-base flex items-center gap-2"><i data-lucide="clock" class="w-5 h-5"></i> Tetapkan Masa</span>
-        <button onclick="closeClockModal()" class="text-white hover:text-red-200 transition-colors" title="Tutup jam"><i data-lucide="x" class="w-6 h-6"></i></button>
+        <span class="text-sm sm:text-base flex items-center gap-2"><i data-lucide="clock" class="w-5 h-5"></i> Tetapkan Masa</span>
+        <button onclick="closeClockModal()" class="text-white hover:text-red-200 transition-colors" title="Tutup jam"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <div class="p-8 bg-[#ece9d8] flex flex-col items-center gap-6">
-        <div class="relative w-52 h-52 rounded-full border-[8px] border-[#003C74] bg-white shadow-inner flex items-center justify-center">
+      <div class="p-6 sm:p-8 bg-[#ece9d8] flex flex-col items-center gap-6">
+        <div class="relative w-48 h-48 sm:w-52 sm:h-52 rounded-full border-[6px] sm:border-[8px] border-[#003C74] bg-white shadow-inner flex items-center justify-center">
            <div class="absolute inset-0" id="clock-markers"></div>
-           <div id="hand-h" class="absolute w-[5px] h-14 bg-black rounded-full origin-bottom z-10 transition-transform duration-300 ease-out" style="bottom: 50%; transform-origin: bottom center;"></div>
-           <div id="hand-m" class="absolute w-[3px] h-20 bg-[#0058e6] rounded-full origin-bottom z-20 transition-transform duration-300 ease-out" style="bottom: 50%; transform-origin: bottom center;"></div>
-           <div class="absolute w-4 h-4 bg-red-600 rounded-full z-30 shadow-md border border-black"></div>
+           <div id="hand-h" class="absolute w-[4px] sm:w-[5px] h-12 sm:h-14 bg-black rounded-full origin-bottom z-10 transition-transform duration-300 ease-out" style="bottom: 50%; transform-origin: bottom center;"></div>
+           <div id="hand-m" class="absolute w-[2px] sm:w-[3px] h-16 sm:h-20 bg-[#0058e6] rounded-full origin-bottom z-20 transition-transform duration-300 ease-out" style="bottom: 50%; transform-origin: bottom center;"></div>
+           <div class="absolute w-3 h-3 sm:w-4 sm:h-4 bg-red-600 rounded-full z-30 shadow-md border border-black"></div>
         </div>
         <div class="w-full flex flex-col gap-2 text-center">
-           <label class="text-sm font-bold text-[#000080]">Pilih Masa:</label>
-           <input type="time" id="clock-time-input" class="xp-input text-2xl font-black p-3 text-center w-full shadow-inner border-[#003C74]" oninput="updateClockHands(this.value)" />
+           <label class="text-xs sm:text-sm font-bold text-[#000080]">Pilih Masa:</label>
+           <input type="time" id="clock-time-input" class="xp-input text-xl sm:text-2xl font-black p-2 sm:p-3 text-center w-full shadow-inner border-[#003C74]" oninput="updateClockHands(this.value)" />
         </div>
       </div>
-      <div class="p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between gap-3">
-        <button type="button" onclick="closeClockModal()" class="xp-button text-sm px-6 py-2 w-full justify-center" title="Batal pemilihan">Batal</button>
-        <button type="button" onclick="applyClockTime()" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] text-sm px-6 py-2 w-full justify-center shadow-sm" title="Sahkan dan masukkan masa ini">Pilih Masa</button>
+      <div class="p-3 sm:p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between gap-2 sm:gap-3">
+        <button type="button" onclick="closeClockModal()" class="xp-button text-xs sm:text-sm px-4 sm:px-6 py-2 w-full justify-center" title="Batal pemilihan">Batal</button>
+        <button type="button" onclick="applyClockTime()" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] text-xs sm:text-sm px-4 sm:px-6 py-2 w-full justify-center shadow-sm" title="Sahkan dan masukkan masa ini">Pilih Masa</button>
       </div>
     </div>
   </div>
 
   <!-- MODAL PENGURUSAN PROFIL SUPER ADMIN -->
   <div id="sa-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print hidden">
-    <div class="xp-window w-[95%] sm:w-full max-w-lg flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
+    <div class="xp-window w-[95%] sm:w-full max-w-lg flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)] rounded-[12px]">
       <div class="xp-titlebar">
-        <span class="text-base flex items-center gap-2" id="sa-modal-title">Urus Profil Setiausaha</span>
+        <span class="text-sm sm:text-base flex items-center gap-2" id="sa-modal-title">Urus Profil Setiausaha</span>
       </div>
-      <div class="p-6 bg-[#ece9d8] overflow-y-auto max-h-[75vh]">
-        <div id="sa-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-4 py-3 rounded text-sm font-bold mb-4 flex items-start gap-2 hidden shadow-sm">
+      <div class="p-5 sm:p-6 bg-[#ece9d8] overflow-y-auto max-h-[75vh]">
+        <div id="sa-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-4 py-3 rounded text-xs sm:text-sm font-bold mb-4 flex items-start gap-2 hidden shadow-sm">
           <span class="w-5 h-5 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-xs shrink-0 mt-0.5">!</span>
           <span id="sa-error-msg" class="flex-1"></span>
         </div>
-        <form id="saForm" class="space-y-5">
+        <form id="saForm" class="space-y-4 sm:space-y-5">
           <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-bold text-black">Nama Profil / Username:</label>
+            <label class="text-xs sm:text-sm font-bold text-black">Nama Profil / Username:</label>
             <input type="text" id="sa-username" required class="xp-input" placeholder="Cth: Setiausaha BPS" />
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-bold text-black">Nama Bahagian / Unit:</label>
+            <label class="text-xs sm:text-sm font-bold text-black">Nama Bahagian / Unit:</label>
             <input type="text" id="sa-department" required class="xp-input" placeholder="Nama penuh bahagian" />
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-bold text-black">Kata Laluan (Biarkan kosong untuk lalai):</label>
+            <label class="text-xs sm:text-sm font-bold text-black">Kata Laluan (Biarkan kosong untuk lalai):</label>
             <input type="text" id="sa-password" class="xp-input" placeholder="Kata laluan" />
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-bold text-black">Pilih Ikon Profil:</label>
-            <div id="sa-icon-grid" class="flex gap-3 flex-wrap bg-white p-4 rounded-xl border border-[#a9a9a9] shadow-inner">
+            <label class="text-xs sm:text-sm font-bold text-black">Pilih Ikon Profil:</label>
+            <div id="sa-icon-grid" class="flex gap-2 sm:gap-3 flex-wrap bg-white p-3 sm:p-4 rounded-xl border border-[#a9a9a9] shadow-inner">
                <!-- JS Injects Icons here -->
             </div>
           </div>
         </form>
       </div>
-      <div class="p-5 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-end gap-3 flex-wrap sm:flex-nowrap">
-        <button type="button" onclick="closeSAModal()" class="xp-button text-sm px-6 py-2">Batal</button>
-        <button type="button" onclick="saveSAUser()" class="xp-button font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] text-sm px-8 py-2 shadow-sm"><i data-lucide="save" class="w-4 h-4"></i> Simpan Profil</button>
+      <div class="p-4 sm:p-5 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-end gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
+        <button type="button" onclick="closeSAModal()" class="xp-button text-xs sm:text-sm px-4 sm:px-6 py-2 w-full sm:w-auto justify-center">Batal</button>
+        <button type="button" onclick="saveSAUser()" class="xp-button font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] text-xs sm:text-sm px-6 sm:px-8 py-2 shadow-sm w-full sm:w-auto justify-center"><i data-lucide="save" class="w-4 h-4"></i> Simpan Profil</button>
       </div>
     </div>
   </div>
 
   <!-- Modal Tindakan Penerima Surat -->
   <div id="surat-tindakan-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden">
-    <div class="xp-window w-[95%] sm:w-full max-w-lg flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
+    <div class="xp-window w-[95%] sm:w-full max-w-lg flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)] rounded-[12px]">
       <div class="xp-titlebar">
-        <span class="text-base flex items-center gap-2"><i data-lucide="check-square" class="w-5 h-5"></i> Tindakan Dokumen Surat</span>
+        <span class="text-sm sm:text-base flex items-center gap-2"><i data-lucide="check-square" class="w-4 h-4 sm:w-5 sm:h-5"></i> Tindakan Dokumen Surat</span>
       </div>
-      <div class="p-6 bg-[#ece9d8]">
-        <div class="bg-white p-3 border border-[#a9a9a9] rounded-lg shadow-sm mb-5">
-            <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Tindakan Untuk Dokumen:</p>
-            <span id="modalNoRuj" class="font-black text-[#000080] text-lg block"></span>
+      <div class="p-5 sm:p-6 bg-[#ece9d8]">
+        <div class="bg-white p-3 border border-[#a9a9a9] rounded-lg shadow-sm mb-4 sm:mb-5">
+            <p class="text-[10px] sm:text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Tindakan Untuk Dokumen:</p>
+            <span id="modalNoRuj" class="font-black text-[#000080] text-base sm:text-lg block"></span>
         </div>
         <input type="hidden" id="modalDocId">
-        <div class="space-y-5">
-          <div class="flex flex-col gap-1.5">
-              <label class="text-sm font-bold text-black">Jenis Tindakan:</label>
-              <select id="tindakanPilihan" class="xp-input cursor-pointer font-bold" onchange="togglePegawaiSurat()" title="Pilih tindakan untuk surat ini">
+        <div class="space-y-4 sm:space-y-5">
+          <div class="flex flex-col gap-1 sm:gap-1.5">
+              <label class="text-xs sm:text-sm font-bold text-black">Jenis Tindakan:</label>
+              <select id="tindakanPilihan" class="xp-input cursor-pointer font-bold text-xs sm:text-sm" onchange="togglePegawaiSurat()" title="Pilih tindakan untuk surat ini">
                   <option value="kiv">Simpan Sementara (KIV)</option>
                   <option value="edar">Edar kepada Pegawai</option>
                   <option value="kembali">Kembalikan / Pulang Semula ke Penghantar</option>
                   <option value="selesai">Simpan & Selesai</option>
               </select>
           </div>
-          <div id="divPegawai" class="flex flex-col gap-1.5 hidden">
-              <label class="text-sm font-bold text-black">Masukkan Nama Pegawai (Dalaman):</label>
-              <input type="text" id="pegawaiPilihan" class="xp-input font-semibold" placeholder="Nama Pegawai..." title="Taip nama pegawai penerima edaran"/>
+          <div id="divPegawai" class="flex flex-col gap-1 sm:gap-1.5 hidden">
+              <label class="text-xs sm:text-sm font-bold text-black">Masukkan Nama Pegawai (Dalaman):</label>
+              <input type="text" id="pegawaiPilihan" class="xp-input font-semibold text-xs sm:text-sm" placeholder="Nama Pegawai..." title="Taip nama pegawai penerima edaran"/>
           </div>
-          <div class="flex flex-col gap-1.5">
-              <label class="text-sm font-bold text-black">Catatan / Arahan (Pilihan):</label>
-              <textarea id="catatanTindakan" rows="3" class="xp-input resize-none" placeholder="Sila semak dokumen ini..." title="Masukkan arahan atau catatan khas tindakan"></textarea>
+          <div class="flex flex-col gap-1 sm:gap-1.5">
+              <label class="text-xs sm:text-sm font-bold text-black">Catatan / Arahan (Pilihan):</label>
+              <textarea id="catatanTindakan" rows="3" class="xp-input resize-none text-xs sm:text-sm" placeholder="Sila semak dokumen ini..." title="Masukkan arahan atau catatan khas tindakan"></textarea>
           </div>
         </div>
       </div>
-      <div class="p-5 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-end gap-3 flex-wrap sm:flex-nowrap">
-          <button onclick="tutupModalSuratTindakan()" class="xp-button text-sm px-6 py-2 w-full sm:w-auto justify-center" title="Batal tindakan">Batal</button>
-          <button onclick="simpanTindakanSurat()" class="xp-button font-bold text-white bg-[#008000] border-[#005000] text-sm px-6 py-2 w-full sm:w-auto justify-center shadow-sm" title="Simpan rekod tindakan surat"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Simpan Tindakan</button>
+      <div class="p-4 sm:p-5 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-end gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
+          <button onclick="tutupModalSuratTindakan()" class="xp-button text-xs sm:text-sm px-4 sm:px-6 py-2 w-full sm:w-auto justify-center" title="Batal tindakan">Batal</button>
+          <button onclick="simpanTindakanSurat()" class="xp-button font-bold text-white bg-[#008000] border-[#005000] text-xs sm:text-sm px-4 sm:px-6 py-2 w-full sm:w-auto justify-center shadow-sm" title="Simpan rekod tindakan surat"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Simpan Tindakan</button>
       </div>
     </div>
   </div>
 
   <!-- Modal Edit Pembetulan Surat -->
   <div id="surat-edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden">
-    <div class="xp-window w-[95%] sm:w-full max-w-lg flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)]">
+    <div class="xp-window w-[95%] sm:w-full max-w-lg flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)] rounded-[12px]">
       <div class="xp-titlebar bg-gradient-to-b from-[#FFA500] to-[#E65C00]">
-        <span class="text-base flex items-center gap-2 text-white"><i data-lucide="edit" class="w-5 h-5"></i> Edit Pembetulan Surat</span>
+        <span class="text-sm sm:text-base flex items-center gap-2 text-white"><i data-lucide="edit" class="w-4 h-4 sm:w-5 sm:h-5"></i> Edit Pembetulan Surat</span>
       </div>
-      <div class="p-6 bg-[#ece9d8] max-h-[75vh] overflow-y-auto">
-        <p class="text-sm text-gray-800 font-semibold mb-5 bg-yellow-100 p-3 border border-yellow-400 rounded-lg shadow-sm flex items-start gap-2">
-            <i data-lucide="info" class="w-5 h-5 text-yellow-700 shrink-0"></i> Anda boleh menyunting maklumat di bawah. Ia akan terus dikemas kini kepada penerima.
+      <div class="p-4 sm:p-6 bg-[#ece9d8] max-h-[75vh] overflow-y-auto">
+        <p class="text-xs sm:text-sm text-gray-800 font-semibold mb-4 sm:mb-5 bg-yellow-100 p-2 sm:p-3 border border-yellow-400 rounded-lg shadow-sm flex items-start gap-2">
+            <i data-lucide="info" class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-700 shrink-0"></i> Anda boleh menyunting maklumat di bawah. Ia akan terus dikemas kini kepada penerima.
         </p>
         <input type="hidden" id="editDocId">
-        <div class="space-y-5">
-          <div class="flex flex-col gap-1.5">
-              <label class="text-sm font-bold text-black">Tajuk Dokumen:</label>
-              <input type="text" id="editTajuk" class="xp-input font-bold text-sm w-full" title="Ubah tajuk surat di sini">
+        <div class="space-y-4 sm:space-y-5">
+          <div class="flex flex-col gap-1 sm:gap-1.5">
+              <label class="text-xs sm:text-sm font-bold text-black">Tajuk Dokumen:</label>
+              <input type="text" id="editTajuk" class="xp-input font-bold text-xs sm:text-sm w-full" title="Ubah tajuk surat di sini">
           </div>
-          <div class="flex flex-col gap-1.5" id="editDestinasiWrapper">
-              <label class="text-sm font-bold text-black">Destinasi Baru (Boleh tambah/buang penerima):</label>
-              <div id="edit-destinasi-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-white p-4 rounded-lg border border-[#a9a9a9] max-h-40 overflow-y-auto shadow-inner">
+          <div class="flex flex-col gap-1 sm:gap-1.5" id="editDestinasiWrapper">
+              <label class="text-xs sm:text-sm font-bold text-black">Destinasi Baru (Boleh tambah/buang penerima):</label>
+              <div id="edit-destinasi-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-white p-3 sm:p-4 rounded-lg border border-[#a9a9a9] max-h-[30vh] sm:max-h-40 overflow-y-auto shadow-inner">
                   <!-- Checkbox Dijana Oleh JS -->
               </div>
           </div>
         </div>
       </div>
-      <div class="p-5 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between items-center flex-wrap gap-3">
-          <button onclick="batalSuratKeluar()" class="xp-button font-bold text-white bg-[#e53935] border-[#b71c1c] hover:bg-red-700 text-sm px-5 py-2 shadow-sm w-full sm:w-auto justify-center" title="Tarik balik dan batalkan surat ini"><i data-lucide="ban" class="w-4 h-4"></i> Batal Penghantaran</button>
-          <div class="flex gap-3 w-full sm:w-auto sm:ml-auto flex-wrap sm:flex-nowrap">
-            <button onclick="tutupModalSuratEdit()" class="xp-button text-sm px-6 py-2 w-full sm:w-auto justify-center" title="Tutup paparan pembetulan">Tutup</button>
-            <button onclick="simpanEditSurat()" class="xp-button font-bold text-white bg-[#e65c00] border-[#b34700] text-sm px-6 py-2 shadow-sm w-full sm:w-auto justify-center" title="Simpan perubahan dan kemaskini dokumen"><i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan</button>
+      <div class="p-4 sm:p-5 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between items-center flex-col sm:flex-row gap-2 sm:gap-3">
+          <button onclick="batalSuratKeluar()" class="xp-button font-bold text-white bg-[#e53935] border-[#b71c1c] hover:bg-red-700 text-xs sm:text-sm px-4 sm:px-5 py-2 shadow-sm w-full sm:w-auto justify-center" title="Tarik balik dan batalkan surat ini"><i data-lucide="ban" class="w-4 h-4"></i> Batal Penghantaran</button>
+          <div class="flex gap-2 sm:gap-3 w-full sm:w-auto sm:ml-auto flex-wrap sm:flex-nowrap">
+            <button onclick="tutupModalSuratEdit()" class="xp-button text-xs sm:text-sm px-4 sm:px-6 py-2 w-full sm:w-auto justify-center" title="Tutup paparan pembetulan">Tutup</button>
+            <button onclick="simpanEditSurat()" class="xp-button font-bold text-white bg-[#e65c00] border-[#b34700] text-xs sm:text-sm px-4 sm:px-6 py-2 shadow-sm w-full sm:w-auto justify-center" title="Simpan perubahan dan kemaskini dokumen"><i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan</button>
           </div>
       </div>
     </div>
@@ -875,7 +881,7 @@
       setAppStatus(msg, isError ? 'error' : 'success');
       const t = document.getElementById('toast');
       const icon = document.getElementById('toast-icon');
-      t.className = `fixed top-4 right-4 z-[100] text-white px-5 py-4 rounded-lg border-2 border-white shadow-lg flex items-center font-bold text-sm md:text-base no-print toast-anim max-w-[90vw] ${isError ? 'bg-[#d32f2f]' : 'bg-[#008000]'}`;
+      t.className = `fixed bottom-4 right-4 sm:top-4 sm:bottom-auto z-[100] text-white px-5 py-4 rounded-lg border-2 border-white shadow-lg flex items-center font-bold text-sm md:text-base no-print toast-anim max-w-[90vw] ${isError ? 'bg-[#d32f2f]' : 'bg-[#008000]'}`;
       icon.setAttribute('data-lucide', isError ? 'alert-circle' : 'check-circle-2');
       document.getElementById('toast-msg').innerText = msg;
       lucide.createIcons();
@@ -906,8 +912,8 @@
       const grid = document.getElementById('profile-grid');
       grid.innerHTML = users.filter(u => u.isActive).map(u => `
           <div onclick="openProfileMenu('${u.id}')" class="profile-card flex flex-col items-center gap-4 cursor-pointer group" title="Log masuk sebagai ${escapeHTML(u.username)}">
-            <div class="profile-img w-32 h-32 md:w-40 md:h-40 bg-[#ece9d8] border-[4px] border-[#003C74] rounded-3xl flex items-center justify-center shadow-xl transition-all">
-               <i data-lucide="${u.icon || 'user'}" class="w-16 h-16 md:w-20 md:h-20 text-[#0058e6] drop-shadow-sm"></i>
+            <div class="profile-img w-28 h-28 md:w-40 md:h-40 bg-[#ece9d8] border-[4px] border-[#003C74] rounded-3xl flex items-center justify-center shadow-xl transition-all">
+               <i data-lucide="${u.icon || 'user'}" class="w-14 h-14 md:w-20 md:h-20 text-[#0058e6] drop-shadow-sm"></i>
             </div>
             <span class="text-white font-extrabold text-base md:text-xl group-hover:text-yellow-300 drop-shadow-md tracking-wide text-center">${escapeHTML(u.username)}</span>
           </div>
@@ -924,19 +930,19 @@
       if (userId === 'superadmin') {
         if(pelawatSection) pelawatSection.classList.add('hidden');
         document.getElementById('auth-profile-name').innerText = "Sistem Super-Admin";
-        document.getElementById('auth-profile-name').className = "text-2xl font-black text-red-600 text-center mb-1";
+        document.getElementById('auth-profile-name').className = "text-xl sm:text-2xl font-black text-red-600 text-center mb-1";
         document.getElementById('auth-profile-dept').innerText = "Mod Konfigurasi Utama";
-        document.getElementById('auth-profile-icon-container').innerHTML = `<i data-lucide="shield" class="w-10 h-10 text-red-600"></i>`;
-        document.getElementById('auth-profile-icon-container').className = "w-20 h-20 rounded-2xl border-4 border-red-600 bg-red-50 flex items-center justify-center mb-4 shadow-md";
+        document.getElementById('auth-profile-icon-container').innerHTML = `<i data-lucide="shield" class="w-8 h-8 sm:w-10 sm:h-10 text-red-600"></i>`;
+        document.getElementById('auth-profile-icon-container').className = "w-16 h-16 sm:w-20 sm:h-20 rounded-xl border-2 sm:border-4 border-red-600 bg-red-50 flex items-center justify-center mb-4 shadow-md shrink-0";
         document.getElementById('auth-password-label').innerHTML = `Kata Laluan <span class="text-[#888] font-normal">(Taip 'admin' atau biar kosong)</span>:`;
       } else {
         if(pelawatSection) pelawatSection.classList.remove('hidden');
         const user = users.find(u => u.id === userId);
         document.getElementById('auth-profile-name').innerText = user.username;
-        document.getElementById('auth-profile-name').className = "text-xl font-bold text-[#000080] text-center mb-1";
+        document.getElementById('auth-profile-name').className = "text-lg sm:text-xl font-bold text-[#000080] text-center mb-1";
         document.getElementById('auth-profile-dept').innerText = user.departmentName;
-        document.getElementById('auth-profile-icon-container').innerHTML = `<i data-lucide="${user.icon || 'user'}" class="w-10 h-10 text-[#000080]"></i>`;
-        document.getElementById('auth-profile-icon-container').className = "w-20 h-20 rounded-2xl border-4 border-[#003C74] bg-white flex items-center justify-center mb-4 shadow-md";
+        document.getElementById('auth-profile-icon-container').innerHTML = `<i data-lucide="${user.icon || 'user'}" class="w-8 h-8 sm:w-10 sm:h-10 text-[#000080]"></i>`;
+        document.getElementById('auth-profile-icon-container').className = "w-16 h-16 sm:w-20 sm:h-20 rounded-xl border-2 sm:border-4 border-[#003C74] bg-white flex items-center justify-center mb-4 shadow-md shrink-0";
         document.getElementById('auth-password-label').innerHTML = `Kata Laluan Pengesahan:`;
       }
       
@@ -1039,8 +1045,8 @@
 
     function buildSAIconGrid(selectedIcon) {
       return availableIcons.map(ic => `
-          <div onclick="selectSAIcon('${ic}')" class="sa-icon-btn w-12 h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-200 ${selectedIcon === ic ? 'border-2 border-[#0058e6] bg-[#e6f0ff]' : 'border-2 border-transparent'}" data-icon="${ic}">
-             <i data-lucide="${ic}" class="w-7 h-7 text-[#000080]"></i>
+          <div onclick="selectSAIcon('${ic}')" class="sa-icon-btn w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-200 ${selectedIcon === ic ? 'border-2 border-[#0058e6] bg-[#e6f0ff]' : 'border-2 border-transparent'}" data-icon="${ic}" title="Pilih ikon ${ic}">
+             <i data-lucide="${ic}" class="w-6 h-6 sm:w-7 sm:h-7 text-[#000080]"></i>
           </div>
       `).join('');
     }
@@ -1050,8 +1056,8 @@
       const grid = document.getElementById('sa-icon-grid');
       Array.from(grid.children).forEach(el => {
          el.className = el.dataset.icon === iconName 
-           ? "sa-icon-btn w-12 h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-200 border-2 border-[#0058e6] bg-[#e6f0ff]"
-           : "sa-icon-btn w-12 h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-200 border-2 border-transparent";
+           ? "sa-icon-btn w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-200 border-2 border-[#0058e6] bg-[#e6f0ff]"
+           : "sa-icon-btn w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-200 border-2 border-transparent";
       });
     }
 
@@ -1170,56 +1176,58 @@
       if (currentUserRole === 'superadmin') {
         let userRows = users.map(u => `
           <tr class="hover:bg-[#ffffe1]">
-            <td class="border border-[#a9a9a9] p-3">
+            <td class="border border-[#a9a9a9] p-2 sm:p-3">
               <div class="flex items-center gap-2">
-                <i data-lucide="${u.icon || 'user'}" class="w-5 h-5 text-[#0058e6]"></i>
-                <span class="font-bold text-[#000080] truncate text-base">${escapeHTML(u.username)}</span>
+                <i data-lucide="${u.icon || 'user'}" class="w-4 h-4 sm:w-5 sm:h-5 text-[#0058e6]"></i>
+                <span class="font-bold text-[#000080] truncate text-xs sm:text-base">${escapeHTML(u.username)}</span>
               </div>
             </td>
-            <td class="border border-[#a9a9a9] p-3 font-medium text-sm">
+            <td class="border border-[#a9a9a9] p-2 sm:p-3 font-medium text-xs sm:text-sm">
               <span onclick="impersonateUser('${u.id}')" class="cursor-pointer text-[#0058e6] hover:underline hover:text-blue-800 transition-colors block" title="Klik untuk terus masuk ke Dashboard profil ini">
                 ${escapeHTML(u.departmentName)}
               </span>
             </td>
-            <td class="border border-[#a9a9a9] p-3 font-medium text-red-600 hidden md:table-cell text-sm">${escapeHTML(u.password) || '<i class="text-gray-400 text-xs">Tiada</i>'}</td>
-            <td class="border border-[#a9a9a9] p-3 text-center">
+            <td class="border border-[#a9a9a9] p-2 sm:p-3 font-medium text-red-600 hidden md:table-cell text-xs sm:text-sm">${escapeHTML(u.password) || '<i class="text-gray-400 text-xs">Tiada</i>'}</td>
+            <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center">
               ${u.isActive 
-                ? '<span class="bg-green-100 text-green-800 font-bold px-3 py-1.5 rounded text-xs">Aktif</span>' 
-                : '<span class="bg-red-100 text-red-800 font-bold px-3 py-1.5 rounded text-xs">T.Aktif</span>'
+                ? '<span class="bg-green-100 text-green-800 font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded text-[10px] sm:text-xs">Aktif</span>' 
+                : '<span class="bg-red-100 text-red-800 font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded text-[10px] sm:text-xs">T.Aktif</span>'
               }
             </td>
-            <td class="border border-[#a9a9a9] p-3 text-center">
-              <div class="flex items-center justify-center gap-2 flex-wrap">
-                <button onclick="openSAModal('${u.id}')" class="xp-button text-[#0058e6] px-3 h-8 text-xs" title="Edit Profil">Edit</button>
-                <button onclick="toggleSAUserStatus('${u.id}')" class="xp-button ${u.isActive ? 'text-orange-600' : 'text-green-600'} px-3 h-8 hidden sm:inline-flex text-xs" title="Tukar Status">
+            <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center">
+              <div class="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap">
+                <button onclick="openSAModal('${u.id}')" class="xp-button text-[#0058e6] px-2 sm:px-3 h-7 sm:h-8 text-[10px] sm:text-xs" title="Edit Profil">Edit</button>
+                <button onclick="toggleSAUserStatus('${u.id}')" class="xp-button ${u.isActive ? 'text-orange-600' : 'text-green-600'} px-2 sm:px-3 h-7 sm:h-8 hidden lg:inline-flex text-[10px] sm:text-xs" title="Tukar Status">
                   ${u.isActive ? 'Gantung' : 'Aktif'}
                 </button>
-                <button onclick="deleteSAUser('${u.id}')" class="xp-button text-red-600 px-3 h-8 text-xs" title="Padam Kekal">Padam</button>
+                <button onclick="deleteSAUser('${u.id}')" class="xp-button text-red-600 px-2 sm:px-3 h-7 sm:h-8 text-[10px] sm:text-xs" title="Padam Kekal">Padam</button>
               </div>
             </td>
           </tr>
         `).join('');
 
         container.innerHTML = `
-          <div class="bg-white p-4 md:p-6 rounded-lg border border-[#a9a9a9] min-h-[400px] overflow-x-auto w-full">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+          <div class="bg-white p-3 sm:p-4 md:p-6 rounded-lg border border-[#a9a9a9] flex-1 overflow-y-auto w-full">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
               <p class="text-sm md:text-base font-semibold text-[#555]">Senarai Profil Pengguna & Bahagian</p>
-              <button onclick="openSAModal(null)" class="xp-button h-10 px-5 font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] text-sm" title="Tambah akaun setiausaha baharu">
-                <i data-lucide="user-plus" class="w-5 h-5"></i> Tambah Setiausaha
+              <button onclick="openSAModal(null)" class="xp-button h-9 sm:h-10 px-4 sm:px-5 font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] text-xs sm:text-sm w-full sm:w-auto justify-center" title="Tambah akaun setiausaha baharu">
+                <i data-lucide="user-plus" class="w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Setiausaha
               </button>
             </div>
-            <table class="w-full border-collapse sa-table text-sm min-w-[600px]">
-              <thead>
-                <tr>
-                  <th class="w-[25%] md:w-[20%]">Pengguna</th>
-                  <th class="w-[30%] md:w-[25%]">Bahagian</th>
-                  <th class="w-[15%] hidden md:table-cell">K. Laluan</th>
-                  <th class="w-[15%] md:w-[10%] text-center">Status</th>
-                  <th class="w-[30%] text-center">Tindakan</th>
-                </tr>
-              </thead>
-              <tbody>${userRows}</tbody>
-            </table>
+            <div class="w-full overflow-x-auto min-h-0 border border-[#a9a9a9]">
+                <table class="w-full border-collapse sa-table text-sm min-w-[500px]">
+                  <thead>
+                    <tr>
+                      <th class="w-[30%] md:w-[20%] p-2 sm:p-3 text-xs sm:text-sm">Pengguna</th>
+                      <th class="w-[35%] md:w-[25%] p-2 sm:p-3 text-xs sm:text-sm">Bahagian</th>
+                      <th class="w-[15%] hidden md:table-cell p-2 sm:p-3 text-xs sm:text-sm">K. Laluan</th>
+                      <th class="w-[10%] text-center p-2 sm:p-3 text-xs sm:text-sm">Status</th>
+                      <th class="w-[25%] text-center p-2 sm:p-3 text-xs sm:text-sm">Tindakan</th>
+                    </tr>
+                  </thead>
+                  <tbody>${userRows}</tbody>
+                </table>
+            </div>
           </div>
         `;
         lucide.createIcons();
@@ -1233,41 +1241,41 @@
         const yearLabel = weekDaysForLabel[6].dateStr.substring(0,4);
         const isCurrentWeek = baseDate.getTime() === getStartOfWeek(new Date()).getTime();
 
-        let btnClass = isCurrentWeek ? "xp-button h-8 px-4 md:px-6 font-bold text-[#000080] text-[11px]" : "xp-button h-8 px-4 md:px-6 font-bold text-[#e53935] text-[11px]";
+        let btnClass = isCurrentWeek ? "xp-button h-8 sm:h-10 px-3 sm:px-6 font-bold text-[#000080] text-[10px] sm:text-[11px]" : "xp-button h-8 sm:h-10 px-3 sm:px-6 font-bold text-[#e53935] text-[10px] sm:text-[11px]";
 
         subNavContainer.innerHTML = `
-          <div class="flex gap-2">
-              <button onclick="changeView('weekly')" class="xp-button text-sm h-10 ${viewMode==='weekly'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Paparan kalendar mingguan"><i data-lucide="calendar-days" class="w-5 h-5"></i> Mingguan</button>
-              <button onclick="changeView('matrix')" class="xp-button text-sm h-10 ${viewMode==='matrix'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Paparan laporan cetakan kalendar"><i data-lucide="printer" class="w-5 h-5"></i> Laporan Cetakan</button>
+          <div class="flex gap-2 w-full md:w-auto overflow-x-auto hide-scrollbar">
+              <button onclick="changeView('weekly')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='weekly'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Paparan kalendar mingguan"><i data-lucide="calendar-days" class="w-4 h-4 sm:w-5 sm:h-5"></i> Mingguan</button>
+              <button onclick="changeView('matrix')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='matrix'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Paparan laporan cetakan kalendar"><i data-lucide="printer" class="w-4 h-4 sm:w-5 sm:h-5"></i> Laporan Cetakan</button>
           </div>
           ${['weekly', 'matrix'].includes(viewMode) ? `
-          <div class="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0 justify-between md:justify-end">
+          <div class="flex items-center gap-2 sm:gap-3 w-full lg:w-auto justify-between lg:justify-end shrink-0 mt-2 lg:mt-0">
               <div class="flex items-center gap-1 xp-panel p-1 bg-white">
-                <button onclick="handlePrevWeek()" class="xp-button h-8 w-10 p-0" title="Minggu Sebelumnya"><i data-lucide="chevron-left" class="w-5 h-5 text-[#000080]"></i></button>
+                <button onclick="handlePrevWeek()" class="xp-button h-7 sm:h-8 w-8 sm:w-10 p-0" title="Minggu Sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4 sm:w-5 sm:h-5 text-[#000080]"></i></button>
                 <button onclick="handleCurrentWeek()" class="${btnClass}" title="Lompat ke minggu semasa">${startLabel} - ${endLabel} ${yearLabel}</button>
-                <button onclick="handleNextWeek()" class="xp-button h-8 w-10 p-0" title="Minggu Seterusnya"><i data-lucide="chevron-right" class="w-5 h-5 text-[#000080]"></i></button>
+                <button onclick="handleNextWeek()" class="xp-button h-7 sm:h-8 w-8 sm:w-10 p-0" title="Minggu Seterusnya"><i data-lucide="chevron-right" class="w-4 h-4 sm:w-5 sm:h-5 text-[#000080]"></i></button>
               </div>
               ${currentUserRole === 'admin' ? `
-              <button onclick="openModalCalendar()" class="xp-button h-9 px-5 font-bold text-white bg-[#008000] border-[#005000] shadow-sm text-sm" title="Tambah Rekod Aktiviti Baru">
-                <i data-lucide="plus" class="w-4 h-4"></i> Tambah Aktiviti
+              <button onclick="openModalCalendar()" class="xp-button h-8 sm:h-9 px-3 sm:px-5 font-bold text-white bg-[#008000] border-[#005000] shadow-sm text-xs sm:text-sm" title="Tambah Rekod Aktiviti Baru">
+                <i data-lucide="plus" class="w-3 h-3 sm:w-4 sm:h-4"></i> <span class="hidden sm:inline">Tambah Aktiviti</span>
               </button>` : ''}
           </div>` : ''}
         `;
       } else if (mainTab === 'surat') {
         subNavContainer.innerHTML = `
-          <div class="flex flex-wrap gap-2 w-full items-center">
-              <button onclick="changeView('surat-dashboard')" class="xp-button text-sm h-10 px-4 ${viewMode==='surat-dashboard'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Papan pemuka ringkasan rekod surat"><i data-lucide="home" class="w-5 h-5"></i></button>
-              <button onclick="changeView('surat-inbox')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-inbox'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative" title="Senarai dokumen masuk yang memerlukan tindakan anda"><i data-lucide="inbox" class="w-5 h-5"></i> Peti Masuk</button>
-              <button onclick="changeView('surat-outbox')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-outbox'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative" title="Senarai dokumen keluar yang belum selesai"><i data-lucide="send" class="w-5 h-5"></i> Peti Keluar <span id="badge-outbox" class="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm font-bold">0</span></button>
-              <button onclick="changeView('surat-jejak')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-jejak'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Jejak sejarah pergerakan setiap dokumen"><i data-lucide="route" class="w-5 h-5"></i> Jejak</button>
-              <button onclick="changeView('surat-laporan')" class="xp-button text-sm h-10 flex-1 md:flex-none ${viewMode==='surat-laporan'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Cetak Laporan Surat"><i data-lucide="printer" class="w-5 h-5"></i> Laporan Cetakan</button>
-              <button onclick="changeView('surat-trash')" class="xp-button text-sm h-10 px-4 ${viewMode==='surat-trash'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative" title="Senarai dokumen yang telah dibatalkan"><i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i><span id="badge-trash" class="absolute -top-1.5 -right-1.5 bg-gray-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm font-bold">0</span></button>
-              <button onclick="changeView('surat-daftar')" class="xp-button text-sm h-10 w-full md:w-auto ml-auto font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] shadow-sm" title="Borang mendaftar dan menghantar surat baharu"><i data-lucide="mail-plus" class="w-5 h-5 text-white"></i> Daftar Surat Baru</button>
+          <div class="flex gap-2 w-full items-center overflow-x-auto hide-scrollbar pb-1">
+              <button onclick="changeView('surat-dashboard')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='surat-dashboard'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Papan pemuka ringkasan rekod surat"><i data-lucide="home" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+              <button onclick="changeView('surat-inbox')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='surat-inbox'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative" title="Senarai dokumen masuk yang memerlukan tindakan anda"><i data-lucide="inbox" class="w-4 h-4 sm:w-5 sm:h-5"></i> Peti Masuk</button>
+              <button onclick="changeView('surat-outbox')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='surat-outbox'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative" title="Senarai dokumen keluar yang belum selesai"><i data-lucide="send" class="w-4 h-4 sm:w-5 sm:h-5"></i> Peti Keluar <span id="badge-outbox" class="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm font-bold">0</span></button>
+              <button onclick="changeView('surat-jejak')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='surat-jejak'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Jejak sejarah pergerakan setiap dokumen"><i data-lucide="route" class="w-4 h-4 sm:w-5 sm:h-5"></i> Jejak</button>
+              <button onclick="changeView('surat-laporan')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='surat-laporan'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}" title="Cetak Laporan Surat"><i data-lucide="printer" class="w-4 h-4 sm:w-5 sm:h-5"></i> Laporan Cetakan</button>
+              <button onclick="changeView('surat-trash')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='surat-trash'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''} relative" title="Senarai dokumen yang telah dibatalkan"><i data-lucide="trash-2" class="w-4 h-4 sm:w-5 sm:h-5 text-red-600"></i><span id="badge-trash" class="absolute -top-1.5 -right-1.5 bg-gray-500 text-white text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm font-bold">0</span></button>
+              <button onclick="changeView('surat-daftar')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 shrink-0 lg:ml-auto font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] shadow-sm" title="Borang mendaftar dan menghantar surat baharu"><i data-lucide="mail-plus" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i> Daftar Surat Baru</button>
           </div>
         `;
         updateBadges(); 
       } else if (mainTab === 'settings') {
-          subNavContainer.innerHTML = `<div class="text-sm font-bold text-[#555] px-2 py-1"><i data-lucide="settings-2" class="w-5 h-5 inline mb-0.5"></i> Tetapan & Konfigurasi Profil Pengguna</div>`;
+          subNavContainer.innerHTML = `<div class="text-xs sm:text-sm font-bold text-[#555] px-2 py-1"><i data-lucide="settings-2" class="w-4 h-4 sm:w-5 sm:h-5 inline mb-0.5"></i> Tetapan & Konfigurasi Profil Pengguna</div>`;
       }
 
       if (viewMode === 'weekly') renderKalendarMingguan(container);
@@ -1373,7 +1381,7 @@
       const weekDays = getDaysOfWeek(baseDate);
       const myActivities = activities.filter(a => a.userId === currentUserId);
 
-      let html = `<div class="flex flex-col bg-white overflow-hidden rounded-xl border border-[#a9a9a9] w-full">`;
+      let html = `<div class="flex flex-col bg-white overflow-y-auto overflow-x-hidden rounded-xl border border-[#a9a9a9] w-full flex-1">`;
       weekDays.forEach(dayObj => {
         const dayActivities = myActivities.filter(a => {
           let sDate = a.startDate || a.date;
@@ -1388,18 +1396,18 @@
         const bgHeader = dayObj.isWeekend ? 'bg-[#d2cbbb]' : 'bg-[#ece9d8]';
         
         html += `
-          <div class="flex flex-col md:flex-row border-b border-[#a9a9a9] last:border-0 min-h-[110px] ${bgRow}">
-            <div class="w-auto md:w-44 m-2 md:m-3 p-3 flex md:flex-col justify-between md:justify-center border border-[#a9a9a9] rounded-xl ${bgHeader} shadow-sm items-center md:items-start z-10 shrink-0">
-              <h3 class="font-black text-black uppercase text-sm md:text-base">${dayObj.dayName}</h3>
-              <p class="text-[#333] text-sm md:text-[15px] font-semibold">${dayObj.displayDate}</p>
+          <div class="flex flex-col md:flex-row border-b border-[#a9a9a9] last:border-0 min-h-[90px] md:min-h-[110px] ${bgRow}">
+            <div class="w-auto md:w-44 m-2 md:m-3 p-2 md:p-3 flex md:flex-col justify-between md:justify-center border border-[#a9a9a9] rounded-xl ${bgHeader} shadow-sm items-center md:items-start z-10 shrink-0">
+              <h3 class="font-black text-black uppercase text-xs sm:text-sm md:text-base">${dayObj.dayName}</h3>
+              <p class="text-[#333] text-xs sm:text-sm md:text-[15px] font-semibold">${dayObj.displayDate}</p>
             </div>
-            <div class="flex-1 p-2 md:p-3 flex gap-4 overflow-x-auto items-center snap-x scroll-smooth">
+            <div class="flex-1 p-2 md:p-3 flex gap-3 sm:gap-4 overflow-x-auto items-center snap-x scroll-smooth hide-scrollbar">
         `;
 
         if(dayActivities.length > 0) {
           dayActivities.forEach(act => {
             let editBtn = currentUserRole === 'admin' 
-              ? `<button onclick="openModalCalendar('${act.id}')" class="p-1.5 xp-button-mini text-black rounded ml-1" title="Pinda Rekod Aktiviti Ini"><i data-lucide="edit" class="w-4 h-4"></i></button>`
+              ? `<button onclick="openModalCalendar('${act.id}')" class="p-1 sm:p-1.5 xp-button-mini text-black rounded ml-1 shrink-0" title="Pinda Rekod Aktiviti Ini"><i data-lucide="edit" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>`
               : '';
 
             let actBgColor = 'bg-[#ffffe1]'; 
@@ -1410,30 +1418,30 @@
             if (act.isGuest) {
                 actBgColor = 'bg-[#f3e5f5]'; 
                 actBorderColor = 'border-[#ce93d8]';
-                indicator = `<span class="bg-[#ce93d8] text-[#4a148c] px-2 py-0.5 rounded text-[9px] font-bold uppercase ml-2 border border-[#ba68c8]" title="Status sebagai tetamu">Jemputan</span>`;
+                indicator = `<span class="bg-[#ce93d8] text-[#4a148c] px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-bold uppercase ml-2 border border-[#ba68c8]" title="Status sebagai tetamu">Jemputan</span>`;
             } else if (isOutside) {
                 actBgColor = 'bg-[#e0f7fa]'; 
                 actBorderColor = 'border-[#80deea]';
-                indicator = `<span class="bg-[#80deea] text-[#006064] px-2 py-0.5 rounded text-[9px] font-bold uppercase ml-2 border border-[#4dd0e1]" title="Lokasi di luar kawasan rasmi">Luar Kawasan</span>`;
+                indicator = `<span class="bg-[#80deea] text-[#006064] px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-bold uppercase ml-2 border border-[#4dd0e1]" title="Lokasi di luar kawasan rasmi">Luar Kawasan</span>`;
             }
 
             html += `
-              <div class="min-w-[240px] md:min-w-[280px] max-w-[320px] snap-center p-4 ${actBgColor} border ${actBorderColor} rounded-xl shadow-[1px_2px_5px_rgba(0,0,0,0.15)] flex flex-col shrink-0 h-[100%]">
-                <div class="flex justify-between items-start mb-2 gap-2">
-                  <span class="inline-flex items-center text-xs font-bold text-[#000080] leading-tight">
-                    <i data-lucide="clock" class="w-4 h-4 mr-1.5 shrink-0"></i>${getDisplayDateTime(act)}${indicator}
+              <div class="w-[85vw] sm:w-[240px] md:min-w-[280px] max-w-[320px] snap-center p-3 sm:p-4 ${actBgColor} border ${actBorderColor} rounded-xl shadow-[1px_2px_5px_rgba(0,0,0,0.15)] flex flex-col shrink-0 h-full">
+                <div class="flex justify-between items-start mb-1.5 sm:mb-2 gap-2">
+                  <span class="inline-flex items-center text-[11px] sm:text-xs font-bold text-[#000080] leading-tight">
+                    <i data-lucide="clock" class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 shrink-0"></i>${getDisplayDateTime(act)}${indicator}
                   </span>
                   <div class="flex shrink-0">${editBtn}</div>
                 </div>
-                <h4 class="font-extrabold text-black text-[14px] md:text-[15px] mb-1 line-clamp-2 leading-tight">${escapeHTML(act.program)}</h4>
-                ${act.chairman ? `<div class="text-[11px] text-[#000080] font-semibold mb-3 line-clamp-1 leading-tight">Peng: ${escapeHTML(act.chairman)}</div>` : '<div class="mb-3"></div>'}
-                <div class="mt-auto space-y-1.5 pt-2 border-t border-black/10">
-                  <div class="flex items-start text-xs text-black font-medium">
-                    <i data-lucide="map-pin" class="w-4 h-4 mr-1.5 mt-0.5 text-[#555] shrink-0"></i>
+                <h4 class="font-extrabold text-black text-xs sm:text-[14px] md:text-[15px] mb-1 line-clamp-2 leading-tight">${escapeHTML(act.program)}</h4>
+                ${act.chairman ? `<div class="text-[10px] sm:text-[11px] text-[#000080] font-semibold mb-2 sm:mb-3 line-clamp-1 leading-tight">Peng: ${escapeHTML(act.chairman)}</div>` : '<div class="mb-2 sm:mb-3"></div>'}
+                <div class="mt-auto space-y-1 sm:space-y-1.5 pt-1.5 sm:pt-2 border-t border-black/10">
+                  <div class="flex items-start text-[10px] sm:text-xs text-black font-medium">
+                    <i data-lucide="map-pin" class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 mt-0.5 text-[#555] shrink-0"></i>
                     <span class="line-clamp-2">${escapeHTML(act.location)}</span>
                   </div>
-                  <div class="flex items-start text-xs text-black font-medium">
-                    <i data-lucide="users" class="w-4 h-4 mr-1.5 mt-0.5 text-[#555] shrink-0"></i>
+                  <div class="flex items-start text-[10px] sm:text-xs text-black font-medium">
+                    <i data-lucide="users" class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 mt-0.5 text-[#555] shrink-0"></i>
                     <span class="line-clamp-2 whitespace-pre-line">${escapeHTML(act.officers).replace(/\n/g, ', ')}</span>
                   </div>
                 </div>
@@ -1441,13 +1449,13 @@
             `;
           });
           if(currentUserRole === 'admin') {
-            html += `<div onclick="openModalCalendar(null, '${dayObj.dateStr}')" class="min-w-[56px] h-full min-h-[140px] border-2 border-dashed border-[#a9a9a9] rounded-xl flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors shrink-0" title="Klik untuk tambah aktiviti pada hari ini"><i data-lucide="plus" class="w-6 h-6"></i></div>`;
+            html += `<div onclick="openModalCalendar(null, '${dayObj.dateStr}')" class="min-w-[48px] sm:min-w-[56px] h-full min-h-[100px] border-2 border-dashed border-[#a9a9a9] rounded-xl flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors shrink-0" title="Klik untuk tambah aktiviti pada hari ini"><i data-lucide="plus" class="w-5 h-5 sm:w-6 sm:h-6"></i></div>`;
           }
         } else {
           if(currentUserRole === 'admin') {
-            html += `<div onclick="openModalCalendar(null, '${dayObj.dateStr}')" class="w-full flex-1 border-2 border-dashed border-[#a9a9a9] rounded-xl flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors min-h-[80px]" title="Klik untuk tambah aktiviti pada hari ini"><i data-lucide="plus" class="w-6 h-6 mr-2"></i> Tambah Aktiviti</div>`;
+            html += `<div onclick="openModalCalendar(null, '${dayObj.dateStr}')" class="w-full flex-1 border-2 border-dashed border-[#a9a9a9] rounded-xl flex items-center justify-center text-[#888] hover:text-[#0058e6] hover:bg-[#e6f0ff] hover:border-[#0058e6] cursor-pointer transition-colors min-h-[70px] sm:min-h-[80px]" title="Klik untuk tambah aktiviti pada hari ini"><i data-lucide="plus" class="w-5 h-5 sm:w-6 sm:h-6 mr-1.5 sm:mr-2"></i> <span class="text-xs sm:text-sm">Tambah Aktiviti</span></div>`;
           } else {
-             html += `<div class="w-full flex items-center justify-center text-[#888] italic text-sm font-semibold py-6">Tiada Aktiviti Didaftarkan</div>`;
+             html += `<div class="w-full flex items-center justify-center text-[#888] italic text-xs sm:text-sm font-semibold py-4 sm:py-6">Tiada Aktiviti Didaftarkan</div>`;
           }
         }
         html += `</div></div>`;
@@ -1490,42 +1498,42 @@
             // Latar sel tarikh lebih menonjol sedikit
             const dateBg = isWeekend ? 'bg-[#ffebeb]' : 'bg-[#e6f0ff]';
             tbodyHTML += `
-              <td class="border border-[#a9a9a9] p-3 text-center align-top text-black ${dateBg}" rowspan="${rowActs.length}">
-                <div class="font-bold text-gray-600 text-xs md:text-sm mb-1">${group.dayInfo.dayName}</div>
-                <div class="text-lg md:text-xl text-[#000080] font-black leading-none">${group.dayInfo.displayDate.split(' ')[0]}</div>
-                <div class="text-[10px] md:text-xs uppercase text-gray-500 font-bold mt-1 tracking-wider">${group.dayInfo.displayDate.split(' ')[1]}</div>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center align-top text-black ${dateBg}" rowspan="${rowActs.length}">
+                <div class="font-bold text-gray-600 text-[10px] sm:text-xs md:text-sm mb-1">${group.dayInfo.dayName}</div>
+                <div class="text-base sm:text-lg md:text-xl text-[#000080] font-black leading-none">${group.dayInfo.displayDate.split(' ')[0]}</div>
+                <div class="text-[9px] sm:text-[10px] md:text-xs uppercase text-gray-500 font-bold mt-1 tracking-wider">${group.dayInfo.displayDate.split(' ')[1]}</div>
               </td>
             `;
           }
 
           if (act) {
             let editBtnHTML = (includeOverlayBtn && currentUserRole === 'admin') ? `
-              <button onclick="openModalCalendar('${act.id}')" class="absolute top-1 right-1 xp-button-mini no-print opacity-0 group-hover:opacity-100 p-1.5 rounded" title="Edit aktiviti ini"><i data-lucide="edit" class="w-4 h-4 text-black"></i></button>
+              <button onclick="openModalCalendar('${act.id}')" class="absolute top-1 right-1 xp-button-mini no-print opacity-0 group-hover:opacity-100 p-1 sm:p-1.5 rounded" title="Edit aktiviti ini"><i data-lucide="edit" class="w-3 h-3 sm:w-4 sm:h-4 text-black"></i></button>
             ` : '';
 
             tbodyHTML += `
-              <td class="border border-[#a9a9a9] p-3 text-center align-top text-black">
-                <div class="font-bold text-[#0058e6] text-xs md:text-sm leading-normal whitespace-pre-line">${getDisplayDateTime(act, true)}</div>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center align-top text-black">
+                <div class="font-bold text-[#0058e6] text-[11px] sm:text-xs md:text-sm leading-normal whitespace-pre-line">${getDisplayDateTime(act, true)}</div>
               </td>
-              <td class="border border-[#a9a9a9] p-3 align-top group relative">
-                <div class="font-black text-black text-sm leading-normal whitespace-pre-line">${escapeHTML(act.program)}</div>
-                ${act.chairman ? `<div class="mt-2 text-[10px] md:text-xs text-[#000080] font-bold leading-normal"><i data-lucide="user" class="w-3 h-3 inline text-gray-500 mr-1"></i>Pengerusi: ${escapeHTML(act.chairman)}</div>` : ''}
-                ${act.notes ? `<div class="mt-2 text-[10px] md:text-xs text-gray-700 font-bold whitespace-pre-line leading-normal bg-white/60 p-1.5 rounded border border-gray-200 shadow-sm">${escapeHTML(act.notes)}</div>` : ''}
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 align-top group relative">
+                <div class="font-black text-black text-xs sm:text-sm leading-normal whitespace-pre-line">${escapeHTML(act.program)}</div>
+                ${act.chairman ? `<div class="mt-1.5 sm:mt-2 text-[9px] sm:text-[10px] md:text-xs text-[#000080] font-bold leading-normal"><i data-lucide="user" class="w-3 h-3 inline text-gray-500 mr-1"></i>Pengerusi: ${escapeHTML(act.chairman)}</div>` : ''}
+                ${act.notes ? `<div class="mt-1.5 sm:mt-2 text-[9px] sm:text-[10px] md:text-xs text-gray-700 font-bold whitespace-pre-line leading-normal bg-white/60 p-1.5 rounded border border-gray-200 shadow-sm">${escapeHTML(act.notes)}</div>` : ''}
                 ${editBtnHTML}
               </td>
-              <td class="border border-[#a9a9a9] p-3 align-top text-center text-black">
-                <div class="text-xs md:text-sm font-bold leading-normal whitespace-pre-line">${escapeHTML(act.location)}</div>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 align-top text-center text-black">
+                <div class="text-[11px] sm:text-xs md:text-sm font-bold leading-normal whitespace-pre-line">${escapeHTML(act.location)}</div>
               </td>
-              <td class="border border-[#a9a9a9] p-3 align-top text-black">
-                 <div class="text-xs md:text-sm font-bold leading-normal whitespace-pre-line">${escapeHTML(act.officers)}</div>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 align-top text-black">
+                 <div class="text-[11px] sm:text-xs md:text-sm font-bold leading-normal whitespace-pre-line">${escapeHTML(act.officers)}</div>
               </td>
             `;
           } else {
             tbodyHTML += `
-              <td class="border border-[#a9a9a9] p-3 text-center align-top text-gray-400"><div class="text-xs md:text-sm font-bold leading-normal">-</div></td>
-              <td class="border border-[#a9a9a9] p-3 text-center align-top italic text-gray-400 font-bold"><div class="text-xs md:text-sm font-bold leading-normal">Tiada Aktiviti</div></td>
-              <td class="border border-[#a9a9a9] p-3 text-center align-top text-gray-400"><div class="text-xs md:text-sm font-bold leading-normal">-</div></td>
-              <td class="border border-[#a9a9a9] p-3 text-center align-top text-gray-400"><div class="text-xs md:text-sm font-bold leading-normal">-</div></td>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center align-top text-gray-400"><div class="text-[11px] sm:text-xs md:text-sm font-bold leading-normal">-</div></td>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center align-top italic text-gray-400 font-bold"><div class="text-[11px] sm:text-xs md:text-sm font-bold leading-normal">Tiada Aktiviti</div></td>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center align-top text-gray-400"><div class="text-[11px] sm:text-xs md:text-sm font-bold leading-normal">-</div></td>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center align-top text-gray-400"><div class="text-[11px] sm:text-xs md:text-sm font-bold leading-normal">-</div></td>
             `;
           }
           tbodyHTML += `</tr>`;
@@ -1534,34 +1542,34 @@
       });
 
       let overlayBtn = includeOverlayBtn ? `
-        <div class="absolute top-4 right-4 no-print">
-          <button onclick="window.print()" class="xp-button h-10 rounded-lg font-bold px-4 text-sm" title="Papar dialog untuk cetak atau jana PDF laporan"><i data-lucide="printer" class="w-5 h-5 text-black"></i> <span class="hidden md:inline">Cetak / Jana PDF</span></button>
+        <div class="absolute top-2 right-2 sm:top-4 sm:right-4 no-print z-10">
+          <button onclick="window.print()" class="xp-button h-8 sm:h-10 rounded-lg font-bold px-3 sm:px-4 text-xs sm:text-sm shadow-sm" title="Papar dialog untuk cetak atau jana PDF laporan"><i data-lucide="printer" class="w-4 h-4 sm:w-5 sm:h-5 text-black"></i> <span class="hidden md:inline">Cetak / Jana PDF</span></button>
         </div>
       ` : '';
 
       return `
-        <div class="bg-white p-5 md:p-10 overflow-x-auto relative border border-[#a9a9a9] shadow-inner printable-container rounded-xl w-full" id="print-area">
+        <div class="bg-white p-3 sm:p-5 md:p-8 overflow-y-auto flex-1 relative border border-[#a9a9a9] shadow-inner printable-container rounded-xl w-full" id="print-area">
           ${overlayBtn}
-          <div class="text-center mb-8 md:mb-10 mt-6 md:mt-0">
-            <h2 class="font-black text-xl md:text-2xl uppercase text-[#000080] tracking-wide">${title}</h2>
-            <h3 class="font-bold text-lg md:text-xl uppercase text-black mt-1" id="matrix-dept-name">${escapeHTML(deptName)}</h3>
-            <p class="mt-2 text-gray-700 font-bold text-sm md:text-base bg-gray-100 inline-block px-4 py-1.5 rounded-full border border-gray-300 shadow-sm">${dateRangeText}</p>
+          <div class="text-center mb-6 sm:mb-8 md:mb-10 mt-8 sm:mt-4 md:mt-0">
+            <h2 class="font-black text-lg sm:text-xl md:text-2xl uppercase text-[#000080] tracking-wide">${title}</h2>
+            <h3 class="font-bold text-base sm:text-lg md:text-xl uppercase text-black mt-1" id="matrix-dept-name">${escapeHTML(deptName)}</h3>
+            <p class="mt-2 text-gray-700 font-bold text-xs sm:text-sm md:text-base bg-gray-100 inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-gray-300 shadow-sm">${dateRangeText}</p>
           </div>
-          <div class="w-full min-w-[800px] overflow-x-auto">
-              <table class="w-full border-collapse border border-[#a9a9a9] text-sm print-table shadow-sm">
+          <div class="w-full min-w-[700px] overflow-x-auto">
+              <table class="w-full border-collapse border border-[#a9a9a9] text-[11px] sm:text-sm print-table shadow-sm">
                 <thead>
                   <tr class="bg-[#cce0ff]" style="print-color-adjust: exact; -webkit-print-color-adjust: exact;">
-                    <th class="border border-[#a9a9a9] p-3 font-black text-center w-[12%] uppercase text-[#000080]">TARIKH</th>
-                    <th class="border border-[#a9a9a9] p-3 font-black text-center w-[15%] uppercase text-[#000080]">MASA</th>
-                    <th class="border border-[#a9a9a9] p-3 font-black text-center w-[33%] uppercase text-[#000080]">MESYUARAT / PROGRAM</th>
-                    <th class="border border-[#a9a9a9] p-3 font-black text-center w-[20%] uppercase text-[#000080]">TEMPAT</th>
-                    <th class="border border-[#a9a9a9] p-3 font-black text-center w-[20%] uppercase text-[#000080]">PEGAWAI</th>
+                    <th class="border border-[#a9a9a9] p-2 sm:p-3 font-black text-center w-[12%] uppercase text-[#000080]">TARIKH</th>
+                    <th class="border border-[#a9a9a9] p-2 sm:p-3 font-black text-center w-[15%] uppercase text-[#000080]">MASA</th>
+                    <th class="border border-[#a9a9a9] p-2 sm:p-3 font-black text-center w-[33%] uppercase text-[#000080]">MESYUARAT / PROGRAM</th>
+                    <th class="border border-[#a9a9a9] p-2 sm:p-3 font-black text-center w-[20%] uppercase text-[#000080]">TEMPAT</th>
+                    <th class="border border-[#a9a9a9] p-2 sm:p-3 font-black text-center w-[20%] uppercase text-[#000080]">PEGAWAI</th>
                   </tr>
                 </thead>
                 <tbody>${tbodyHTML}</tbody>
               </table>
           </div>
-          <p class="mt-4 text-[10px] md:text-xs italic text-gray-500 font-semibold text-center md:text-left">* (Tertakluk kepada sebarang pindaan)</p>
+          <p class="mt-4 text-[9px] sm:text-[10px] md:text-xs italic text-gray-500 font-semibold text-center md:text-left">* (Tertakluk kepada sebarang pindaan)</p>
         </div>
       `;
     }
@@ -1599,7 +1607,7 @@
         editingId = actId;
         const act = activities.find(a => a.id === actId);
         
-        modalTitle.innerHTML = `<i data-lucide="edit" class="w-5 h-5"></i> Pindaan Rekod Aktiviti`;
+        modalTitle.innerHTML = `<i data-lucide="edit" class="w-4 h-4 sm:w-5 sm:h-5"></i> Pindaan Rekod Aktiviti`;
         btnDelete.classList.remove('hidden');
 
         formStartDate.value = act.startDate || act.date;
@@ -1627,7 +1635,7 @@
       } else {
         editingId = Date.now().toString();
         
-        modalTitle.innerHTML = `<i data-lucide="plus-circle" class="w-5 h-5"></i> Daftar Aktiviti Baharu`;
+        modalTitle.innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4 sm:w-5 sm:h-5"></i> Daftar Aktiviti Baharu`;
         btnDelete.classList.add('hidden');
         
         const weekDays = getDaysOfWeek(baseDate);
@@ -1792,55 +1800,55 @@
     function renderTetapan(container) {
         const user = users.find(u => u.id === currentUserId);
         const iconHTML = availableIcons.map(ic => `
-          <div onclick="selectTenantIcon('${ic}')" class="icon-picker-btn w-12 h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-100 ${user.icon === ic ? 'selected border-2 border-[#0058e6] bg-[#e6f0ff]' : 'border-2 border-transparent'}" data-icon="${ic}" title="Pilih ikon ini">
-             <i data-lucide="${ic}" class="w-7 h-7 text-[#000080]"></i>
+          <div onclick="selectTenantIcon('${ic}')" class="icon-picker-btn w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-100 ${user.icon === ic ? 'selected border-2 border-[#0058e6] bg-[#e6f0ff]' : 'border-2 border-transparent'}" data-icon="${ic}" title="Pilih ikon ini">
+             <i data-lucide="${ic}" class="w-6 h-6 sm:w-7 sm:h-7 text-[#000080]"></i>
           </div>
         `).join('');
 
         container.innerHTML = `
-          <div class="bg-white border-none p-2 md:p-6 rounded-lg min-h-[400px]">
-            <div class="max-w-3xl mx-auto space-y-6">
+          <div class="bg-white border-none p-3 sm:p-6 rounded-lg overflow-y-auto flex-1 w-full">
+            <div class="max-w-3xl mx-auto space-y-4 sm:space-y-6">
               
-              <div class="bg-[#ece9d8] p-5 md:p-6 rounded-xl border border-[#a9a9a9] shadow-inner">
-                <h2 class="font-black text-base text-[#000080] border-b-2 border-[#a9a9a9] pb-3 mb-5 flex items-center gap-2"><i data-lucide="settings" class="w-5 h-5"></i> Tetapan Profil Anda</h2>
-                <div class="flex flex-col gap-5">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="bg-[#ece9d8] p-4 sm:p-6 rounded-xl border border-[#a9a9a9] shadow-inner">
+                <h2 class="font-black text-sm sm:text-base text-[#000080] border-b-2 border-[#a9a9a9] pb-2 sm:pb-3 mb-4 sm:mb-5 flex items-center gap-2"><i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5"></i> Tetapan Profil Anda</h2>
+                <div class="flex flex-col gap-4 sm:gap-5">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                     <div class="md:col-span-2 flex flex-col gap-1.5">
-                      <label class="font-bold text-sm text-black">Nama Bahagian / Unit:</label>
-                      <input type="text" id="setting-dept" value="${escapeHTML(user.departmentName)}" class="xp-input text-base font-bold" title="Kemaskini nama bahagian anda" />
+                      <label class="font-bold text-xs sm:text-sm text-black">Nama Bahagian / Unit:</label>
+                      <input type="text" id="setting-dept" value="${escapeHTML(user.departmentName)}" class="xp-input text-sm sm:text-base font-bold" title="Kemaskini nama bahagian anda" />
                     </div>
                     <div class="flex flex-col gap-1.5">
-                      <label class="font-bold text-sm text-black">Nama Pengarah / Ketua Unit:</label>
-                      <input type="text" id="setting-director" value="${escapeHTML(user.directorName || '')}" class="xp-input text-base" placeholder="Cth: Pengarah Kanan..." title="Kemaskini nama Pengarah/Ketua anda" />
+                      <label class="font-bold text-xs sm:text-sm text-black">Nama Pengarah / Ketua Unit:</label>
+                      <input type="text" id="setting-director" value="${escapeHTML(user.directorName || '')}" class="xp-input text-sm sm:text-base" placeholder="Cth: Pengarah Kanan..." title="Kemaskini nama Pengarah/Ketua anda" />
                     </div>
                     <div class="flex flex-col gap-1.5">
-                      <label class="font-bold text-sm text-black">Nama Setiausaha / Admin:</label>
-                      <input type="text" id="setting-secretary" value="${escapeHTML(user.secretaryName || '')}" class="xp-input text-base" placeholder="Nama anda..." title="Kemaskini nama anda selaku pengguna sistem" />
+                      <label class="font-bold text-xs sm:text-sm text-black">Nama Setiausaha / Admin:</label>
+                      <input type="text" id="setting-secretary" value="${escapeHTML(user.secretaryName || '')}" class="xp-input text-sm sm:text-base" placeholder="Nama anda..." title="Kemaskini nama anda selaku pengguna sistem" />
                     </div>
                     <div class="flex flex-col gap-1.5">
-                      <label class="font-bold text-sm text-black">No. Sambungan Telefon:</label>
-                      <input type="text" id="setting-phone" value="${escapeHTML(user.phoneExt || '')}" class="xp-input text-base" placeholder="Cth: 4321 / 03-88884321" title="Kemaskini nombor telefon bahagian" />
+                      <label class="font-bold text-xs sm:text-sm text-black">No. Sambungan Telefon:</label>
+                      <input type="text" id="setting-phone" value="${escapeHTML(user.phoneExt || '')}" class="xp-input text-sm sm:text-base" placeholder="Cth: 4321 / 03-88884321" title="Kemaskini nombor telefon bahagian" />
                     </div>
                   </div>
-                  <div class="flex justify-end border-t border-[#a9a9a9] pt-4 mt-2">
-                     <button onclick="updateProfileDetails()" class="xp-button font-bold px-8 py-2 text-sm text-white bg-[#0058e6] border-[#003C74] shadow-sm" title="Simpan perubahan tetapan profil"><i data-lucide="save" class="w-4 h-4"></i> Simpan Profil</button>
+                  <div class="flex justify-end border-t border-[#a9a9a9] pt-3 sm:pt-4 mt-1 sm:mt-2">
+                     <button onclick="updateProfileDetails()" class="xp-button font-bold px-6 sm:px-8 py-2 text-xs sm:text-sm text-white bg-[#0058e6] border-[#003C74] shadow-sm w-full sm:w-auto justify-center" title="Simpan perubahan tetapan profil"><i data-lucide="save" class="w-4 h-4"></i> Simpan Profil</button>
                   </div>
-                  <div class="mt-4">
-                    <label class="font-bold text-sm text-black block mb-2">Pilih Ikon Profil Visual:</label>
-                    <div class="flex flex-wrap gap-3 p-4 border border-[#a9a9a9] rounded-xl bg-white shadow-inner" id="tenant-icon-grid">${iconHTML}</div>
+                  <div class="mt-2 sm:mt-4">
+                    <label class="font-bold text-xs sm:text-sm text-black block mb-2">Pilih Ikon Profil Visual:</label>
+                    <div class="flex flex-wrap gap-2 sm:gap-3 p-3 sm:p-4 border border-[#a9a9a9] rounded-xl bg-white shadow-inner" id="tenant-icon-grid">${iconHTML}</div>
                   </div>
                 </div>
               </div>
 
-              <div class="bg-white p-5 md:p-6 rounded-xl border border-red-300 shadow-sm bg-red-50/30">
-                <h2 class="font-black text-base text-[#e53935] border-b-2 border-red-200 pb-3 mb-5 flex items-center gap-2"><i data-lucide="key" class="w-5 h-5"></i> Keselamatan (Kata Laluan)</h2>
+              <div class="bg-white p-4 sm:p-6 rounded-xl border border-red-300 shadow-sm bg-red-50/30">
+                <h2 class="font-black text-sm sm:text-base text-[#e53935] border-b-2 border-red-200 pb-2 sm:pb-3 mb-3 sm:mb-5 flex items-center gap-2"><i data-lucide="key" class="w-4 h-4 sm:w-5 sm:h-5"></i> Keselamatan (Kata Laluan)</h2>
                 <div class="flex flex-col gap-2">
-                  <label class="font-bold text-sm text-black">Kata Laluan Baharu:</label>
-                  <div class="flex flex-wrap md:flex-nowrap gap-3">
-                     <input type="password" id="setting-password" placeholder="Masukkan kata laluan baharu..." class="xp-input text-base font-bold" title="Taip kata laluan baru jika mahu ditukar" />
-                     <button onclick="updatePassword()" class="xp-button font-bold shrink-0 text-sm px-6 h-10 border-[#a9a9a9]" title="Kemaskini kata laluan profil anda">Kemas Kini</button>
+                  <label class="font-bold text-xs sm:text-sm text-black">Kata Laluan Baharu:</label>
+                  <div class="flex flex-wrap md:flex-nowrap gap-2 sm:gap-3">
+                     <input type="password" id="setting-password" placeholder="Masukkan kata laluan baharu..." class="xp-input text-sm sm:text-base font-bold" title="Taip kata laluan baru jika mahu ditukar" />
+                     <button onclick="updatePassword()" class="xp-button font-bold shrink-0 text-xs sm:text-sm px-4 sm:px-6 h-9 sm:h-10 border-[#a9a9a9] w-full sm:w-auto justify-center" title="Kemaskini kata laluan profil anda">Kemas Kini</button>
                   </div>
-                  <p class="text-xs text-[#555] font-semibold mt-1">Biarkan kosong jika tidak mahu menggunakan kata laluan (Bypass).</p>
+                  <p class="text-[10px] sm:text-xs text-[#555] font-semibold mt-1">Biarkan kosong jika tidak mahu menggunakan kata laluan (Bypass).</p>
                 </div>
               </div>
             </div>
@@ -1890,8 +1898,8 @@
           if (window.dbAPI) await window.dbAPI.saveUser(user);
           const grid = document.getElementById('tenant-icon-grid');
           Array.from(grid.children).forEach(el => {
-             if(el.dataset.icon === iconName) el.className = "icon-picker-btn w-12 h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-100 selected border-2 border-[#0058e6] bg-[#e6f0ff]";
-             else el.className = "icon-picker-btn w-12 h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-100 border-2 border-transparent";
+             if(el.dataset.icon === iconName) el.className = "icon-picker-btn w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-100 selected border-2 border-[#0058e6] bg-[#e6f0ff]";
+             else el.className = "icon-picker-btn w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-100 border-2 border-transparent";
           });
           showToast("Ikon profil disimpan.");
         } catch(e) { setAppStatus('Gagal menyimpan pangkalan data', 'error'); }
@@ -2004,8 +2012,8 @@
                     
                     let dateCell = '';
                     if (idx === 0) {
-                        dateCell = `<td class="border border-[#a9a9a9] p-3 text-center text-sm font-black align-top bg-gray-100" rowspan="${docsForDate.length}">
-                            <div class="uppercase text-[11px] text-gray-500 mb-0.5 font-bold tracking-wider">${dayName}</div>
+                        dateCell = `<td class="border border-[#a9a9a9] p-2 sm:p-3 text-center text-xs sm:text-sm font-black align-top bg-gray-100" rowspan="${docsForDate.length}">
+                            <div class="uppercase text-[9px] sm:text-[11px] text-gray-500 mb-0.5 font-bold tracking-wider">${dayName}</div>
                             <div>${displayDate}</div>
                         </td>`;
                     }
@@ -2016,19 +2024,19 @@
                     tbodyHtml += `
                         <tr style="${trStyle}">
                             ${dateCell}
-                            <td class="p-3 align-top border-b-[2px] border-t-[2px] border-l-[2px] ${borderClass} ${bgClass}">
-                                <div class="font-black text-[10px] ${textTypeClass} mb-1 uppercase tracking-wider">${typeLabel}</div>
-                                <div class="font-bold text-black text-xs mb-1.5">${d.noRuj}</div>
-                                <div class="text-[9px] font-bold px-1.5 py-0.5 rounded inline-block text-white ${d.klasifikasi === 'Sulit' ? 'bg-red-600' : (d.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${d.klasifikasi || 'Biasa'}</div>
+                            <td class="p-2 sm:p-3 align-top border-b-[2px] border-t-[2px] border-l-[2px] ${borderClass} ${bgClass}">
+                                <div class="font-black text-[9px] sm:text-[10px] ${textTypeClass} mb-1 uppercase tracking-wider">${typeLabel}</div>
+                                <div class="font-bold text-black text-[11px] sm:text-xs mb-1.5">${d.noRuj}</div>
+                                <div class="text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded inline-block text-white ${d.klasifikasi === 'Sulit' ? 'bg-red-600' : (d.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${d.klasifikasi || 'Biasa'}</div>
                             </td>
-                            <td class="p-3 align-top border-b-[2px] border-t-[2px] ${borderClass} ${bgClass}">
-                                <div class="font-bold text-sm text-black">${escapeHTML(d.tajuk)}</div>
+                            <td class="p-2 sm:p-3 align-top border-b-[2px] border-t-[2px] ${borderClass} ${bgClass}">
+                                <div class="font-bold text-[11px] sm:text-sm text-black">${escapeHTML(d.tajuk)}</div>
                             </td>
-                            <td class="p-3 align-top border-b-[2px] border-t-[2px] ${borderClass} ${bgClass}">
-                                <div class="text-[10px] text-gray-600 uppercase font-bold">${destLabel}</div>
-                                <div class="text-xs font-semibold text-black">${destVal}</div>
+                            <td class="p-2 sm:p-3 align-top border-b-[2px] border-t-[2px] ${borderClass} ${bgClass}">
+                                <div class="text-[9px] sm:text-[10px] text-gray-600 uppercase font-bold">${destLabel}</div>
+                                <div class="text-[11px] sm:text-xs font-semibold text-black">${destVal}</div>
                             </td>
-                            <td class="p-3 text-center align-top font-bold text-xs border-b-[2px] border-t-[2px] border-r-[2px] ${borderClass} ${bgClass}">
+                            <td class="p-2 sm:p-3 text-center align-top font-bold text-[11px] sm:text-xs border-b-[2px] border-t-[2px] border-r-[2px] ${borderClass} ${bgClass}">
                                 ${statusVal}
                             </td>
                         </tr>
@@ -2038,46 +2046,48 @@
         }
 
         container.innerHTML = `
-            <div class="flex flex-col gap-4 no-print mb-6 border-b-2 border-[#a9a9a9] pb-5 w-full">
-                <div class="flex items-center gap-4 flex-wrap">
-                    <span class="font-bold text-sm text-[#000080] bg-blue-50 px-3 py-1.5 rounded border border-blue-200">Format Paparan:</span>
-                    <div class="flex gap-2">
-                        <button onclick="setSuratReportMode('weekly')" class="xp-button text-sm h-10 ${suratReportMode==='weekly'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}">Mingguan</button>
-                        <button onclick="setSuratReportMode('monthly')" class="xp-button text-sm h-10 ${suratReportMode==='monthly'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}">Bulanan</button>
+            <div class="flex flex-col gap-3 sm:gap-4 no-print mb-4 sm:mb-6 border-b-2 border-[#a9a9a9] pb-4 sm:pb-5 w-full shrink-0">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div class="flex items-center gap-2 sm:gap-4 flex-wrap">
+                        <span class="font-bold text-xs sm:text-sm text-[#000080] bg-blue-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded border border-blue-200">Format Paparan:</span>
+                        <div class="flex gap-2">
+                            <button onclick="setSuratReportMode('weekly')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 ${suratReportMode==='weekly'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}">Mingguan</button>
+                            <button onclick="setSuratReportMode('monthly')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 ${suratReportMode==='monthly'?'font-extrabold bg-[#e6f0ff] border-[#0058e6] text-[#000080]':''}">Bulanan</button>
+                        </div>
+                        <div class="w-px h-6 sm:h-8 bg-[#a9a9a9] mx-1 sm:mx-2 hidden md:block"></div>
+                        <div class="flex items-center gap-1 xp-panel p-1 bg-white">
+                            <button onclick="ubahSuratReportDate(-1)" class="xp-button h-7 sm:h-8 w-8 sm:w-10 p-0" title="Tempoh Sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4 sm:w-5 sm:h-5 text-[#000080]"></i></button>
+                            <span class="font-bold text-[#000080] text-[10px] sm:text-xs px-2 sm:px-4 min-w-[150px] sm:min-w-[200px] text-center">${titleText.split('(')[1].replace(')','')}</span>
+                            <button onclick="ubahSuratReportDate(1)" class="xp-button h-7 sm:h-8 w-8 sm:w-10 p-0" title="Tempoh Seterusnya"><i data-lucide="chevron-right" class="w-4 h-4 sm:w-5 sm:h-5 text-[#000080]"></i></button>
+                        </div>
                     </div>
-                    <div class="w-px h-8 bg-[#a9a9a9] mx-2 hidden md:block"></div>
-                    <div class="flex items-center gap-1 xp-panel p-1 bg-white">
-                        <button onclick="ubahSuratReportDate(-1)" class="xp-button h-8 w-10 p-0" title="Tempoh Sebelumnya"><i data-lucide="chevron-left" class="w-5 h-5 text-[#000080]"></i></button>
-                        <span class="font-bold text-[#000080] text-xs px-4 min-w-[200px] text-center">${titleText.split('(')[1].replace(')','')}</span>
-                        <button onclick="ubahSuratReportDate(1)" class="xp-button h-8 w-10 p-0" title="Tempoh Seterusnya"><i data-lucide="chevron-right" class="w-5 h-5 text-[#000080]"></i></button>
-                    </div>
-                    <button onclick="window.print()" class="xp-button font-bold text-black ml-auto h-10 px-6 shadow-sm"><i data-lucide="printer" class="w-5 h-5 text-black"></i> Cetak / Jana PDF</button>
+                    <button onclick="window.print()" class="xp-button font-bold text-black h-8 sm:h-10 px-4 sm:px-6 shadow-sm w-full lg:w-auto mt-2 lg:mt-0 justify-center" title="Jana PDF untuk laporan ini"><i data-lucide="printer" class="w-4 h-4 sm:w-5 sm:h-5 text-black"></i> Cetak / Jana PDF</button>
                 </div>
             </div>
 
-            <div class="bg-white p-5 md:p-10 overflow-x-auto relative shadow-inner printable-container rounded-xl border border-[#a9a9a9] w-full" id="print-area">
-                <div class="text-center mb-8">
-                    <h2 class="font-black text-xl md:text-2xl uppercase text-black tracking-wide">Rekod Pendaftaran Surat Keluar & Masuk</h2>
-                    <h3 class="font-bold text-lg md:text-xl uppercase text-black mt-1">${escapeHTML(currentDept)}</h3>
-                    <p class="mt-2 text-black font-semibold text-sm">${titleText}</p>
+            <div class="bg-white p-3 sm:p-5 md:p-8 flex-1 overflow-y-auto relative shadow-inner printable-container rounded-xl border border-[#a9a9a9] w-full" id="print-area">
+                <div class="text-center mb-6 sm:mb-8">
+                    <h2 class="font-black text-lg sm:text-xl md:text-2xl uppercase text-black tracking-wide">Rekod Pendaftaran Surat Keluar & Masuk</h2>
+                    <h3 class="font-bold text-base sm:text-lg md:text-xl uppercase text-black mt-1">${escapeHTML(currentDept)}</h3>
+                    <p class="mt-2 text-black font-semibold text-xs sm:text-sm">${titleText}</p>
                 </div>
 
-                <div class="mb-8 w-full min-w-[800px] overflow-x-auto">
-                    <table class="w-full border-collapse border border-[#a9a9a9] text-sm print-table border-spacing-y-2" style="border-spacing: 0 4px;">
+                <div class="mb-6 sm:mb-8 w-full min-w-[700px] overflow-x-auto">
+                    <table class="w-full border-collapse border border-[#a9a9a9] text-[11px] sm:text-sm print-table border-spacing-y-2" style="border-spacing: 0 4px;">
                         <thead>
                             <tr class="bg-gray-300" style="print-color-adjust: exact; -webkit-print-color-adjust: exact;">
-                                <th class="border border-[#a9a9a9] p-3 font-extrabold text-center w-[12%]">TARIKH</th>
-                                <th class="border border-[#a9a9a9] p-3 font-extrabold text-left w-[20%]">JENIS & NO. RUJUKAN</th>
-                                <th class="border border-[#a9a9a9] p-3 font-extrabold text-left w-[35%]">TAJUK SURAT / PERKARA</th>
-                                <th class="border border-[#a9a9a9] p-3 font-extrabold text-left w-[20%]">DARI / KEPADA</th>
-                                <th class="border border-[#a9a9a9] p-3 font-extrabold text-center w-[13%]">STATUS</th>
+                                <th class="border border-[#a9a9a9] p-2 sm:p-3 font-extrabold text-center w-[12%]">TARIKH</th>
+                                <th class="border border-[#a9a9a9] p-2 sm:p-3 font-extrabold text-left w-[20%]">JENIS & NO. RUJUKAN</th>
+                                <th class="border border-[#a9a9a9] p-2 sm:p-3 font-extrabold text-left w-[35%]">TAJUK SURAT / PERKARA</th>
+                                <th class="border border-[#a9a9a9] p-2 sm:p-3 font-extrabold text-left w-[20%]">DARI / KEPADA</th>
+                                <th class="border border-[#a9a9a9] p-2 sm:p-3 font-extrabold text-center w-[13%]">STATUS</th>
                             </tr>
                         </thead>
                         <tbody>${tbodyHtml}</tbody>
                     </table>
                 </div>
                 
-                <div class="mt-8 pt-4 border-t border-dashed border-gray-400 text-xs text-center text-gray-500 italic">
+                <div class="mt-6 sm:mt-8 pt-4 border-t border-dashed border-gray-400 text-[10px] sm:text-xs text-center text-gray-500 italic">
                     Laporan ini dijana oleh Sistem Pengurusan Kalendar & Rekod Surat pada ${formatDateTime(new Date().toISOString())}
                 </div>
             </div>
@@ -2139,12 +2149,12 @@
             const isSelected = checkSamaHari(thisDate, suratSelectedDate);
             const isToday = checkSamaHari(thisDate, new Date());
             
-            let classes = "p-2 flex flex-col items-center justify-center text-sm surat-cal-day ";
+            let classes = "p-1.5 sm:p-2 flex flex-col items-center justify-center text-[11px] sm:text-sm surat-cal-day ";
             if(isSelected) classes += "active shadow-sm";
             else if(isToday) classes += "bg-blue-50 text-[#0058e6] font-extrabold border border-blue-200";
 
             const adaSurat = documents.some(d => checkSamaHari(new Date(d.tarikhDaftar), thisDate) && (d.lokasiSemasa === currentDept || d.pendaftar === currentDept) && d.status !== 'Dibatalkan');
-            const dot = adaSurat ? `<div class="w-2 h-2 bg-red-600 rounded-full mt-1"></div>` : `<div class="w-2 h-2 mt-1"></div>`;
+            const dot = adaSurat ? `<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-600 rounded-full mt-0.5 sm:mt-1"></div>` : `<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 mt-0.5 sm:mt-1"></div>`;
 
             calHtml += `<div class="${classes}" onclick="setSuratDate(${year}, ${month}, ${i})" title="Klik untuk papar surat pada tarikh ini"><span>${i}</span>${dot}</div>`;
         }
@@ -2184,7 +2194,7 @@
 
         const dKeluar = Object.values(dKeluarMap).sort((a,b) => new Date(b.tarikhDaftar) - new Date(a.tarikhDaftar));
 
-        const buildList = (list, type) => list.length === 0 ? `<div class="text-center text-[#888] text-sm italic py-8">Tiada rekod pada tarikh ini.</div>` : list.map(d => {
+        const buildList = (list, type) => list.length === 0 ? `<div class="text-center text-[#888] text-xs sm:text-sm italic py-6 sm:py-8">Tiada rekod pada tarikh ini.</div>` : list.map(d => {
             const destText = d.allDestinasi ? d.allDestinasi.join(', ') : d.lokasiSemasa;
             let badgeStatus = d.status;
             let labelBawah = '';
@@ -2207,44 +2217,48 @@
             }
 
             return `
-            <div class="border border-[#a9a9a9] bg-white rounded-lg p-3 mb-3 shadow-sm cursor-pointer hover:bg-[#e6f0ff] transition" onclick="jumpToSuratJejak('${d.noRuj}')" title="Klik untuk papar pergerakan dan butiran dokumen ini">
-                <div class="flex justify-between items-center mb-1.5">
-                    <span class="font-bold text-[#000080] text-xs md:text-sm">${d.noRuj}</span>
-                    <span class="text-[10px] font-bold px-2 py-1 rounded ${d.dipulangkan ? 'bg-orange-100 text-orange-800' : 'bg-gray-200 text-gray-800'}">${badgeStatus}</span>
+            <div class="border border-[#a9a9a9] bg-white rounded-lg p-2.5 sm:p-3 mb-2 sm:mb-3 shadow-sm cursor-pointer hover:bg-[#e6f0ff] transition" onclick="jumpToSuratJejak('${d.noRuj}')" title="Klik untuk papar pergerakan dan butiran dokumen ini">
+                <div class="flex justify-between items-center mb-1 sm:mb-1.5">
+                    <span class="font-bold text-[#000080] text-[11px] sm:text-xs md:text-sm">${d.noRuj}</span>
+                    <span class="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded ${d.dipulangkan ? 'bg-orange-100 text-orange-800' : 'bg-gray-200 text-gray-800'}">${badgeStatus}</span>
                 </div>
-                <p class="text-sm text-black font-bold truncate">${escapeHTML(d.tajuk)}</p>
-                <div class="flex justify-between items-end mt-2 gap-2">
-                    <p class="text-[11px] text-[#555] font-semibold truncate flex-1">${labelBawah}</p>
-                    <span class="text-[9px] font-bold text-white px-1.5 py-0.5 rounded shrink-0 ${d.klasifikasi === 'Sulit' ? 'bg-red-600' : (d.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${d.klasifikasi || 'Biasa'}</span>
+                <p class="text-xs sm:text-sm text-black font-bold truncate">${escapeHTML(d.tajuk)}</p>
+                <div class="flex justify-between items-end mt-1.5 sm:mt-2 gap-2">
+                    <p class="text-[9px] sm:text-[11px] text-[#555] font-semibold truncate flex-1">${labelBawah}</p>
+                    <span class="text-[8px] sm:text-[9px] font-bold text-white px-1.5 py-0.5 rounded shrink-0 ${d.klasifikasi === 'Sulit' ? 'bg-red-600' : (d.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${d.klasifikasi || 'Biasa'}</span>
                 </div>
             </div>
             `;
         }).join('');
 
         container.innerHTML = `
-            <div class="flex flex-col lg:flex-row gap-4 h-full pb-2">
-                <div class="flex-1 min-w-0 xp-panel bg-[#ece9d8] flex flex-col p-4 shadow-inner border-t-[6px] border-t-red-600 rounded-t-xl order-1 lg:order-1">
-                    <h3 class="font-black text-base text-red-700 mb-2 flex items-center gap-2"><i data-lucide="log-in" class="w-5 h-5"></i> Rekod Surat Masuk</h3>
-                    <p class="text-xs text-[#555] font-bold mb-3 border-b-2 border-[#a9a9a9] pb-2">Tarikh: <span class="text-black">${suratSelectedDate.toLocaleDateString('ms-MY')}</span></p>
-                    <div class="overflow-y-auto flex-1 pr-1">${buildList(dMasuk, 'masuk')}</div>
+            <div class="flex flex-col lg:flex-row gap-3 sm:gap-4 h-full pb-2 overflow-hidden">
+                <div class="flex-1 min-w-0 min-h-[30vh] lg:min-h-0 xp-panel bg-[#ece9d8] flex flex-col p-3 sm:p-4 shadow-inner border-t-[6px] border-t-red-600 rounded-t-xl order-2 lg:order-1">
+                    <h3 class="font-black text-sm sm:text-base text-red-700 mb-1 sm:mb-2 flex items-center gap-2 shrink-0"><i data-lucide="log-in" class="w-4 h-4 sm:w-5 sm:h-5"></i> Rekod Surat Masuk</h3>
+                    <p class="text-[10px] sm:text-xs text-[#555] font-bold mb-2 sm:mb-3 border-b-2 border-[#a9a9a9] pb-1.5 sm:pb-2 shrink-0">Tarikh: <span class="text-black">${suratSelectedDate.toLocaleDateString('ms-MY')}</span></p>
+                    <div class="overflow-y-auto flex-1 pr-1 w-full relative">
+                        <div class="absolute w-full pb-2">${buildList(dMasuk, 'masuk')}</div>
+                    </div>
                 </div>
                 
-                <div class="flex-1 min-w-0 xp-panel bg-[#ece9d8] flex flex-col p-4 shadow-inner border-t-[6px] border-t-blue-600 rounded-t-xl order-2 lg:order-2">
-                    <h3 class="font-black text-base text-[#000080] mb-2 flex items-center gap-2"><i data-lucide="log-out" class="w-5 h-5"></i> Rekod Surat Keluar</h3>
-                    <p class="text-xs text-[#555] font-bold mb-3 border-b-2 border-[#a9a9a9] pb-2">Tarikh: <span class="text-black">${suratSelectedDate.toLocaleDateString('ms-MY')}</span></p>
-                    <div class="overflow-y-auto flex-1 pr-1">${buildList(dKeluar, 'keluar')}</div>
+                <div class="flex-1 min-w-0 min-h-[30vh] lg:min-h-0 xp-panel bg-[#ece9d8] flex flex-col p-3 sm:p-4 shadow-inner border-t-[6px] border-t-blue-600 rounded-t-xl order-3 lg:order-2 mt-2 lg:mt-0">
+                    <h3 class="font-black text-sm sm:text-base text-[#000080] mb-1 sm:mb-2 flex items-center gap-2 shrink-0"><i data-lucide="log-out" class="w-4 h-4 sm:w-5 sm:h-5"></i> Rekod Surat Keluar</h3>
+                    <p class="text-[10px] sm:text-xs text-[#555] font-bold mb-2 sm:mb-3 border-b-2 border-[#a9a9a9] pb-1.5 sm:pb-2 shrink-0">Tarikh: <span class="text-black">${suratSelectedDate.toLocaleDateString('ms-MY')}</span></p>
+                    <div class="overflow-y-auto flex-1 pr-1 w-full relative">
+                        <div class="absolute w-full pb-2">${buildList(dKeluar, 'keluar')}</div>
+                    </div>
                 </div>
 
-                <div class="w-full lg:w-72 xl:w-80 xp-panel bg-white flex flex-col p-4 shadow-inner order-3 lg:order-3 shrink-0">
-                    <div class="flex justify-between items-center mb-4 pb-3 border-b-2 border-[#a9a9a9]">
-                        <button onclick="ubahBulanSurat(-1)" class="xp-button px-3 py-1" title="Bulan sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4 text-[#0058e6]"></i></button>
-                        <span class="font-black text-[13px] text-[#000080] uppercase tracking-wide">${monthNamesList[month]} ${year}</span>
-                        <button onclick="ubahBulanSurat(1)" class="xp-button px-3 py-1" title="Bulan seterusnya"><i data-lucide="chevron-right" class="w-4 h-4 text-[#0058e6]"></i></button>
+                <div class="w-full lg:w-72 xl:w-80 xp-panel bg-white flex flex-col p-3 sm:p-4 shadow-inner order-1 lg:order-3 shrink-0">
+                    <div class="flex justify-between items-center mb-3 sm:mb-4 pb-2 sm:pb-3 border-b-2 border-[#a9a9a9]">
+                        <button onclick="ubahBulanSurat(-1)" class="xp-button px-2 sm:px-3 py-1" title="Bulan sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4 text-[#0058e6]"></i></button>
+                        <span class="font-black text-[11px] sm:text-[13px] text-[#000080] uppercase tracking-wide">${monthNamesList[month]} ${year}</span>
+                        <button onclick="ubahBulanSurat(1)" class="xp-button px-2 sm:px-3 py-1" title="Bulan seterusnya"><i data-lucide="chevron-right" class="w-4 h-4 text-[#0058e6]"></i></button>
                     </div>
-                    <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-[#555] mb-2 uppercase">
+                    <div class="grid grid-cols-7 gap-1 text-center text-[9px] sm:text-[11px] font-bold text-[#555] mb-1.5 sm:mb-2 uppercase">
                         <div>Ahd</div><div>Isn</div><div>Sel</div><div>Rab</div><div>Kha</div><div>Jum</div><div>Sab</div>
                     </div>
-                    <div class="grid grid-cols-7 gap-1 text-center">${calHtml}</div>
+                    <div class="grid grid-cols-7 gap-0.5 sm:gap-1 text-center">${calHtml}</div>
                 </div>
             </div>
         `;
@@ -2258,50 +2272,50 @@
         const myDocs = documents.filter(d => d.lokasiSemasa === currentDept && d.pendaftar !== currentDept && d.status !== 'Dibatalkan').sort((a,b) => new Date(b.tarikhDaftar) - new Date(a.tarikhDaftar));
         
         if(myDocs.length === 0) {
-            container.innerHTML = `<div class="flex flex-col items-center justify-center h-[50vh] text-[#888]"><i data-lucide="inbox" class="w-16 h-16 mb-4 text-[#a9a9a9]"></i><p class="text-base font-bold">Peti masuk anda kosong buat masa ini.</p></div>`;
+            container.innerHTML = `<div class="flex flex-col items-center justify-center h-[50vh] text-[#888]"><i data-lucide="inbox" class="w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 text-[#a9a9a9]"></i><p class="text-sm sm:text-base font-bold">Peti masuk anda kosong buat masa ini.</p></div>`;
             return;
         }
 
-        container.innerHTML = `<div class="flex flex-col gap-4 pb-4">` + myDocs.map(doc => {
+        container.innerHTML = `<div class="flex flex-col gap-3 sm:gap-4 pb-4 overflow-y-auto flex-1 w-full">` + myDocs.map(doc => {
             const isBaru = doc.status === 'Dihantar';
             const bgClass = isBaru ? 'bg-[#ffffe1] border-[#0058e6] shadow-[0_4px_10px_rgba(0,88,230,0.15)]' : 'bg-white border-[#a9a9a9] shadow-sm';
             
             let actionBtn = '';
             if(isBaru) {
-                actionBtn = `<button onclick="terimaSurat('${doc.id}')" class="xp-button font-bold text-white bg-[#008000] border-[#005000] px-5 py-2 text-sm" title="Klik untuk sahkan penerimaan dokumen ini"><i data-lucide="check-square" class="w-4 h-4"></i> Sahkan Penerimaan</button>`;
+                actionBtn = `<button onclick="terimaSurat('${doc.id}')" class="xp-button font-bold text-white bg-[#008000] border-[#005000] px-4 sm:px-5 py-1.5 sm:py-2 text-[11px] sm:text-sm w-full sm:w-auto justify-center" title="Klik untuk sahkan penerimaan dokumen ini"><i data-lucide="check-square" class="w-3 h-3 sm:w-4 sm:h-4"></i> Sahkan Penerimaan</button>`;
             } else if (['Diterima', 'KIV'].includes(doc.status)) {
                 actionBtn = `
-                    <div class="flex flex-col items-end gap-1.5">
-                        <button onclick="bukaModalTindakanSurat('${doc.id}', false)" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] px-5 py-2 text-sm" title="Rekod tindakan ke atas surat ini"><i data-lucide="file-check-2" class="w-4 h-4"></i> Ambil Tindakan</button>
-                        ${doc.status === 'KIV' ? `<button onclick="bukaModalTindakanSurat('${doc.id}', true)" class="text-[11px] font-bold text-[#0058e6] hover:text-[#e53935] hover:underline flex items-center gap-1 mt-1" title="Pinda status KIV"><i data-lucide="edit-3" class="w-3 h-3"></i> Pinda KIV (Pembetulan)</button>` : ''}
+                    <div class="flex flex-col items-end gap-1.5 w-full sm:w-auto">
+                        <button onclick="bukaModalTindakanSurat('${doc.id}', false)" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] px-4 sm:px-5 py-1.5 sm:py-2 text-[11px] sm:text-sm w-full sm:w-auto justify-center" title="Rekod tindakan ke atas surat ini"><i data-lucide="file-check-2" class="w-3 h-3 sm:w-4 sm:h-4"></i> Ambil Tindakan</button>
+                        ${doc.status === 'KIV' ? `<button onclick="bukaModalTindakanSurat('${doc.id}', true)" class="text-[10px] sm:text-[11px] font-bold text-[#0058e6] hover:text-[#e53935] hover:underline flex items-center justify-center sm:justify-end gap-1 mt-1 w-full sm:w-auto" title="Pinda status KIV"><i data-lucide="edit-3" class="w-3 h-3"></i> Pinda KIV (Pembetulan)</button>` : ''}
                     </div>
                 `;
             } else {
                 actionBtn = `
-                    <div class="flex flex-col items-end gap-1.5">
-                        <span class="text-xs font-bold text-[#555] bg-gray-200 px-3 py-1.5 rounded border border-[#a9a9a9]"><i data-lucide="check-circle" class="w-3 h-3 inline mr-1 text-green-600"></i> ${doc.status}</span>
-                        <button onclick="bukaModalTindakanSurat('${doc.id}', true)" class="text-[11px] font-bold text-[#0058e6] hover:text-[#e53935] hover:underline flex items-center gap-1 mt-1" title="Ubah tindakan yang telah direkodkan"><i data-lucide="edit-3" class="w-3 h-3"></i> Pinda Tindakan (Pembetulan)</button>
+                    <div class="flex flex-col items-end gap-1.5 w-full sm:w-auto">
+                        <span class="text-[11px] sm:text-xs font-bold text-[#555] bg-gray-200 px-3 py-1 sm:py-1.5 rounded border border-[#a9a9a9] w-full sm:w-auto text-center"><i data-lucide="check-circle" class="w-3 h-3 inline mr-1 text-green-600"></i> ${doc.status}</span>
+                        <button onclick="bukaModalTindakanSurat('${doc.id}', true)" class="text-[10px] sm:text-[11px] font-bold text-[#0058e6] hover:text-[#e53935] hover:underline flex items-center justify-center sm:justify-end gap-1 mt-1 w-full sm:w-auto" title="Ubah tindakan yang telah direkodkan"><i data-lucide="edit-3" class="w-3 h-3"></i> Pinda Tindakan (Pembetulan)</button>
                     </div>
                 `;
             }
 
             return `
-                <div class="xp-panel p-4 md:p-5 ${bgClass} flex flex-col md:flex-row justify-between items-start md:items-center">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="font-black text-[#000080] text-sm bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${doc.noRuj}</span>
-                            ${isBaru ? `<span class="text-[10px] font-black tracking-wide text-white bg-red-600 px-2.5 py-1 rounded-full animate-pulse shadow-sm">BARU</span>` : ''}
-                            <span class="text-[10px] font-bold text-white px-2 py-0.5 rounded ${doc.klasifikasi === 'Sulit' ? 'bg-red-600' : (doc.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${doc.klasifikasi || 'Biasa'}</span>
+                <div class="xp-panel p-3 sm:p-4 md:p-5 ${bgClass} flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div class="flex-1 w-full mb-3 md:mb-0">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2 flex-wrap">
+                            <span class="font-black text-[#000080] text-xs sm:text-sm bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${doc.noRuj}</span>
+                            ${isBaru ? `<span class="text-[9px] sm:text-[10px] font-black tracking-wide text-white bg-red-600 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full animate-pulse shadow-sm">BARU</span>` : ''}
+                            <span class="text-[9px] sm:text-[10px] font-bold text-white px-1.5 sm:px-2 py-0.5 rounded ${doc.klasifikasi === 'Sulit' ? 'bg-red-600' : (doc.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${doc.klasifikasi || 'Biasa'}</span>
                         </div>
-                        <h4 class="text-base md:text-lg font-bold text-black mb-2">${escapeHTML(doc.tajuk)}</h4>
-                        <div class="flex flex-wrap gap-4 text-xs text-[#555] font-semibold mt-2">
-                            <span class="bg-[#ece9d8] px-2 py-1 rounded border border-[#ccc]"><i data-lucide="tag" class="w-3.5 h-3.5 inline mr-1"></i> ${doc.jenis}</span>
-                            <span class="bg-[#ece9d8] px-2 py-1 rounded border border-[#ccc]"><i data-lucide="building" class="w-3.5 h-3.5 inline mr-1"></i> Dari: <span class="text-black">${doc.pendaftar}</span></span>
-                            ${doc.tarikhTerima ? `<span class="text-green-700 bg-green-50 px-2 py-1 rounded border border-green-200"><i data-lucide="calendar-check" class="w-3.5 h-3.5 inline mr-1"></i> Diterima: ${formatDateOnly(doc.tarikhTerima)}</span>` : ''}
+                        <h4 class="text-sm sm:text-base md:text-lg font-bold text-black mb-1.5 sm:mb-2">${escapeHTML(doc.tajuk)}</h4>
+                        <div class="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-[10px] sm:text-xs text-[#555] font-semibold mt-1.5 sm:mt-2">
+                            <span class="bg-[#ece9d8] px-2 py-1 rounded border border-[#ccc] w-max"><i data-lucide="tag" class="w-3 h-3 sm:w-3.5 sm:h-3.5 inline mr-1"></i> ${doc.jenis}</span>
+                            <span class="bg-[#ece9d8] px-2 py-1 rounded border border-[#ccc] w-max"><i data-lucide="building" class="w-3 h-3 sm:w-3.5 sm:h-3.5 inline mr-1"></i> Dari: <span class="text-black">${doc.pendaftar}</span></span>
+                            ${doc.tarikhTerima ? `<span class="text-green-700 bg-green-50 px-2 py-1 rounded border border-green-200 w-max"><i data-lucide="calendar-check" class="w-3 h-3 sm:w-3.5 sm:h-3.5 inline mr-1"></i> Diterima: ${formatDateOnly(doc.tarikhTerima)}</span>` : ''}
                         </div>
                     </div>
-                    <div class="mt-4 md:mt-0 flex flex-col md:items-end gap-3 shrink-0 border-t md:border-t-0 md:border-l border-[#a9a9a9] pt-3 md:pt-0 md:pl-5 w-full md:w-auto">
-                        <span class="text-xs text-[#888] font-bold">Dihantar Pada: <span class="text-black block md:inline">${formatDateTime(doc.tarikhDaftar)}</span></span>
+                    <div class="flex flex-col sm:items-end gap-2 sm:gap-3 shrink-0 border-t md:border-t-0 md:border-l border-[#a9a9a9] pt-2 sm:pt-3 md:pt-0 md:pl-5 w-full md:w-auto">
+                        <span class="text-[10px] sm:text-xs text-[#888] font-bold">Dihantar Pada: <span class="text-black block md:inline">${formatDateTime(doc.tarikhDaftar)}</span></span>
                         ${actionBtn}
                     </div>
                 </div>
@@ -2321,29 +2335,29 @@
         const list = Object.values(grouped).sort((a,b) => new Date(b.tarikhDaftar) - new Date(a.tarikhDaftar));
 
         if(list.length === 0) {
-            container.innerHTML = `<div class="flex flex-col items-center justify-center h-[50vh] text-[#888]"><i data-lucide="send" class="w-16 h-16 mb-4 text-[#a9a9a9]"></i><p class="text-base font-bold">Tiada rekod surat yang sedang dalam tindakan (Peti Keluar Kosong).</p></div>`;
+            container.innerHTML = `<div class="flex flex-col items-center justify-center h-[50vh] text-[#888]"><i data-lucide="send" class="w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 text-[#a9a9a9]"></i><p class="text-sm sm:text-base font-bold">Tiada rekod surat yang sedang dalam tindakan (Peti Keluar Kosong).</p></div>`;
             return;
         }
 
-        container.innerHTML = `<div class="flex flex-col gap-4 pb-4">` + list.map(group => {
-            let statusHtml = group.allDocs.map(d => `<div class="text-[11px] font-bold mt-1 ${d.status === 'KIV' ? 'text-orange-600' : (d.status === 'Diterima' ? 'text-green-600' : 'text-blue-600')}"><span class="text-black">${d.lokasiSemasa}:</span> ${d.status}</div>`).join('');
+        container.innerHTML = `<div class="flex flex-col gap-3 sm:gap-4 pb-4 overflow-y-auto flex-1 w-full">` + list.map(group => {
+            let statusHtml = group.allDocs.map(d => `<div class="text-[10px] sm:text-[11px] font-bold mt-1 ${d.status === 'KIV' ? 'text-orange-600' : (d.status === 'Diterima' ? 'text-green-600' : 'text-blue-600')}"><span class="text-black">${d.lokasiSemasa}:</span> ${d.status}</div>`).join('');
 
             return `
-                <div class="xp-panel p-4 md:p-5 bg-white border-[#a9a9a9] shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer hover:bg-blue-50 transition" onclick="jumpToSuratJejak('${group.noRuj}')" title="Klik untuk lihat paparan jejak bagi rekod ini">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="font-black text-[#000080] text-sm bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${group.noRuj}</span>
-                            <span class="text-[10px] font-bold text-white px-2 py-0.5 rounded ${group.klasifikasi === 'Sulit' ? 'bg-red-600' : (group.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${group.klasifikasi || 'Biasa'}</span>
+                <div class="xp-panel p-3 sm:p-4 md:p-5 bg-white border-[#a9a9a9] shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer hover:bg-blue-50 transition" onclick="jumpToSuratJejak('${group.noRuj}')" title="Klik untuk lihat paparan jejak bagi rekod ini">
+                    <div class="flex-1 w-full mb-3 md:mb-0">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2 flex-wrap">
+                            <span class="font-black text-[#000080] text-xs sm:text-sm bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${group.noRuj}</span>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-white px-1.5 sm:px-2 py-0.5 rounded ${group.klasifikasi === 'Sulit' ? 'bg-red-600' : (group.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${group.klasifikasi || 'Biasa'}</span>
                         </div>
-                        <h4 class="text-base md:text-lg font-bold text-black mb-2">${escapeHTML(group.tajuk)}</h4>
-                        <div class="flex flex-col text-xs text-[#555] font-semibold mt-2 bg-gray-50 p-3 rounded-lg border border-gray-200 w-full md:w-3/4">
-                            <span class="mb-1.5 text-black font-extrabold border-b border-gray-300 pb-1">Status Tindakan Penerima:</span>
+                        <h4 class="text-sm sm:text-base md:text-lg font-bold text-black mb-1.5 sm:mb-2">${escapeHTML(group.tajuk)}</h4>
+                        <div class="flex flex-col text-[10px] sm:text-xs text-[#555] font-semibold mt-1.5 sm:mt-2 bg-gray-50 p-2 sm:p-3 rounded-lg border border-gray-200 w-full md:w-3/4">
+                            <span class="mb-1 sm:mb-1.5 text-black font-extrabold border-b border-gray-300 pb-1">Status Tindakan Penerima:</span>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">${statusHtml}</div>
                         </div>
                     </div>
-                    <div class="mt-4 md:mt-0 flex flex-col md:items-end gap-2 shrink-0 border-t md:border-t-0 md:border-l border-[#a9a9a9] pt-3 md:pt-0 md:pl-5 w-full md:w-auto">
-                        <span class="text-xs text-[#888] font-bold">Dihantar Pada: <span class="text-black block md:inline">${formatDateTime(group.tarikhDaftar)}</span></span>
-                        <button onclick="event.stopPropagation(); jumpToSuratJejak('${group.noRuj}')" class="xp-button font-bold text-[#000080] bg-[#e6f0ff] border-[#0058e6] px-5 py-2 text-xs mt-3 w-full justify-center" title="Buka paparan terperinci jejak dokumen ini"><i data-lucide="route" class="w-4 h-4"></i> Jejak Terperinci</button>
+                    <div class="mt-2 sm:mt-4 md:mt-0 flex flex-col sm:items-end gap-2 shrink-0 border-t md:border-t-0 md:border-l border-[#a9a9a9] pt-2 sm:pt-3 md:pt-0 md:pl-5 w-full md:w-auto">
+                        <span class="text-[10px] sm:text-xs text-[#888] font-bold">Dihantar Pada: <span class="text-black block md:inline">${formatDateTime(group.tarikhDaftar)}</span></span>
+                        <button onclick="event.stopPropagation(); jumpToSuratJejak('${group.noRuj}')" class="xp-button font-bold text-[#000080] bg-[#e6f0ff] border-[#0058e6] px-4 sm:px-5 py-1.5 sm:py-2 text-[11px] sm:text-xs mt-2 sm:mt-3 w-full sm:w-auto justify-center" title="Buka paparan terperinci jejak dokumen ini"><i data-lucide="route" class="w-3 h-3 sm:w-4 sm:h-4"></i> Jejak Terperinci</button>
                     </div>
                 </div>
             `;
@@ -2360,23 +2374,23 @@
         const list = Object.values(grouped).sort((a,b) => new Date(b.tarikhDaftar) - new Date(a.tarikhDaftar));
 
         if(list.length === 0) {
-            container.innerHTML = `<div class="flex flex-col items-center justify-center h-[50vh] text-[#888]"><i data-lucide="trash-2" class="w-16 h-16 mb-4 text-[#a9a9a9]"></i><p class="text-base font-bold">Tiada rekod surat yang dibatalkan / Tong sampah kosong.</p></div>`;
+            container.innerHTML = `<div class="flex flex-col items-center justify-center h-[50vh] text-[#888]"><i data-lucide="trash-2" class="w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 text-[#a9a9a9]"></i><p class="text-sm sm:text-base font-bold">Tiada rekod surat yang dibatalkan / Tong sampah kosong.</p></div>`;
             return;
         }
 
-        container.innerHTML = `<div class="flex flex-col gap-4 pb-4">` + list.map(group => {
+        container.innerHTML = `<div class="flex flex-col gap-3 sm:gap-4 pb-4 overflow-y-auto flex-1 w-full">` + list.map(group => {
             return `
-                <div class="xp-panel p-4 md:p-5 bg-red-50 border-red-300 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="font-black text-gray-500 line-through text-sm bg-gray-100 px-2 py-0.5 rounded border border-gray-300">${group.noRuj}</span>
-                            <span class="text-[10px] font-black tracking-wide text-white bg-red-600 px-2.5 py-1 rounded shadow-sm">DIBATALKAN</span>
+                <div class="xp-panel p-3 sm:p-4 md:p-5 bg-red-50 border-red-300 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div class="flex-1 w-full mb-3 md:mb-0">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2 flex-wrap">
+                            <span class="font-black text-gray-500 line-through text-xs sm:text-sm bg-gray-100 px-2 py-0.5 rounded border border-gray-300">${group.noRuj}</span>
+                            <span class="text-[9px] sm:text-[10px] font-black tracking-wide text-white bg-red-600 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded shadow-sm">DIBATALKAN</span>
                         </div>
-                        <h4 class="text-base md:text-lg font-bold text-gray-600 mb-2">${escapeHTML(group.tajuk)}</h4>
+                        <h4 class="text-sm sm:text-base md:text-lg font-bold text-gray-600 mb-1.5 sm:mb-2">${escapeHTML(group.tajuk)}</h4>
                     </div>
-                    <div class="mt-4 md:mt-0 flex flex-col md:items-end gap-2 shrink-0 border-t md:border-t-0 md:border-l border-red-200 pt-3 md:pt-0 md:pl-5 w-full md:w-auto">
-                        <span class="text-xs text-[#888] font-bold">Asal Dihantar: <span class="text-black block md:inline">${formatDateTime(group.tarikhDaftar)}</span></span>
-                        <button onclick="pulihkanSuratKeluar('${group.noRuj}')" class="xp-button font-bold text-white bg-[#008000] border-[#005000] px-5 py-2 text-xs mt-2 w-full justify-center shadow-sm" title="Kembalikan dokumen ini sebagai aktif"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Pulihkan Rekod</button>
+                    <div class="mt-2 sm:mt-4 md:mt-0 flex flex-col sm:items-end gap-2 shrink-0 border-t md:border-t-0 md:border-l border-red-200 pt-2 sm:pt-3 md:pt-0 md:pl-5 w-full md:w-auto">
+                        <span class="text-[10px] sm:text-xs text-[#888] font-bold">Asal Dihantar: <span class="text-black block md:inline">${formatDateTime(group.tarikhDaftar)}</span></span>
+                        <button onclick="pulihkanSuratKeluar('${group.noRuj}')" class="xp-button font-bold text-white bg-[#008000] border-[#005000] px-4 sm:px-5 py-1.5 sm:py-2 text-[11px] sm:text-xs mt-1.5 sm:mt-2 w-full sm:w-auto justify-center shadow-sm" title="Kembalikan dokumen ini sebagai aktif"><i data-lucide="refresh-cw" class="w-3 h-3 sm:w-4 sm:h-4"></i> Pulihkan Rekod</button>
                     </div>
                 </div>
             `;
@@ -2426,53 +2440,53 @@
     
     function renderSuratJejak(container) {
         container.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-full pb-2">
-                <div class="xp-panel bg-[#ece9d8] p-4 flex flex-col col-span-1 shadow-inner h-[60vh] md:h-auto">
-                    <div class="flex items-center gap-2 mb-4">
-                        <i data-lucide="search" class="w-5 h-5 text-[#000080]"></i>
-                        <input type="text" id="carianSurat" onkeyup="tapisSenaraiJejak()" placeholder="Cari No. Rujukan / Tajuk Surat..." class="xp-input flex-1 text-sm font-bold" title="Taip carian untuk mengecilkan senarai">
+            <div class="flex flex-col md:flex-row gap-4 h-full pb-2 overflow-hidden w-full">
+                <div class="xp-panel bg-[#ece9d8] p-3 sm:p-4 flex flex-col w-full md:w-1/3 lg:w-[30%] shadow-inner h-[35vh] md:h-full shrink-0 border-t-[4px] border-[#a9a9a9]">
+                    <div class="flex items-center gap-2 mb-3 sm:mb-4">
+                        <i data-lucide="search" class="w-4 h-4 sm:w-5 sm:h-5 text-[#000080]"></i>
+                        <input type="text" id="carianSurat" onkeyup="tapisSenaraiJejak()" placeholder="Cari No. Ruj / Tajuk..." class="xp-input flex-1 text-xs sm:text-sm font-bold" title="Taip carian untuk mengecilkan senarai">
                     </div>
-                    <div id="senaraiSuratJejak" class="flex-1 overflow-y-auto pr-1 space-y-3"></div>
+                    <div id="senaraiSuratJejak" class="flex-1 overflow-y-auto pr-1 space-y-2 sm:space-y-3 relative"><div class="absolute w-full"></div></div>
                 </div>
-                <div class="xp-panel bg-white p-5 md:p-8 col-span-1 md:col-span-2 shadow-inner relative overflow-y-auto border-t-[6px] border-[#0058e6]">
-                    <div id="placeholderTimeline" class="absolute inset-0 flex flex-col items-center justify-center text-[#888]">
-                        <i data-lucide="route" class="w-16 h-16 mb-4 text-[#a9a9a9]"></i>
-                        <p class="text-base font-bold">Sila pilih rekod surat di senarai kiri untuk melihat pergerakan.</p>
+                <div class="xp-panel bg-white p-4 md:p-6 w-full md:flex-1 shadow-inner relative overflow-y-auto border-t-[6px] border-[#0058e6] min-h-[50vh] md:min-h-0 md:h-full flex flex-col" id="jejak-kandungan-scroll">
+                    <div id="placeholderTimeline" class="absolute inset-0 flex flex-col items-center justify-center text-[#888] p-4 text-center">
+                        <i data-lucide="route" class="w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 text-[#a9a9a9]"></i>
+                        <p class="text-sm sm:text-base font-bold">Sila pilih rekod surat di senarai untuk melihat pergerakan.</p>
                     </div>
                     <div id="kandunganTimeline" class="hidden">
                         
                         <!-- Top Row: No Ruj & Klasifikasi -->
-                        <div class="flex justify-between items-center mb-2">
-                            <div class="text-xs md:text-sm font-bold text-gray-500 uppercase tracking-wider">No Rujukan: <span id="infoNoRuj"></span></div>
+                        <div class="flex justify-between items-center mb-1.5 sm:mb-2 flex-wrap gap-2">
+                            <div class="text-[10px] sm:text-xs md:text-sm font-bold text-gray-500 uppercase tracking-wider">No Rujukan: <span id="infoNoRuj" class="ml-1 sm:ml-2 text-xs sm:text-sm md:text-base"></span></div>
                             <div id="infoKlasifikasiContainer"></div>
                         </div>
                         
                         <!-- Second Row: Title & Edit Button -->
-                        <div class="flex flex-col md:flex-row justify-between items-start border-b-2 border-[#a9a9a9] pb-4 mb-5 gap-3">
-                            <h3 class="font-black text-lg md:text-xl text-black leading-tight" id="tajukTimeline">Tajuk Surat</h3>
-                            <button id="btnEditPembetulan" onclick="bukaModalEditSurat()" class="xp-button text-white bg-[#e65c00] border-[#b34700] hidden shrink-0 text-xs md:text-sm px-4" title="Pinda butiran surat ini sekiranya terdapat ralat"><i data-lucide="edit" class="w-4 h-4"></i> Pinda maklumat</button>
+                        <div class="flex flex-col lg:flex-row justify-between lg:items-start border-b-2 border-[#a9a9a9] pb-3 sm:pb-4 mb-4 sm:mb-5 gap-3">
+                            <h3 class="font-black text-base sm:text-lg md:text-xl text-black leading-tight" id="tajukTimeline">Tajuk Surat</h3>
+                            <button id="btnEditPembetulan" onclick="bukaModalEditSurat()" class="xp-button text-white bg-[#e65c00] border-[#b34700] hidden shrink-0 text-[11px] sm:text-xs md:text-sm px-3 sm:px-4 w-full lg:w-auto justify-center" title="Pinda butiran surat ini sekiranya terdapat ralat"><i data-lucide="edit" class="w-3 h-3 sm:w-4 sm:h-4"></i> Pinda maklumat</button>
                         </div>
                         
                         <!-- Details Box -->
-                        <div id="detailInfoBox" class="p-4 rounded-xl border-2 mb-6 shadow-sm">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6 text-xs md:text-sm font-bold text-black">
-                                <div class="flex justify-between border-b border-black/10 pb-1 flex-col sm:flex-row">
-                                    <span class="text-gray-600">Status Terkini:</span> <div id="infoStatus" class="flex flex-col items-end text-right"></div>
+                        <div id="detailInfoBox" class="p-3 sm:p-4 rounded-xl border-2 mb-4 sm:mb-6 shadow-sm">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-2 sm:gap-y-3 gap-x-4 sm:gap-x-6 text-[11px] sm:text-xs md:text-sm font-bold text-black">
+                                <div class="flex justify-between border-b border-black/10 pb-1 flex-col sm:flex-row gap-1 sm:gap-0">
+                                    <span class="text-gray-600">Status Terkini:</span> <div id="infoStatus" class="flex flex-col sm:items-end sm:text-right"></div>
                                 </div>
-                                <div class="flex justify-between border-b border-black/10 pb-1">
+                                <div class="flex justify-between items-center border-b border-black/10 pb-1">
                                     <span class="text-gray-600">Tarikh Dokumen:</span> <span id="infoTrhDokumen" class="font-semibold text-black"></span>
                                 </div>
-                                <div class="flex justify-between border-b border-black/10 pb-1">
+                                <div class="flex justify-between items-center border-b border-black/10 pb-1">
                                     <span class="text-gray-600" id="label-info-edar">Tarikh Edaran Dibuat:</span> <span id="infoTrhEdar" class="font-semibold text-black"></span>
                                 </div>
-                                <div class="flex justify-between border-b border-black/10 pb-1 flex-col sm:flex-row">
-                                    <span class="text-gray-600">Tarikh Diterima:</span> <div id="infoTrhTerima" class="flex flex-col items-end text-right"></div>
+                                <div class="flex justify-between border-b border-black/10 pb-1 flex-col sm:flex-row gap-1 sm:gap-0">
+                                    <span class="text-gray-600">Tarikh Diterima:</span> <div id="infoTrhTerima" class="flex flex-col sm:items-end sm:text-right"></div>
                                 </div>
                             </div>
                         </div>
 
-                        <h4 class="font-black text-sm text-black mb-4 flex items-center gap-2 border-b border-[#a9a9a9] pb-2"><i data-lucide="history" class="w-5 h-5 text-[#555]"></i> Garis Masa Pergerakan Berkelompok:</h4>
-                        <div id="susunanTimeline" class="timeline-container space-y-6 mt-4"></div>
+                        <h4 class="font-black text-xs sm:text-sm text-black mb-3 sm:mb-4 flex items-center gap-2 border-b border-[#a9a9a9] pb-1.5 sm:pb-2"><i data-lucide="history" class="w-4 h-4 sm:w-5 sm:h-5 text-[#555]"></i> Garis Masa Pergerakan Berkelompok:</h4>
+                        <div id="susunanTimeline" class="timeline-container space-y-4 sm:space-y-6 mt-3 sm:mt-4"></div>
                     </div>
                 </div>
             </div>
@@ -2498,21 +2512,21 @@
 
         const sortedGrouped = Object.values(grouped).sort((a,b) => new Date(b.tarikhDaftar) - new Date(a.tarikhDaftar));
 
-        container.innerHTML = sortedGrouped.length === 0 ? `<div class="text-xs italic text-center text-[#888] mt-6">Tiada rekod padanan.</div>` : sortedGrouped.map(group => {
-            let statusHtml = group.allDocs.map(d => `<span class="bg-gray-200 px-1.5 py-0.5 rounded text-black mr-1 mt-1 inline-block border border-[#ccc]">${d.lokasiSemasa}: ${d.status}</span>`).join('');
+        container.firstElementChild.innerHTML = sortedGrouped.length === 0 ? `<div class="text-[11px] sm:text-xs italic text-center text-[#888] mt-4 sm:mt-6">Tiada rekod padanan.</div>` : sortedGrouped.map(group => {
+            let statusHtml = group.allDocs.map(d => `<span class="bg-gray-200 px-1 sm:px-1.5 py-0.5 rounded text-black mr-1 mt-1 inline-block border border-[#ccc]">${d.lokasiSemasa}: ${d.status}</span>`).join('');
             
             // Logik pewarnaan (Merah utk Masuk, Biru utk Keluar)
             let isMasuk = group.aliran === 'Dokumen / Surat Masuk' || group.pendaftar !== currentDept;
             let badgeClass = isMasuk ? 'text-red-800 bg-red-100 border-red-300' : 'text-[#000080] bg-blue-50 border-blue-200';
 
             return `
-            <div class="bg-white border-2 border-[#a9a9a9] rounded-lg p-3 cursor-pointer hover:bg-[#ffffe1] hover:border-[#0058e6] transition shadow-sm" onclick="paparkanJejakGroup('${group.noRuj}')" title="Papar perincian dokumen">
-                <div class="flex justify-between items-start mb-1.5">
-                   <span class="font-black text-xs px-2 py-0.5 rounded border ${badgeClass}">${group.noRuj}</span>
-                   <span class="text-[9px] font-bold text-white px-1.5 py-0.5 rounded ${group.klasifikasi === 'Sulit' ? 'bg-red-600' : (group.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')} shrink-0">${group.klasifikasi || 'Biasa'}</span>
+            <div class="bg-white border-2 border-[#a9a9a9] rounded-lg p-2 sm:p-3 mb-2 sm:mb-3 cursor-pointer hover:bg-[#ffffe1] hover:border-[#0058e6] transition shadow-sm" onclick="paparkanJejakGroup('${group.noRuj}')" title="Papar perincian dokumen">
+                <div class="flex justify-between items-start mb-1 sm:mb-1.5">
+                   <span class="font-black text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded border ${badgeClass}">${group.noRuj}</span>
+                   <span class="text-[8px] sm:text-[9px] font-bold text-white px-1 sm:px-1.5 py-0.5 rounded ${group.klasifikasi === 'Sulit' ? 'bg-red-600' : (group.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')} shrink-0">${group.klasifikasi || 'Biasa'}</span>
                 </div>
-                <div class="text-xs text-black font-bold truncate mb-2 mt-2" title="${escapeHTML(group.tajuk)}">${escapeHTML(group.tajuk)}</div>
-                <div class="text-[9px] text-[#555] font-semibold border-t border-[#eee] pt-1.5 flex flex-wrap">
+                <div class="text-[11px] sm:text-xs text-black font-bold truncate mb-1.5 sm:mb-2 mt-1.5 sm:mt-2" title="${escapeHTML(group.tajuk)}">${escapeHTML(group.tajuk)}</div>
+                <div class="text-[8px] sm:text-[9px] text-[#555] font-semibold border-t border-[#eee] pt-1 sm:pt-1.5 flex flex-wrap">
                     ${statusHtml}
                 </div>
             </div>
@@ -2537,17 +2551,17 @@
         
         noRujEl.innerText = baseDoc.noRuj;
         if(isMasuk) {
-            noRujEl.className = 'font-black ml-1 text-sm md:text-lg px-3 py-1 rounded-md border-2 bg-red-50 text-red-700 border-red-300';
-            detailBox.className = 'bg-[#fff5f5] p-4 rounded-xl border-2 border-red-600 mb-6 shadow-sm';
+            noRujEl.className = 'font-black px-2 sm:px-3 py-0.5 sm:py-1 rounded-md border-2 bg-red-50 text-red-700 border-red-300';
+            detailBox.className = 'bg-[#fff5f5] p-3 sm:p-4 rounded-xl border-2 border-red-600 mb-4 sm:mb-6 shadow-sm';
         } else {
-            noRujEl.className = 'font-black ml-1 text-sm md:text-lg px-3 py-1 rounded-md border-2 bg-blue-50 text-[#000080] border-blue-300';
-            detailBox.className = 'bg-[#e6f0ff] p-4 rounded-xl border-2 border-[#0058e6] mb-6 shadow-sm';
+            noRujEl.className = 'font-black px-2 sm:px-3 py-0.5 sm:py-1 rounded-md border-2 bg-blue-50 text-[#000080] border-blue-300';
+            detailBox.className = 'bg-[#e6f0ff] p-3 sm:p-4 rounded-xl border-2 border-[#0058e6] mb-4 sm:mb-6 shadow-sm';
         }
         
         const klasColor = baseDoc.klasifikasi === 'Sulit' ? 'bg-red-600' : (baseDoc.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600');
-        document.getElementById('infoKlasifikasiContainer').innerHTML = `<span class="text-xs md:text-sm font-black text-white px-3 py-1.5 rounded-md shadow-sm tracking-wide ${klasColor}">${baseDoc.klasifikasi || 'Biasa'}</span>`;
+        document.getElementById('infoKlasifikasiContainer').innerHTML = `<span class="text-[10px] sm:text-xs md:text-sm font-black text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md shadow-sm tracking-wide ${klasColor}">${baseDoc.klasifikasi || 'Biasa'}</span>`;
         
-        let statusHtml = docs.map(d => `<div class="mb-1"><span class="font-bold text-black">${d.lokasiSemasa}:</span> <span class="${d.status === 'Diterima' ? 'text-green-600' : (d.status === 'Dikembalikan' ? 'text-orange-600' : 'text-red-600')} font-black uppercase">${d.status}</span></div>`).join('');
+        let statusHtml = docs.map(d => `<div class="mb-0.5 sm:mb-1"><span class="font-bold text-black">${d.lokasiSemasa}:</span> <span class="${d.status === 'Diterima' ? 'text-green-600' : (d.status === 'Dikembalikan' ? 'text-orange-600' : 'text-red-600')} font-black uppercase">${d.status}</span></div>`).join('');
         document.getElementById('infoStatus').innerHTML = statusHtml;
 
         document.getElementById('infoTrhDokumen').innerText = formatDateOnly(baseDoc.tarikhDokumen);
@@ -2555,7 +2569,7 @@
         
         document.getElementById('label-info-edar').innerText = baseDoc.aliran === 'Dokumen / Surat Masuk' ? 'Tarikh Surat Diterima:' : 'Tarikh Edaran Dibuat:';
         
-        let trhTerimaHtml = docs.map(d => `<div class="mb-1"><span class="font-bold text-black">${d.lokasiSemasa}:</span> <span class="font-semibold text-green-700">${d.tarikhTerima ? formatDateOnly(d.tarikhTerima) : 'Belum'}</span></div>`).join('');
+        let trhTerimaHtml = docs.map(d => `<div class="mb-0.5 sm:mb-1"><span class="font-bold text-black">${d.lokasiSemasa}:</span> <span class="font-semibold text-green-700">${d.tarikhTerima ? formatDateOnly(d.tarikhTerima) : 'Belum'}</span></div>`).join('');
         document.getElementById('infoTrhTerima').innerHTML = trhTerimaHtml;
 
         const btnEdit = document.getElementById('btnEditPembetulan');
@@ -2577,7 +2591,7 @@
             let existingLog = unifiedTimeline.find(ul => ul.tarikh === log.tarikh && ul.tindakan === log.tindakan && ul.oleh === log.oleh);
             
             let currentStatusForTarget = docs.find(x => x.lokasiSemasa === log.targetDept || x.pendaftar === log.targetDept)?.status || 'Selesai';
-            let targetText = log.targetDept ? `${log.targetDept} <span class="bg-blue-100 text-blue-800 text-[10px] px-1.5 rounded ml-1 font-bold">[${currentStatusForTarget}]</span>` : log.kepada;
+            let targetText = log.targetDept ? `${log.targetDept} <span class="bg-blue-100 text-blue-800 text-[9px] sm:text-[10px] px-1 sm:px-1.5 rounded ml-1 font-bold">[${currentStatusForTarget}]</span>` : log.kepada;
 
             if (existingLog) {
                 if (targetText && !existingLog.kepadaList.includes(targetText)) {
@@ -2596,7 +2610,7 @@
         document.getElementById('susunanTimeline').innerHTML = unifiedTimeline.map((log, index) => {
             const isLatest = index === 0;
             const bgBox = isLatest ? 'bg-[#ffffcc] border-[2px] border-[#ff9900] shadow-md' : 'bg-[#ece9d8] border border-[#a9a9a9] shadow-sm';
-            const highlightBadge = isLatest ? `<span class="bg-yellow-400 text-black px-1.5 py-0.5 rounded text-[10px] font-black ml-2 animate-pulse">LOKASI TERKINI</span>` : '';
+            const highlightBadge = isLatest ? `<span class="bg-yellow-400 text-black px-1 sm:px-1.5 py-0.5 rounded text-[8px] sm:text-[10px] font-black ml-1.5 sm:ml-2 animate-pulse">LOKASI TERKINI</span>` : '';
             
             let kepadaHtml = log.kepadaList && log.kepadaList.length > 0 
                 ? log.kepadaList.join(', ') 
@@ -2604,19 +2618,27 @@
 
             return `
                 <div class="timeline-item ${isLatest ? 'opacity-100' : 'opacity-70'}">
-                    <div class="flex flex-col mb-1.5">
-                        <span class="text-sm font-black text-[#000080] uppercase tracking-wide">${log.tindakan} ${highlightBadge}</span>
-                        <span class="text-[10px] md:text-xs text-[#555] font-bold">${formatDateTime(log.tarikh)}</span>
+                    <div class="flex flex-col mb-1 sm:mb-1.5">
+                        <span class="text-xs sm:text-sm font-black text-[#000080] uppercase tracking-wide">${log.tindakan} ${highlightBadge}</span>
+                        <span class="text-[9px] sm:text-[10px] md:text-xs text-[#555] font-bold">${formatDateTime(log.tarikh)}</span>
                     </div>
-                    <div class="${bgBox} rounded-lg p-3 mt-1 text-xs text-black">
-                        <p class="mb-1.5"><i data-lucide="user" class="w-4 h-4 inline text-[#555] align-text-bottom"></i> Oleh: <strong>${log.oleh}</strong></p>
-                        ${kepadaHtml ? `<div class="mb-1.5 flex items-start gap-1"><i data-lucide="arrow-right" class="w-4 h-4 inline text-blue-600 align-text-bottom shrink-0"></i> <div class="${isLatest ? 'bg-yellow-300 px-1 rounded' : ''} flex-1 leading-relaxed">Kepada: ${kepadaHtml}</div></div>` : ''}
-                        ${log.catatan ? `<div class="bg-white border-l-4 border-[#0058e6] p-2 mt-2 font-medium italic text-slate-700">"${log.catatan}"</div>` : ''}
+                    <div class="${bgBox} rounded-lg p-2 sm:p-3 mt-1 text-[11px] sm:text-xs text-black">
+                        <p class="mb-1 sm:mb-1.5"><i data-lucide="user" class="w-3 h-3 sm:w-4 sm:h-4 inline text-[#555] align-text-bottom"></i> Oleh: <strong>${log.oleh}</strong></p>
+                        ${kepadaHtml ? `<div class="mb-1 sm:mb-1.5 flex items-start gap-1"><i data-lucide="arrow-right" class="w-3 h-3 sm:w-4 sm:h-4 inline text-blue-600 align-text-bottom shrink-0"></i> <div class="${isLatest ? 'bg-yellow-300 px-1 rounded' : ''} flex-1 leading-relaxed">Kepada: ${kepadaHtml}</div></div>` : ''}
+                        ${log.catatan ? `<div class="bg-white border-l-4 border-[#0058e6] p-1.5 sm:p-2 mt-1.5 sm:mt-2 font-medium italic text-slate-700">"${log.catatan}"</div>` : ''}
                     </div>
                 </div>
             `;
         }).join('');
         lucide.createIcons();
+
+        // Autoscroll pada skrin kecil
+        if (window.innerWidth < 768) {
+            setTimeout(() => {
+                const scrollArea = document.getElementById('jejak-kandungan-scroll');
+                if (scrollArea) scrollArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
     }
 
     function bukaModalEditSurat() {
@@ -2632,7 +2654,7 @@
         let html = `
             <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-blue-100 rounded border border-transparent hover:border-blue-300 transition-colors col-span-1 sm:col-span-2">
                 <input type="checkbox" name="edit_destinasi" value="Simpanan Fail" class="w-4 h-4 text-blue-600 rounded" ${currentDests.includes('Simpanan Fail') ? 'checked' : ''}>
-                <span class="text-sm font-extrabold text-[#000080]">Simpanan Fail</span>
+                <span class="text-[11px] sm:text-sm font-extrabold text-[#000080]">Simpanan Fail</span>
             </label>
         `;
         
@@ -2641,7 +2663,7 @@
             html += `
                 <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-blue-100 rounded border border-transparent hover:border-blue-300 transition-colors">
                     <input type="checkbox" name="edit_destinasi" value="${u.departmentName}" class="w-4 h-4 text-blue-600 rounded" ${currentDests.includes(u.departmentName) ? 'checked' : ''}>
-                    <span class="text-sm font-bold text-black">${u.departmentName}</span>
+                    <span class="text-[11px] sm:text-sm font-bold text-black">${u.departmentName}</span>
                 </label>
             `;
         });
@@ -2662,46 +2684,46 @@
 
     function renderSuratDaftar(container) {
         container.innerHTML = `
-            <div class="xp-panel bg-[#ece9d8] p-5 md:p-8 max-w-3xl mx-auto shadow-inner mt-2 border-t-[6px] border-[#0058e6] rounded-t-xl">
-                <h2 class="font-black text-lg md:text-xl text-[#000080] border-b-2 border-[#a9a9a9] pb-3 mb-6 flex items-center gap-2"><i data-lucide="mail-plus" class="w-6 h-6"></i> Rekod Pendaftaran Surat</h2>
+            <div class="xp-panel bg-[#ece9d8] p-4 sm:p-5 md:p-8 max-w-3xl mx-auto shadow-inner mt-1 sm:mt-2 border-t-[6px] border-[#0058e6] rounded-t-xl w-full overflow-y-auto">
+                <h2 class="font-black text-base sm:text-lg md:text-xl text-[#000080] border-b-2 border-[#a9a9a9] pb-2 sm:pb-3 mb-4 sm:mb-6 flex items-center gap-2"><i data-lucide="mail-plus" class="w-5 h-5 sm:w-6 sm:h-6"></i> Rekod Pendaftaran Surat</h2>
                 <form id="formDaftarSurat" onsubmit="handleDaftarSurat(event)">
-                    <div class="space-y-5">
+                    <div class="space-y-4 sm:space-y-5">
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 bg-white p-5 rounded-xl border border-[#a9a9a9] shadow-inner">
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-bold text-[#000080]">Aliran Surat:</label>
-                                <select id="sr-aliran" required class="xp-input cursor-pointer font-bold text-[#000080] border-[#0058e6]" onchange="toggleTarikhLabel()" title="Pilih aliran keluar atau masuk">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 bg-white p-4 sm:p-5 rounded-xl border border-[#a9a9a9] shadow-inner">
+                            <div class="flex flex-col gap-1.5 sm:gap-2">
+                                <label class="text-xs sm:text-sm font-bold text-[#000080]">Aliran Surat:</label>
+                                <select id="sr-aliran" required class="xp-input cursor-pointer font-bold text-[#000080] border-[#0058e6] text-xs sm:text-sm" onchange="toggleTarikhLabel()" title="Pilih aliran keluar atau masuk">
                                     <option value="Dokumen / Surat Keluar" class="font-bold">Dokumen / Surat Keluar</option>
                                     <option value="Dokumen / Surat Masuk" class="font-bold">Dokumen / Surat Masuk</option>
                                 </select>
                             </div>
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-bold text-black">Klasifikasi Dokumen:</label>
-                                <select id="sr-klasifikasi" required class="xp-input cursor-pointer font-bold" title="Pilih status keselamatan dokumen">
+                            <div class="flex flex-col gap-1.5 sm:gap-2">
+                                <label class="text-xs sm:text-sm font-bold text-black">Klasifikasi Dokumen:</label>
+                                <select id="sr-klasifikasi" required class="xp-input cursor-pointer font-bold text-xs sm:text-sm" title="Pilih status keselamatan dokumen">
                                     <option value="Biasa" class="font-bold text-green-700">Biasa</option>
                                     <option value="Sulit" class="font-bold text-red-700">Sulit</option>
                                     <option value="Terperingkat" class="font-bold text-purple-700">Terperingkat</option>
                                 </select>
                             </div>
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-bold text-black">Tarikh Surat / Dokumen:</label>
-                                <input type="date" id="sr-tarikh-dokumen" required class="xp-input font-semibold text-sm" title="Tarikh yang tertera pada dokumen surat">
+                            <div class="flex flex-col gap-1.5 sm:gap-2">
+                                <label class="text-xs sm:text-sm font-bold text-black">Tarikh Surat / Dokumen:</label>
+                                <input type="date" id="sr-tarikh-dokumen" required class="xp-input font-bold text-xs sm:text-sm" title="Tarikh yang tertera pada dokumen surat">
                             </div>
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-bold text-black" id="label-tarikh-edar">Tarikh Edaran Dibuat:</label>
-                                <input type="date" id="sr-tarikh-edar" required class="xp-input font-semibold text-sm" title="Tarikh tindakan/edaran direkodkan">
+                            <div class="flex flex-col gap-1.5 sm:gap-2">
+                                <label class="text-xs sm:text-sm font-bold text-black" id="label-tarikh-edar">Tarikh Edaran Dibuat:</label>
+                                <input type="date" id="sr-tarikh-edar" required class="xp-input font-bold text-xs sm:text-sm" title="Tarikh tindakan/edaran direkodkan">
                             </div>
                         </div>
 
                         <div class="flex flex-col gap-1.5">
-                            <label class="text-sm font-bold text-black">Tajuk Dokumen / Perkara Utama:</label>
-                            <input type="text" id="sr-tajuk" required class="xp-input text-sm font-bold" placeholder="Sila masukkan tajuk penuh surat..." title="Tajuk atau maklumat penting surat">
+                            <label class="text-xs sm:text-sm font-bold text-black">Tajuk Dokumen / Perkara Utama:</label>
+                            <input type="text" id="sr-tajuk" required class="xp-input text-xs sm:text-sm font-bold" placeholder="Sila masukkan tajuk penuh surat..." title="Tajuk atau maklumat penting surat">
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                             <div class="flex flex-col gap-1.5">
-                                <label class="text-sm font-bold text-black">Jenis Dokumen:</label>
-                                <select id="sr-jenis" required class="xp-input cursor-pointer text-sm font-bold" onchange="document.getElementById('sr-lain-div').classList.toggle('hidden', this.value !== '4')" title="Pilih kategori jenis format surat">
+                                <label class="text-xs sm:text-sm font-bold text-black">Jenis Dokumen:</label>
+                                <select id="sr-jenis" required class="xp-input cursor-pointer text-xs sm:text-sm font-bold" onchange="document.getElementById('sr-lain-div').classList.toggle('hidden', this.value !== '4')" title="Pilih kategori jenis format surat">
                                     <option value="1" class="font-bold">Surat Rasmi</option>
                                     <option value="2" class="font-bold">Memo Dalaman</option>
                                     <option value="3" class="font-bold">Minit Mesyuarat</option>
@@ -2709,30 +2731,30 @@
                                 </select>
                             </div>
                             <div class="flex flex-col gap-1.5 hidden" id="sr-lain-div">
-                                <label class="text-sm font-bold text-black">Nyatakan Jenis (Jika Lain-lain):</label>
-                                <input type="text" id="sr-lain" class="xp-input border-blue-400 text-sm font-bold" placeholder="Cth: Borang Cuti, Kertas Kerja" title="Nyatakan jenis khusus secara manual">
+                                <label class="text-xs sm:text-sm font-bold text-black">Nyatakan Jenis (Jika Lain-lain):</label>
+                                <input type="text" id="sr-lain" class="xp-input border-blue-400 text-xs sm:text-sm font-bold" placeholder="Cth: Borang Cuti, Kertas Kerja" title="Nyatakan jenis khusus secara manual">
                             </div>
                             <div class="flex flex-col gap-1.5">
-                                <label class="text-sm font-bold text-black">Kategori Daftar:</label>
-                                <select id="sr-kategori" required class="xp-input cursor-pointer font-bold text-sm" title="Pilih kategori rekod simpanan">
+                                <label class="text-xs sm:text-sm font-bold text-black">Kategori Daftar:</label>
+                                <select id="sr-kategori" required class="xp-input cursor-pointer font-bold text-xs sm:text-sm" title="Pilih kategori rekod simpanan">
                                     <option value="Edaran Dalaman" class="font-bold">Edaran Dalaman</option>
                                     <option value="Surat Keluar" class="font-bold">Surat Keluar Luar (Luar Agensi)</option>
                                     <option value="Disimpan ke dalam fail" class="font-bold">Disimpan ke dalam fail</option>
                                 </select>
                             </div>
                             <div class="flex flex-col gap-1.5 md:col-span-2">
-                                <label class="text-sm font-bold text-black">Destinasi Penghantaran (Boleh Pilih Lebih Dari Satu):</label>
-                                <div id="sr-destinasi-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-blue-50 p-4 rounded-lg border-2 border-[#0058e6] max-h-48 overflow-y-auto shadow-inner">
+                                <label class="text-xs sm:text-sm font-bold text-black">Destinasi Penghantaran (Boleh Pilih Lebih Dari Satu):</label>
+                                <div id="sr-destinasi-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-blue-50 p-3 sm:p-4 rounded-lg border-2 border-[#0058e6] max-h-40 sm:max-h-48 overflow-y-auto shadow-inner">
                                     <!-- Checkbox Destinasi Dijana Oleh JS -->
                                 </div>
                             </div>
                             <div class="flex flex-col gap-1.5 md:col-span-2">
-                                <label class="text-sm font-bold text-black">Nota Tambahan / Arahan (Pilihan):</label>
-                                <textarea id="sr-nota" rows="3" class="xp-input resize-none text-sm font-bold" placeholder="Tinggalkan pesanan kepada penerima di sini..." title="Nota bantuan atau arahan khusus kepada pihak penerima"></textarea>
+                                <label class="text-xs sm:text-sm font-bold text-black">Nota Tambahan / Arahan (Pilihan):</label>
+                                <textarea id="sr-nota" rows="3" class="xp-input resize-none text-xs sm:text-sm font-bold" placeholder="Tinggalkan pesanan kepada penerima di sini..." title="Nota bantuan atau arahan khusus kepada pihak penerima"></textarea>
                             </div>
                         </div>
-                        <div class="flex justify-end pt-5 border-t-2 border-[#a9a9a9] mt-4">
-                            <button type="submit" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] px-8 py-3 text-sm shadow-md hover:bg-[#0040cc]" title="Sahkan pendaftaran dan hantar sistem"><i data-lucide="send" class="w-5 h-5"></i> Daftar & Hantar Dokumen</button>
+                        <div class="flex justify-end pt-4 sm:pt-5 border-t-2 border-[#a9a9a9] mt-3 sm:mt-4">
+                            <button type="submit" class="xp-button font-bold text-white bg-[#0058e6] border-[#003C74] px-6 sm:px-8 py-2 sm:py-3 text-xs sm:text-sm shadow-md hover:bg-[#0040cc] w-full sm:w-auto justify-center" title="Sahkan pendaftaran dan hantar sistem"><i data-lucide="send" class="w-4 h-4 sm:w-5 sm:h-5"></i> Daftar & Hantar Dokumen</button>
                         </div>
                     </div>
                 </form>
@@ -2750,18 +2772,18 @@
         const container = document.getElementById('sr-destinasi-container');
         if(container) {
             let html = `
-                <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-blue-200 rounded border border-transparent hover:border-blue-400 transition-colors col-span-1 sm:col-span-2" title="Pilih untuk simpanan rekod fail sendiri">
-                    <input type="checkbox" name="destinasi" value="Simpanan Fail" class="w-5 h-5 text-blue-600 rounded cursor-pointer">
-                    <span class="text-sm font-extrabold text-[#000080]">Simpanan Fail</span>
+                <label class="flex items-center gap-2 sm:gap-3 cursor-pointer p-2 hover:bg-blue-200 rounded border border-transparent hover:border-blue-400 transition-colors col-span-1 sm:col-span-2" title="Pilih untuk simpanan rekod fail sendiri">
+                    <input type="checkbox" name="destinasi" value="Simpanan Fail" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded cursor-pointer">
+                    <span class="text-xs sm:text-sm font-extrabold text-[#000080]">Simpanan Fail</span>
                 </label>
             `;
             
             const depts = users.filter(u => u.departmentName !== currentDept && u.id !== 'superadmin');
             depts.forEach(u => {
                 html += `
-                    <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-blue-200 rounded border border-transparent hover:border-blue-400 transition-colors" title="Hantar surat ke bahagian ${u.departmentName}">
-                        <input type="checkbox" name="destinasi" value="${u.departmentName}" class="w-5 h-5 text-blue-600 rounded cursor-pointer">
-                        <span class="text-sm font-bold text-black">${u.departmentName}</span>
+                    <label class="flex items-center gap-2 sm:gap-3 cursor-pointer p-2 hover:bg-blue-200 rounded border border-transparent hover:border-blue-400 transition-colors" title="Hantar surat ke bahagian ${u.departmentName}">
+                        <input type="checkbox" name="destinasi" value="${u.departmentName}" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded cursor-pointer">
+                        <span class="text-[11px] sm:text-sm font-bold text-black">${u.departmentName}</span>
                     </label>
                 `;
             });
