@@ -2205,12 +2205,12 @@
             const isSelected = checkSamaHari(thisDate, suratSelectedDate);
             const isToday = checkSamaHari(thisDate, new Date());
             
-            let classes = "p-1.5 sm:p-2 flex flex-col items-center justify-center text-[11px] sm:text-sm surat-cal-day ";
+            let classes = "p-1 sm:p-1.5 flex flex-col items-center justify-center text-[10px] sm:text-xs surat-cal-day ";
             if(isSelected) classes += "active shadow-sm";
             else if(isToday) classes += "bg-blue-50 text-[#4169E1] font-extrabold border border-blue-200";
 
             const adaSurat = documents.some(d => checkSamaHari(new Date(d.tarikhDaftar), thisDate) && (d.lokasiSemasa === currentDept || d.pendaftar === currentDept) && d.status !== 'Dibatalkan');
-            const dot = adaSurat ? `<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-600 rounded-full mt-0.5 sm:mt-1"></div>` : `<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 mt-0.5 sm:mt-1"></div>`;
+            const dot = adaSurat ? `<div class="w-1.5 h-1.5 bg-red-600 rounded-full mt-0.5"></div>` : `<div class="w-1.5 h-1.5 mt-0.5"></div>`;
 
             calHtml += `<div class="${classes}" onclick="setSuratDate(${year}, ${month}, ${i})" title="Klik untuk papar surat pada tarikh ini"><span>${i}</span>${dot}</div>`;
         }
@@ -2250,7 +2250,7 @@
 
         const dKeluar = Object.values(dKeluarMap).sort((a,b) => new Date(b.tarikhDaftar) - new Date(a.tarikhDaftar));
 
-        const buildList = (list, type) => list.length === 0 ? `<div class="text-center text-[#888] text-xs sm:text-sm italic py-6 sm:py-8">Tiada rekod pada tarikh ini.</div>` : list.map(d => {
+        const buildList = (list, type) => list.length === 0 ? `<div class="text-center text-[#888] text-[11px] sm:text-xs italic py-6 sm:py-8">Tiada rekod pada tarikh ini.</div>` : list.map(d => {
             const destText = d.allDestinasi ? d.allDestinasi.join(', ') : d.lokasiSemasa;
             let badgeStatus = d.status;
             let labelBawah = '';
@@ -2275,46 +2275,49 @@
             return `
             <div class="border border-[#a9a9a9] bg-white rounded-lg p-2.5 sm:p-3 mb-2 sm:mb-3 shadow-sm cursor-pointer hover:bg-[#e6f0ff] transition" onclick="jumpToSuratJejak('${d.noRuj}')" title="Klik untuk papar pergerakan dan butiran dokumen ini">
                 <div class="flex justify-between items-center mb-1 sm:mb-1.5">
-                    <span class="font-bold text-[#4169E1] text-[11px] sm:text-xs md:text-sm">${d.noRuj}</span>
-                    <span class="text-[10px] font-bold px-2 py-1 rounded ${d.dipulangkan ? 'bg-orange-100 text-orange-800' : 'bg-gray-200 text-gray-800'}">${badgeStatus}</span>
+                    <span class="font-bold text-[#4169E1] text-[10px] sm:text-xs">${d.noRuj}</span>
+                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${d.dipulangkan ? 'bg-orange-100 text-orange-800' : 'bg-gray-200 text-gray-800'}">${badgeStatus}</span>
                 </div>
-                <p class="text-xs sm:text-sm text-black font-bold truncate">${escapeHTML(d.tajuk)}</p>
-                <div class="flex justify-between items-end mt-1.5 sm:mt-2 gap-2">
-                    <p class="text-[9px] sm:text-[11px] text-[#555] font-semibold truncate flex-1">${labelBawah}</p>
-                    <span class="text-[9px] font-bold text-white px-1.5 py-0.5 rounded shrink-0 ${d.klasifikasi === 'Sulit' ? 'bg-red-600' : (d.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${d.klasifikasi || 'Biasa'}</span>
+                <p class="text-[11px] sm:text-xs text-black font-bold truncate">${escapeHTML(d.tajuk)}</p>
+                <div class="flex justify-between items-end mt-1.5 gap-2">
+                    <p class="text-[8px] sm:text-[9px] text-[#555] font-semibold truncate flex-1">${labelBawah}</p>
+                    <span class="text-[8px] sm:text-[9px] font-bold text-white px-1.5 py-0.5 rounded shrink-0 ${d.klasifikasi === 'Sulit' ? 'bg-red-600' : (d.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${d.klasifikasi || 'Biasa'}</span>
                 </div>
             </div>
             `;
         }).join('');
 
         container.innerHTML = `
-            <div class="flex flex-col lg:flex-row gap-3 sm:gap-4 h-full pb-2 overflow-hidden">
-                <div class="flex-1 min-w-0 min-h-[30vh] lg:min-h-0 xp-panel bg-[#ece9d8] flex flex-col p-3 sm:p-4 shadow-inner border-t-[6px] border-t-red-600 rounded-t-xl order-2 lg:order-1">
-                    <h3 class="font-black text-sm sm:text-base text-red-700 mb-1 sm:mb-2 flex items-center gap-2 shrink-0"><i data-lucide="log-in" class="w-4 h-4 sm:w-5 sm:h-5"></i> Rekod Surat Masuk</h3>
-                    <p class="text-[10px] sm:text-xs text-[#555] font-bold mb-2 sm:mb-3 border-b-2 border-[#a9a9a9] pb-1.5 sm:pb-2 shrink-0">Tarikh: <span class="text-black">${suratSelectedDate.toLocaleDateString('ms-MY')}</span></p>
-                    <div class="overflow-y-auto flex-1 pr-1 w-full relative">
-                        <div class="absolute w-full pb-2">${buildList(dMasuk, 'masuk')}</div>
-                    </div>
-                </div>
+            <div class="flex flex-col lg:flex-row gap-3 sm:gap-4 h-full pb-2 overflow-hidden w-full">
                 
-                <div class="flex-1 min-w-0 min-h-[30vh] lg:min-h-0 xp-panel bg-[#ece9d8] flex flex-col p-3 sm:p-4 shadow-inner border-t-[6px] border-t-blue-600 rounded-t-xl order-3 lg:order-2 mt-2 lg:mt-0">
-                    <h3 class="font-black text-sm sm:text-base text-[#4169E1] mb-1 sm:mb-2 flex items-center gap-2 shrink-0"><i data-lucide="log-out" class="w-4 h-4 sm:w-5 sm:h-5"></i> Rekod Surat Keluar</h3>
-                    <p class="text-[10px] sm:text-xs text-[#555] font-bold mb-2 sm:mb-3 border-b-2 border-[#a9a9a9] pb-1.5 sm:pb-2 shrink-0">Tarikh: <span class="text-black">${suratSelectedDate.toLocaleDateString('ms-MY')}</span></p>
-                    <div class="overflow-y-auto flex-1 pr-1 w-full relative">
-                        <div class="absolute w-full pb-2">${buildList(dKeluar, 'keluar')}</div>
+                <div class="flex-1 flex flex-col md:flex-row lg:flex-col xl:flex-row gap-3 sm:gap-4 min-h-0 overflow-hidden order-2 lg:order-1 w-full">
+                    <div class="flex-1 min-w-0 min-h-[30vh] xl:min-h-0 xp-panel bg-[#ece9d8] flex flex-col p-3 sm:p-4 shadow-inner border-t-[6px] border-t-red-600 rounded-t-xl">
+                        <h3 class="font-black text-sm sm:text-base text-red-700 mb-1 sm:mb-2 flex items-center gap-2 shrink-0"><i data-lucide="log-in" class="w-4 h-4 sm:w-5 sm:h-5"></i> Rekod Surat Masuk</h3>
+                        <p class="text-[9px] sm:text-[10px] text-[#555] font-bold mb-2 sm:mb-3 border-b-2 border-[#a9a9a9] pb-1.5 sm:pb-2 shrink-0">Tarikh: <span class="text-black">${suratSelectedDate.toLocaleDateString('ms-MY')}</span></p>
+                        <div class="overflow-y-auto flex-1 pr-1 w-full relative">
+                            <div class="absolute w-full pb-2">${buildList(dMasuk, 'masuk')}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 min-w-0 min-h-[30vh] xl:min-h-0 xp-panel bg-[#ece9d8] flex flex-col p-3 sm:p-4 shadow-inner border-t-[6px] border-t-blue-600 rounded-t-xl mt-2 md:mt-0 lg:mt-2 xl:mt-0">
+                        <h3 class="font-black text-sm sm:text-base text-[#4169E1] mb-1 sm:mb-2 flex items-center gap-2 shrink-0"><i data-lucide="log-out" class="w-4 h-4 sm:w-5 sm:h-5"></i> Rekod Surat Keluar</h3>
+                        <p class="text-[9px] sm:text-[10px] text-[#555] font-bold mb-2 sm:mb-3 border-b-2 border-[#a9a9a9] pb-1.5 sm:pb-2 shrink-0">Tarikh: <span class="text-black">${suratSelectedDate.toLocaleDateString('ms-MY')}</span></p>
+                        <div class="overflow-y-auto flex-1 pr-1 w-full relative">
+                            <div class="absolute w-full pb-2">${buildList(dKeluar, 'keluar')}</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="w-full lg:w-72 xl:w-80 xp-panel bg-white flex flex-col p-3 sm:p-4 shadow-inner order-1 lg:order-3 shrink-0">
-                    <div class="flex justify-between items-center mb-3 sm:mb-4 pb-2 sm:pb-3 border-b-2 border-[#a9a9a9]">
-                        <button onclick="ubahBulanSurat(-1)" class="xp-button px-2 sm:px-3 py-1" title="Bulan sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4 text-[#4169E1]"></i></button>
-                        <span class="font-black text-[11px] sm:text-[13px] text-[#4169E1] uppercase tracking-wide">${monthNamesList[month]} ${year}</span>
-                        <button onclick="ubahBulanSurat(1)" class="xp-button px-2 sm:px-3 py-1" title="Bulan seterusnya"><i data-lucide="chevron-right" class="w-4 h-4 text-[#4169E1]"></i></button>
+                <div class="w-full lg:w-[260px] xp-panel bg-white flex flex-col p-2.5 sm:p-3 shadow-inner order-1 lg:order-2 shrink-0 h-max lg:max-h-full lg:overflow-y-auto hide-scrollbar">
+                    <div class="flex justify-between items-center mb-2 sm:mb-3 pb-2 border-b-2 border-[#a9a9a9] shrink-0">
+                        <button onclick="ubahBulanSurat(-1)" class="xp-button px-1.5 sm:px-2 py-0.5" title="Bulan sebelumnya"><i data-lucide="chevron-left" class="w-3 h-3 sm:w-4 sm:h-4 text-[#4169E1]"></i></button>
+                        <span class="font-black text-[10px] sm:text-[11px] text-[#4169E1] uppercase tracking-wide">${monthNamesList[month]} ${year}</span>
+                        <button onclick="ubahBulanSurat(1)" class="xp-button px-1.5 sm:px-2 py-0.5" title="Bulan seterusnya"><i data-lucide="chevron-right" class="w-3 h-3 sm:w-4 sm:h-4 text-[#4169E1]"></i></button>
                     </div>
-                    <div class="grid grid-cols-7 gap-1 text-center text-[9px] sm:text-[11px] font-bold text-[#555] mb-1.5 sm:mb-2 uppercase">
+                    <div class="grid grid-cols-7 gap-0.5 text-center text-[9px] sm:text-[10px] font-bold text-[#555] mb-1 sm:mb-1.5 uppercase shrink-0">
                         <div>Ahd</div><div>Isn</div><div>Sel</div><div>Rab</div><div>Kha</div><div>Jum</div><div>Sab</div>
                     </div>
-                    <div class="grid grid-cols-7 gap-0.5 sm:gap-1 text-center">${calHtml}</div>
+                    <div class="grid grid-cols-7 gap-0.5 text-center shrink-0">${calHtml}</div>
                 </div>
             </div>
         `;
