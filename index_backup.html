@@ -1,0 +1,3151 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sistem Pengurusan Kalendar & Rekod Surat</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Gaya CSS Khas (Tema Khas Sudut Bulat & Cetakan) -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Tahoma&display=swap');
+    
+    body { margin: 0; font-family: 'Tahoma', 'Trebuchet MS', sans-serif; background-color: #3A6EA5;}
+    .xp-desktop { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+    
+    .xp-window { 
+      background-color: #ECE9D8; 
+      border: 1px solid #27408B; 
+      border-radius: 12px; 
+      box-shadow: 2px 2px 12px rgba(0,0,0,0.4); 
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .xp-titlebar { 
+      background: linear-gradient(to bottom, #4169E1 0%, #5C81E6 8%, #4169E1 40%, #2752D9 88%, #1948D2 100%); 
+      color: white; 
+      padding: 8px 16px; 
+      border-bottom: 1px solid #27408B; 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      font-weight: bold; 
+      text-shadow: 1px 1px #0F1089; 
+      letter-spacing: 0.5px; 
+    }
+    
+    .xp-button { 
+      background-color: #ECE9D8; 
+      border-top: 2px solid #FFFFFF; 
+      border-right: 2px solid #716F64; 
+      border-bottom: 2px solid #716F64; 
+      border-left: 2px solid #FFFFFF; 
+      border-radius: 6px;
+      padding: 6px 14px; 
+      font-size: 13px; 
+      color: #000; 
+      display: inline-flex; 
+      align-items: center; 
+      justify-content: center;
+      gap: 6px; 
+      cursor: pointer; 
+      font-family: 'Tahoma', sans-serif;
+      transition: all 0.1s ease;
+    }
+    .xp-button:active:not(:disabled) { 
+      border-top: 2px solid #716F64; 
+      border-left: 2px solid #716F64; 
+      border-right: 2px solid #FFFFFF; 
+      border-bottom: 2px solid #FFFFFF; 
+      padding: 7px 13px 5px 15px; 
+    }
+    .xp-button:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .xp-button-mini { 
+      background-color: #ECE9D8; 
+      border-top: 1px solid #FFFFFF; 
+      border-left: 1px solid #FFFFFF; 
+      border-right: 1px solid #716F64; 
+      border-bottom: 1px solid #716F64; 
+      border-radius: 4px;
+    }
+    .xp-button-mini:active:not(:disabled) { 
+      border-top: 1px solid #716F64; 
+      border-left: 1px solid #716F64; 
+      border-right: 1px solid #FFFFFF; 
+      border-bottom: 1px solid #FFFFFF; 
+    }
+    
+    .xp-panel { 
+      border-top: 2px solid #716F64; 
+      border-left: 2px solid #716F64; 
+      border-right: 2px solid #FFFFFF; 
+      border-bottom: 2px solid #FFFFFF; 
+      border-radius: 10px;
+      background-color: #ECE9D8; 
+    }
+    
+    .xp-input { 
+      border-top: 2px solid #716F64; 
+      border-left: 2px solid #716F64; 
+      border-right: 2px solid #FFFFFF; 
+      border-bottom: 2px solid #FFFFFF; 
+      border-radius: 6px;
+      padding: 8px 12px; 
+      font-family: 'Tahoma', sans-serif; 
+      outline: none; 
+      width: 100%;
+      font-size: 13px;
+    }
+    .xp-input:focus { background-color: #ffffe1; }
+    .xp-input:disabled { background-color: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+    
+    /* Sembunyikan scrollbar untuk menampakkan rupa tab di mobile lebih cantik */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Main Tabs Style */
+    .main-tab-btn {
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      border-top: 2px solid #ece9d8;
+      border-left: 2px solid #ece9d8;
+      border-right: 2px solid #ece9d8;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+      background-color: #ece9d8;
+      color: #555;
+    }
+    .main-tab-btn.active {
+      background-color: white;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #fff;
+      border-bottom: 0;
+      color: #4169E1;
+      box-shadow: 0px -2px 5px rgba(0,0,0,0.1);
+      margin-bottom: -2px;
+      z-index: 10;
+      position: relative;
+    }
+    .main-tab-btn:not(.active):hover { background-color: #dfdbcf; }
+
+    .profile-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .profile-card:hover { transform: scale(1.08); }
+    .profile-card:hover .profile-img { border-color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+
+    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .toast-anim { animation: slideIn 0.3s ease-out forwards; }
+
+    .sa-table th { background-color: #d2cbbb; border: 1px solid #716f64; padding: 10px; text-align: left; }
+    .sa-table td { border: 1px solid #a9a9a9; padding: 10px; background-color: white; }
+
+    /* SRS Timeline CSS */
+    .timeline-container { border-left: 2px solid #4169E1; position: relative; padding-left: 1.5rem; margin-left: 0.5rem; }
+    .timeline-item::before { content: ''; position: absolute; left: -0.4rem; top: 0.25rem; width: 0.75rem; height: 0.75rem; background-color: #4169E1; border-radius: 50%; border: 2px solid white; box-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
+    .surat-cal-day { cursor: pointer; transition: all 0.2s; border-radius: 4px; border: 1px solid transparent; }
+    .surat-cal-day:hover:not(.empty) { background-color: #ffffe1; border-color: #4169E1; }
+    .surat-cal-day.active { background-color: #4169E1; color: white; font-weight: bold; border-color: #27408B; }
+
+    /* Jejak View Responsiveness & Animations */
+    #jejak-wrapper { display: flex; flex-direction: column; width: 100%; height: 100%; gap: 1rem; }
+    #jejak-sidebar { display: flex; flex-direction: column; transition: all 0.3s ease; flex-shrink: 0; }
+    #jejak-detail { display: flex; flex-direction: column; flex: 1; transition: all 0.3s ease; }
+    
+    @media (max-width: 767px) {
+        #jejak-sidebar { height: 40vh; }
+        #jejak-detail { min-height: 50vh; }
+        /* When active on mobile: hide sidebar completely */
+        .jejak-active #jejak-sidebar { display: none !important; }
+        .jejak-active #jejak-detail { min-height: 80vh; }
+    }
+    
+    @media (min-width: 768px) {
+        #jejak-wrapper { flex-direction: row; }
+        #jejak-sidebar { width: 33%; height: 100%; }
+        #jejak-detail { flex: 1; height: 100%; }
+        
+        /* When active on desktop: shrink sidebar to bubbles */
+        .jejak-active #jejak-sidebar { 
+            width: 120px; 
+            padding: 8px !important;
+        }
+        .jejak-active .jejak-search-container { display: none !important; }
+        .jejak-active .surat-item-header { display: none !important; }
+        .jejak-active .surat-item-status { display: none !important; }
+        
+        .jejak-active .surat-item { 
+            padding: 0px !important; 
+            margin-bottom: 12px !important; 
+            background: transparent !important; 
+            border: none !important; 
+            box-shadow: none !important; 
+        }
+        /* Menggantikan No Ruj kepada Tajuk di dalam Bubble */
+        .jejak-active .surat-item-tajuk { 
+            font-size: 10px !important; 
+            padding: 10px 8px !important; 
+            border-radius: 12px; 
+            display: flex !important; 
+            align-items: center;
+            justify-content: center;
+            width: 100%; 
+            word-break: break-word;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            white-space: normal !important;
+            background-color: #4169E1 !important;
+            color: white !important;
+            font-weight: bold;
+            border: 2px solid #27408B;
+            line-height: 1.2;
+            min-height: 48px;
+            margin: 0 !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+        }
+        .jejak-active .surat-item:hover .surat-item-tajuk { background-color: #27408B !important; }
+    }
+
+    /* PREVIEW MODE (PDF MODE) UNTUK CETAKAN BERSIH */
+    body.preview-mode { background-color: #525659 !important; }
+    body.preview-mode .xp-titlebar,
+    body.preview-mode #status-bar-top,
+    body.preview-mode #top-nav-controls,
+    body.preview-mode #superadmin-nav {
+        display: none !important;
+    }
+    body.preview-mode .xp-window {
+        border: none !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+        border-radius: 4px !important;
+        height: auto !important;
+        max-height: none !important;
+        margin-top: 80px !important;
+        max-width: 25cm !important;
+        background: white !important;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 1.5cm !important;
+    }
+    body.preview-mode #view-container {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+    body.preview-mode .printable-container {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+    }
+
+    @media print {
+      @page { margin: 1cm; size: auto; }
+      body, html { background-color: white !important; margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; min-height: auto !important; }
+      
+      body.xp-desktop, .xp-window, #main-app-window, #view-container, #print-area {
+        display: block !important;
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
+        position: static !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: auto !important;
+        max-width: none !important;
+      }
+      
+      #main-app-window > div {
+         display: block !important;
+         overflow: visible !important;
+         height: auto !important;
+         max-height: none !important;
+         padding: 0 !important;
+         background: white !important;
+      }
+
+      .no-print { display: none !important; }
+      
+      body.printing-monthly #main-app-window { display: none !important; }
+      body.printing-monthly .monthly-print-only { display: block !important; position: static !important; width: 100% !important; padding: 0 !important; }
+      body:not(.printing-monthly) .monthly-print-only { display: none !important; }
+      
+      .print-table { width: 100% !important; border-collapse: collapse !important; page-break-inside: auto; }
+      .print-table tr { page-break-inside: avoid !important; page-break-after: auto; }
+      .print-table thead { display: table-header-group; }
+      .print-table tfoot { display: table-footer-group; }
+      
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+  </style>
+</head>
+<body class="xp-desktop p-0 sm:p-2 md:p-4 flex justify-center items-start sm:items-center overflow-x-hidden w-full h-full bg-[#3A6EA5]">
+
+  <!-- Toast Notifikasi -->
+  <div id="toast" class="fixed bottom-4 right-4 sm:top-4 sm:bottom-auto z-[100] bg-[#008000] text-white px-5 py-4 rounded-lg border-2 border-white shadow-lg flex items-center font-bold text-sm md:text-base no-print hidden toast-anim max-w-[90vw]">
+    <i data-lucide="check-circle-2" class="w-6 h-6 mr-3 shrink-0" id="toast-icon"></i>
+    <span id="toast-msg">Mesej Berjaya</span>
+  </div>
+
+  <!-- Custom Konfirmasi Popup Modal -->
+  <div id="custom-confirm-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden no-print">
+    <div class="xp-window w-full max-w-sm flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.8)] animate-[slideIn_0.2s_ease-out] rounded-[12px]">
+      <div class="xp-titlebar bg-gradient-to-b from-red-500 to-red-700 border-red-800">
+        <span class="text-base flex items-center gap-2 text-white"><i data-lucide="alert-triangle" class="w-5 h-5"></i> Pengesahan Tindakan</span>
+      </div>
+      <div class="p-6 bg-[#ece9d8] flex flex-col items-center text-center">
+        <i data-lucide="trash-2" class="w-12 h-12 text-red-600 mb-3 drop-shadow-sm"></i>
+        <h3 id="confirm-msg" class="text-lg font-black text-black mb-2 leading-tight">Adakah anda pasti?</h3>
+        <p id="confirm-sub-msg" class="text-sm text-gray-700 font-semibold leading-snug">Tindakan ini tidak boleh dipulihkan selepas ia disahkan.</p>
+      </div>
+      <div class="p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between gap-3 flex-wrap sm:flex-nowrap">
+        <button onclick="closeConfirmModal()" class="xp-button text-sm px-6 py-2 w-full justify-center" title="Batal dan kembali">Batal</button>
+        <button onclick="executeConfirm()" id="confirm-action-btn" class="xp-button font-bold text-white bg-[#e53935] border-[#b71c1c] hover:bg-red-700 text-sm px-6 py-2 w-full justify-center shadow-sm" title="Teruskan dengan tindakan ini">Ya, Teruskan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SKRIN LOG MASUK -->
+  <div id="login-screen" class="w-full flex flex-col items-center justify-center min-h-[100dvh] relative pt-8 pb-10 no-print">
+    <div class="text-center mb-10 sm:mb-12">
+      <div id="login-date-display" class="text-sm sm:text-base md:text-lg font-bold text-yellow-300 drop-shadow-md mb-2 tracking-wide uppercase" title="Tarikh Hari Ini"></div>
+      <h1 class="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4 leading-tight px-4" style="text-shadow: 3px 3px 6px rgba(0,0,0,0.6);">Sistem Kalendar & Rekod Surat</h1>
+      <h2 class="text-lg sm:text-xl md:text-2xl text-slate-200 font-medium" style="text-shadow: 1px 1px 4px rgba(0,0,0,0.5);">Pilih Profil Akses</h2>
+    </div>
+
+    <div id="profile-grid" class="flex flex-wrap justify-center gap-6 sm:gap-8 md:gap-14 max-w-6xl px-4 z-10 mb-10">
+      <!-- Dijana oleh JS -->
+    </div>
+    
+    <div class="mt-4 sm:mt-6 z-10">
+      <button onclick="openProfileMenu('superadmin')" class="flex items-center gap-2 text-slate-200 hover:text-white bg-black/30 hover:bg-black/50 px-6 py-3 rounded-full backdrop-blur-sm transition-all border border-transparent hover:border-slate-400 shadow-md" title="Log masuk ke panel konfigurasi Super Admin">
+        <i data-lucide="shield" class="w-5 h-5 sm:w-6 sm:h-6 text-red-400"></i>
+        <span class="text-sm sm:text-base font-bold tracking-wide">Akses Super-Admin</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL SUB-MENU LOGIN -->
+  <div id="profile-auth-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+    <div class="xp-window w-[95%] sm:w-full max-w-sm flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.8)] relative animate-[slideIn_0.2s_ease-out] rounded-[12px]">
+      <button onclick="closeProfileMenu()" class="absolute top-2 right-2 text-white hover:text-red-200 z-10 transition-colors" title="Tutup paparan log masuk">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+      <div class="xp-titlebar flex-wrap">
+        <span class="text-base flex items-center gap-2"><i data-lucide="lock" class="w-5 h-5"></i> Pengesahan Akses</span>
+      </div>
+      <div class="p-8 bg-[#ece9d8] rounded-b-[12px] flex flex-col items-center max-h-[85vh] overflow-y-auto">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl border-2 border-[#27408B] bg-white flex items-center justify-center mb-4 shadow-md shrink-0" id="auth-profile-icon-container">
+           <i data-lucide="user" class="w-8 h-8 sm:w-10 sm:h-10 text-[#4169E1]" id="auth-profile-icon"></i>
+        </div>
+        <h3 class="text-lg sm:text-xl font-bold text-[#4169E1] text-center mb-1" id="auth-profile-name">Nama Profil</h3>
+        <p class="text-xs sm:text-sm text-[#555] mb-6 text-center px-4 font-semibold" id="auth-profile-dept">Bahagian Profil</p>
+
+        <div id="login-error" class="w-full bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-4 py-3 rounded text-sm font-bold flex items-start gap-2 hidden mb-5 shadow-sm">
+          <span class="w-5 h-5 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-xs shrink-0 mt-0.5">!</span>
+          <span id="login-error-msg" class="flex-1"></span>
+        </div>
+
+        <div class="w-full" id="auth-pelawat-section">
+          <button onclick="executeLogin('viewer')" class="xp-button w-full justify-center font-bold text-[#4169E1] py-3 text-base shadow-sm" title="Log masuk untuk melihat rekod sahaja">
+            <i data-lucide="eye" class="w-5 h-5"></i> Masuk sebagai Pelawat
+          </button>
+          <div class="flex items-center gap-3 my-5">
+            <div class="h-px bg-[#a9a9a9] flex-1"></div>
+            <span class="text-[10px] sm:text-xs font-bold text-[#777] uppercase tracking-wider">Kawasan Admin</span>
+            <div class="h-px bg-[#a9a9a9] flex-1"></div>
+          </div>
+        </div>
+
+        <div class="w-full flex flex-col gap-2">
+          <label class="text-xs sm:text-sm font-bold text-black" id="auth-password-label">Kata Laluan <span class="text-[#888] font-normal">(Bypass dibenarkan)</span>:</label>
+          <input type="password" id="auth-pass" placeholder="Taip kata laluan..." class="xp-input text-center text-base sm:text-lg" onkeypress="if(event.key === 'Enter') executeLogin('admin')" />
+          <button onclick="executeLogin('admin')" class="xp-button w-full justify-center font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] py-3 mt-2 shadow-sm text-sm sm:text-base" title="Sahkan log masuk ke dalam sistem">
+            <i data-lucide="unlock" class="w-5 h-5"></i> Log Masuk Mod Penuh
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TETINGKAP UTAMA APLIKASI -->
+  <div class="xp-window w-full h-[100dvh] sm:h-[96vh] sm:max-w-[98%] 2xl:max-w-[1600px] flex flex-col hide-on-monthly-print hidden sm:rounded-[12px] border-none sm:border-solid border-[#27408B]" id="main-app-window">
+    
+    <!-- Titlebar Aplikasi -->
+    <div class="xp-titlebar flex-wrap gap-2 md:gap-4 no-print shrink-0">
+      <div class="flex items-center gap-3 max-w-full overflow-hidden">
+        <i data-lucide="layout" class="w-5 h-5 text-white drop-shadow shrink-0"></i>
+        <span class="text-xs sm:text-sm md:text-base tracking-wide truncate">Sistem Pengurusan Kalendar & Rekod Surat</span>
+      </div>
+      <button onclick="handleLogout()" id="header-logout-btn" class="bg-[#e53935] text-white px-3 py-1.5 rounded flex items-center gap-2 hover:bg-red-600 transition-colors border border-red-800 shrink-0 text-[10px] sm:text-xs md:text-sm font-bold shadow-sm" title="Log keluar dari sistem">
+        <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
+      </button>
+    </div>
+
+    <!-- Status Bar & Date (Top) -->
+    <div id="status-bar-top" class="bg-white border-b-2 border-[#a9a9a9] px-3 sm:px-4 md:px-6 py-2 sm:py-3 flex justify-between items-center text-[10px] sm:text-sm md:text-base shadow-sm no-print relative z-20 flex-wrap gap-2 shrink-0">
+      <div class="text-[#4169E1] font-extrabold uppercase tracking-wide flex items-center gap-1.5 sm:gap-2" title="Tahap akses semasa anda">
+          <i data-lucide="user-check" class="w-4 h-4 sm:w-5 sm:h-5"></i> AKSES: <span id="status-role-text" class="text-black font-black bg-[#ffffe1] px-2 sm:px-3 py-0.5 sm:py-1 rounded border border-[#4169E1]"></span>
+      </div>
+      <div class="text-[#008000] font-extrabold flex items-center gap-1.5 sm:gap-2 bg-[#e6f0ff] px-2 sm:px-3 py-0.5 sm:py-1 rounded border border-[#4169E1]" title="Tarikh sistem semasa">
+          <i data-lucide="calendar-check" class="w-4 h-4 sm:w-5 sm:h-5 text-[#4169E1]"></i> <span id="current-date-display"></span>
+      </div>
+    </div>
+
+    <div class="p-2 md:p-4 bg-[#ece9d8] flex-1 overflow-hidden flex flex-col relative z-10 w-full min-h-0">
+      
+      <!-- NAVIGASI TAB UTAMA -->
+      <div id="top-nav-controls" class="flex flex-col mb-3 sm:mb-4 no-print w-full shrink-0">
+        
+        <!-- Main Tabs -->
+        <div class="flex gap-1.5 sm:gap-2 overflow-x-auto items-end pt-1 sm:pt-2 border-b-2 border-[#fff] w-full hide-scrollbar px-1 sm:px-0" id="main-tabs-container">
+            <button onclick="switchMainTab('kalendar')" id="main-tab-kalendar" class="main-tab-btn text-xs sm:text-sm active" title="Papar dan urus kalendar aktiviti"><i data-lucide="calendar" class="w-4 h-4 sm:w-5 sm:h-5"></i> Rekod Kalendar</button>
+            <button onclick="switchMainTab('surat')" id="main-tab-surat" class="main-tab-btn text-xs sm:text-sm relative" title="Urus dan jejak rekod surat menyurat"><i data-lucide="mail" class="w-4 h-4 sm:w-5 sm:h-5"></i> Surat Menyurat 
+               <span id="badge-surat-main" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full hidden border sm:border-2 border-white shadow-md font-black" title="Jumlah surat perlukan tindakan">0</span>
+            </button>
+            <button onclick="switchMainTab('settings')" id="main-tab-settings" class="main-tab-btn text-xs sm:text-sm" title="Tetapan profil dan sistem anda"><i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5"></i> Tetapan</button>
+        </div>
+
+        <!-- Sub Tabs Container -->
+        <div class="bg-white p-2 border border-[#a9a9a9] rounded-b-lg rounded-tr-lg shadow-sm flex flex-wrap items-center justify-between gap-2 overflow-x-auto hide-scrollbar" id="sub-tabs-container">
+           <!-- Diisi dinamik berdasarkan Main Tab -->
+        </div>
+      </div>
+
+      <!-- Super Admin Header -->
+      <div id="superadmin-nav" class="hidden pb-3 border-b border-[#a9a9a9] mb-3 no-print shrink-0">
+        <div class="flex flex-wrap justify-between items-center gap-3">
+          <h2 class="font-bold text-base sm:text-lg md:text-xl text-[#4169E1] flex items-center gap-2">
+            <i data-lucide="shield-alert" class="w-5 h-5 sm:w-6 sm:h-6 text-red-600 shrink-0"></i> <span class="truncate">Panel Super-Admin Sistem</span>
+          </h2>
+        </div>
+      </div>
+
+      <!-- Bekas Utama View -->
+      <div id="view-container" class="bg-white xp-panel p-2 sm:p-3 md:p-5 flex-1 relative shadow-md overflow-hidden flex flex-col w-full min-h-0"></div>
+    </div>
+  </div>
+
+  <!-- BEKAS CETAKAN BULANAN (Kalendar Sahaja) -->
+  <div id="monthly-print-container" class="monthly-print-only w-full"></div>
+
+  <!-- SEMUA MODAL POPUP DILETAKKAN DI SINI -->
+
+  <!-- Modal Aktiviti Kalendar -->
+  <div id="modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-2 sm:p-4 hidden no-print">
+    <div class="xp-window w-full max-w-3xl flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)] rounded-[12px] max-h-[95dvh]">
+      <div class="xp-titlebar shrink-0">
+        <span class="text-sm sm:text-base flex items-center gap-2" id="modal-title"></span>
+        <button onclick="closeModal()" class="text-white hover:text-red-200 transition-colors" title="Tutup paparan"><i data-lucide="x" class="w-5 h-5 sm:w-6 sm:h-6"></i></button>
+      </div>
+      <div class="p-4 sm:p-5 md:p-6 bg-[#ece9d8] overflow-y-auto flex-1">
+        <div id="conflict-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-4 py-3 rounded mb-5 flex items-start gap-3 hidden shadow-sm">
+          <span class="w-5 h-5 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-xs shrink-0 mt-0.5">!</span>
+          <div id="conflict-error-msg" class="flex-1 w-full text-xs sm:text-sm font-semibold"></div>
+        </div>
+        <div id="guest-override-container" class="hidden bg-[#fff8e1] border border-[#ffe082] px-4 py-3 rounded mb-5 shadow-sm">
+          <label class="flex items-start gap-3 cursor-pointer" title="Tandakan jika anda adalah tetamu di bilik ini">
+            <input type="checkbox" id="form-is-guest" class="mt-1 rounded w-4 h-4 sm:w-5 sm:h-5 text-[#f57f17] focus:ring-[#f57f17]" />
+            <div class="flex flex-col">
+              <span class="text-xs sm:text-sm font-bold text-[#f57f17]">Teruskan sebagai Ahli Jemputan</span>
+              <span class="text-[10px] sm:text-xs text-[#795548] leading-tight mt-1">Bilik ini telah ditempah. Tandakan ini jika anda hadir sebagai jemputan.</span>
+            </div>
+          </label>
+        </div>
+        <form id="activityForm" class="space-y-4 sm:space-y-5">
+          <div class="flex items-center gap-4 flex-wrap">
+            <label class="flex items-center gap-2 cursor-pointer" title="Tandakan jika aktiviti berlangsung seharian">
+              <input type="checkbox" id="form-isAllDay" onchange="toggleTimeFields()" class="rounded w-4 h-4 sm:w-5 sm:h-5 text-[#4169E1]" /> 
+              <span class="text-xs sm:text-sm font-bold text-[#4169E1]">Sepanjang Hari / Tiada Waktu Spesifik</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer" title="Tandakan jika ini adalah program peribadi/sulit">
+              <input type="checkbox" id="form-is-private" class="rounded w-4 h-4 sm:w-5 sm:h-5 text-red-600 focus:ring-red-500" /> 
+              <span class="text-xs sm:text-sm font-bold text-red-600"><i data-lucide="lock" class="w-3.5 h-3.5 inline pb-0.5"></i> Sulit / Peribadi (Sembunyi dari Pelawat)</span>
+            </label>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 bg-white p-3 sm:p-4 rounded-xl border border-[#a9a9a9] shadow-inner w-full">
+            <div class="flex flex-col gap-1 sm:gap-1.5"><label class="text-xs sm:text-sm font-bold text-black">Tarikh Mula:</label><input type="date" id="form-startDate" required class="xp-input font-bold text-xs sm:text-sm w-full" title="Pilih tarikh mula aktiviti" /></div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs sm:text-sm font-bold text-black">Masa Mula:</label>
+              <div class="flex w-full">
+                <input type="text" id="form-startTime" readonly onclick="openClockModal('form-startTime')" class="xp-input cursor-pointer text-center bg-white rounded-r-none border-r-0 font-bold text-sm sm:text-base w-full" placeholder="--:--" title="Klik untuk pilih masa" />
+                <button type="button" id="btn-clock-start" onclick="openClockModal('form-startTime')" class="xp-button-mini px-3 sm:px-4 rounded-l-none bg-[#ece9d8] border-l-0 clock-btn shrink-0" title="Buka pemilih masa jam"><i data-lucide="clock" class="w-4 h-4 sm:w-5 sm:h-5 text-[#4169E1]"></i></button>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1.5"><label class="text-xs sm:text-sm font-bold text-black">Tarikh Tamat:</label><input type="date" id="form-endDate" required class="xp-input font-bold text-xs sm:text-sm w-full" title="Pilih tarikh tamat aktiviti" /></div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs sm:text-sm font-bold text-black">Masa Tamat:</label>
+              <div class="flex w-full">
+                <input type="text" id="form-endTime" readonly onclick="openClockModal('form-endTime')" class="xp-input cursor-pointer text-center bg-white rounded-r-none border-r-0 font-bold text-sm sm:text-base w-full" placeholder="--:--" title="Klik untuk pilih masa" />
+                <button type="button" id="btn-clock-end" onclick="openClockModal('form-endTime')" class="xp-button-mini px-3 sm:px-4 rounded-l-none bg-[#ece9d8] border-l-0 clock-btn shrink-0" title="Buka pemilih masa jam"><i data-lucide="clock" class="w-4 h-4 sm:w-5 sm:h-5 text-[#4169E1]"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1.5"><label class="text-xs sm:text-sm font-bold text-black">Mesyuarat / Program:</label><input type="text" id="form-program" required class="xp-input font-bold text-xs sm:text-sm w-full" placeholder="Contoh: Mesyuarat Pengurusan" title="Taip nama program atau mesyuarat" /></div>
+          <div class="flex flex-col gap-1.5"><label class="text-xs sm:text-sm font-bold text-black">Nama Pengerusi (Pilihan):</label><input type="text" id="form-chairman" class="xp-input font-bold text-xs sm:text-sm w-full" title="Taip nama pengerusi sekiranya ada" /></div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs sm:text-sm font-bold text-black">Tempat Lokasi:</label>
+            <select id="form-location" required class="xp-input cursor-pointer font-bold text-xs sm:text-sm w-full" onchange="toggleCustomLocation()" title="Pilih lokasi dari senarai"></select>
+            <div id="form-custom-location-container" class="hidden mt-2">
+              <input type="text" id="form-custom-location" class="xp-input border-blue-500 bg-blue-50 font-bold text-xs sm:text-sm w-full" placeholder="Sila nyatakan lokasi terperinci..." title="Taip lokasi luar atau khusus" />
+            </div>
+          </div>
+          <div class="flex flex-col gap-1.5"><label class="text-xs sm:text-sm font-bold text-black">Pegawai Terlibat (Barisan Baharu Setiap Nama):</label><textarea id="form-officers" rows="3" required class="xp-input resize-none font-bold text-xs sm:text-sm w-full" title="Taipkan senarai nama pegawai yang terlibat"></textarea></div>
+          <div class="flex flex-col gap-1.5"><label class="text-xs sm:text-sm font-bold text-black">Catatan (Pilihan):</label><textarea id="form-notes" rows="2" class="xp-input resize-none font-bold text-xs sm:text-sm w-full" title="Masukkan sebarang maklumat tambahan atau nota penting"></textarea></div>
+        </form>
+      </div>
+      <div class="p-3 sm:p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between items-center gap-2 sm:gap-3 flex-wrap shrink-0">
+        <button type="button" id="btn-delete" onclick="handleDelete()" class="xp-button font-bold text-[#e53935] hidden text-xs sm:text-sm px-4 sm:px-5 py-2 w-full sm:w-auto" title="Padam rekod aktiviti ini sepenuhnya"><i data-lucide="trash-2" class="w-4 h-4 sm:w-5 sm:h-5"></i> Padam Rekod</button>
+        <div class="flex gap-2 sm:gap-3 ml-auto w-full sm:w-auto flex-wrap sm:flex-nowrap">
+          <button type="button" onclick="closeModal()" class="xp-button text-xs sm:text-sm px-4 sm:px-6 py-2 flex-1 sm:flex-none justify-center" title="Batal perubahan dan tutup">Batal</button>
+          <button type="button" onclick="saveActivity()" class="xp-button font-bold text-white bg-[#4169E1] border-[#27408B] text-xs sm:text-sm px-6 sm:px-8 py-2 shadow-sm flex-1 sm:flex-none justify-center" title="Simpan rekod aktiviti ke pangkalan data"><i data-lucide="save" class="w-4 h-4"></i> Simpan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL JAM ANALOG (TIME PICKER WIDGET) -->
+  <div id="clock-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4 hidden no-print">
+    <div class="xp-window w-full max-w-[320px] flex flex-col shadow-2xl rounded-[12px]">
+      <div class="xp-titlebar">
+        <span class="text-sm sm:text-base flex items-center gap-2"><i data-lucide="clock" class="w-5 h-5"></i> Tetapkan Masa</span>
+        <button onclick="closeClockModal()" class="text-white hover:text-red-200 transition-colors" title="Tutup jam"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-6 sm:p-8 bg-[#ece9d8] flex flex-col items-center gap-6">
+        <div class="relative w-48 h-48 sm:w-52 sm:h-52 rounded-full border-[6px] sm:border-[8px] border-[#27408B] bg-white shadow-inner flex items-center justify-center">
+           <div class="absolute inset-0" id="clock-markers"></div>
+           <div id="hand-h" class="absolute w-[4px] sm:w-[5px] h-12 sm:h-14 bg-black rounded-full origin-bottom z-10 transition-transform duration-300 ease-out" style="bottom: 50%; transform-origin: bottom center;"></div>
+           <div id="hand-m" class="absolute w-[2px] sm:w-[3px] h-16 sm:h-20 bg-[#4169E1] rounded-full origin-bottom z-20 transition-transform duration-300 ease-out" style="bottom: 50%; transform-origin: bottom center;"></div>
+           <div class="absolute w-3 h-3 sm:w-4 sm:h-4 bg-red-600 rounded-full z-30 shadow-md border border-black"></div>
+        </div>
+        <div class="w-full flex flex-col gap-2 text-center">
+           <label class="text-xs sm:text-sm font-bold text-[#4169E1]">Pilih Masa:</label>
+           <input type="time" id="clock-time-input" class="xp-input text-xl sm:text-2xl font-black p-2 sm:p-3 text-center w-full shadow-inner border-[#27408B]" oninput="updateClockHands(this.value)" />
+        </div>
+      </div>
+      <div class="p-3 sm:p-4 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between gap-2 sm:gap-3">
+        <button type="button" onclick="closeClockModal()" class="xp-button text-xs sm:text-sm px-4 sm:px-6 py-2 w-full justify-center" title="Batal pemilihan">Batal</button>
+        <button type="button" onclick="applyClockTime()" class="xp-button font-bold text-white bg-[#4169E1] border-[#27408B] text-xs sm:text-sm px-4 sm:px-6 py-2 w-full justify-center shadow-sm" title="Sahkan dan masukkan masa ini">Pilih Masa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PENGURUSAN PROFIL SUPER ADMIN -->
+  <div id="sa-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print hidden">
+    <div class="xp-window w-[95%] sm:w-full max-w-lg flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)] rounded-[12px]">
+      <div class="xp-titlebar">
+        <span class="text-sm sm:text-base flex items-center gap-2" id="sa-modal-title">Urus Profil Setiausaha</span>
+      </div>
+      <div class="p-5 sm:p-6 bg-[#ece9d8] overflow-y-auto max-h-[75vh]">
+        <div id="sa-error" class="bg-[#ffebee] border border-[#ffcdd2] text-[#c62828] px-4 py-3 rounded text-xs sm:text-sm font-bold mb-4 flex items-start gap-2 hidden shadow-sm">
+          <span class="w-5 h-5 rounded-full bg-[#d32f2f] text-white flex items-center justify-center text-xs shrink-0 mt-0.5">!</span>
+          <span id="sa-error-msg" class="flex-1"></span>
+        </div>
+        <form id="saForm" class="space-y-4 sm:space-y-5">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs sm:text-sm font-bold text-black">Nama Profil / Username:</label>
+            <input type="text" id="sa-username" required class="xp-input" placeholder="Cth: Setiausaha BPS" />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs sm:text-sm font-bold text-black">Nama Bahagian / Unit:</label>
+            <input type="text" id="sa-department" required class="xp-input" placeholder="Nama penuh bahagian" />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs sm:text-sm font-bold text-black">Kata Laluan (Biarkan kosong untuk lalai):</label>
+            <input type="text" id="sa-password" class="xp-input" placeholder="Kata Laluan" />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs sm:text-sm font-bold text-black">Pilih Ikon Profil:</label>
+            <div id="sa-icon-grid" class="flex gap-2 sm:gap-3 flex-wrap bg-white p-3 sm:p-4 rounded-xl border border-[#a9a9a9] shadow-inner">
+               <!-- JS Injects Icons here -->
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="p-4 sm:p-5 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-end gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
+        <button type="button" onclick="closeSAModal()" class="xp-button text-xs sm:text-sm px-4 sm:px-6 py-2 w-full sm:w-auto justify-center">Batal</button>
+        <button type="button" onclick="saveSAUser()" class="xp-button font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] text-xs sm:text-sm px-6 sm:px-8 py-2 shadow-sm w-full sm:w-auto justify-center"><i data-lucide="save" class="w-4 h-4"></i> Simpan Profil</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tindakan Penerima Surat -->
+  <div id="surat-tindakan-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden no-print">
+    <div class="xp-window w-[95%] sm:w-full max-w-lg flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)] rounded-[12px]">
+      <div class="xp-titlebar">
+        <span class="text-sm sm:text-base flex items-center gap-2"><i data-lucide="check-square" class="w-4 h-4 sm:w-5 sm:h-5"></i> Tindakan Dokumen Surat</span>
+      </div>
+      <div class="p-5 sm:p-6 bg-[#ece9d8]">
+        <div class="bg-white p-3 border border-[#a9a9a9] rounded-lg shadow-sm mb-4 sm:mb-5">
+            <p class="text-[10px] sm:text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Tindakan Untuk Dokumen:</p>
+            <span id="modalNoRuj" class="font-black text-[#4169E1] text-base sm:text-lg block"></span>
+        </div>
+        <input type="hidden" id="modalDocId">
+        <div class="space-y-4 sm:space-y-5">
+          <div class="flex flex-col gap-1 sm:gap-1.5">
+              <label class="text-xs sm:text-sm font-bold text-black">Jenis Tindakan:</label>
+              <select id="tindakanPilihan" class="xp-input cursor-pointer font-bold text-xs sm:text-sm" onchange="togglePegawaiSurat()" title="Pilih tindakan untuk surat ini">
+                  <option value="kiv">Simpan Sementara (KIV)</option>
+                  <option value="edar">Edar kepada Pegawai</option>
+                  <option value="kembali">Kembalikan / Pulang Semula ke Penghantar</option>
+                  <option value="selesai">Simpan & Selesai</option>
+              </select>
+          </div>
+          <div id="divPegawai" class="flex flex-col gap-1 sm:gap-1.5 hidden">
+              <label class="text-xs sm:text-sm font-bold text-black">Masukkan Nama Pegawai (Dalaman):</label>
+              <input type="text" id="pegawaiPilihan" class="xp-input font-semibold text-xs sm:text-sm" placeholder="Nama Pegawai..." title="Taip nama pegawai penerima edaran"/>
+          </div>
+          <div class="flex flex-col gap-1.5">
+              <label class="text-xs sm:text-sm font-bold text-black">Catatan / Arahan (Pilihan):</label>
+              <textarea id="catatanTindakan" rows="3" class="xp-input resize-none text-xs sm:text-sm font-bold" placeholder="Sila semak dokumen ini..." title="Masukkan arahan atau catatan khas tindakan"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="p-4 sm:p-5 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-end gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
+          <button onclick="tutupModalSuratTindakan()" class="xp-button text-xs sm:text-sm px-4 sm:px-6 py-2 w-full sm:w-auto justify-center" title="Batal tindakan">Batal</button>
+          <button onclick="simpanTindakanSurat()" class="xp-button font-bold text-white bg-[#008000] border-[#005000] text-xs sm:text-sm px-4 sm:px-6 py-2 w-full sm:w-auto justify-center shadow-sm" title="Simpan rekod tindakan surat"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Simpan Tindakan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Edit Pembetulan Surat -->
+  <div id="surat-edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden no-print">
+    <div class="xp-window w-[95%] sm:w-full max-w-lg flex flex-col shadow-[4px_4px_15px_rgba(0,0,0,0.6)] rounded-[12px]">
+      <div class="xp-titlebar bg-gradient-to-b from-[#FFA500] to-[#E65C00]">
+        <span class="text-sm sm:text-base flex items-center gap-2 text-white"><i data-lucide="edit" class="w-4 h-4 sm:w-5 sm:h-5"></i> Edit Pembetulan Surat</span>
+      </div>
+      <div class="p-4 sm:p-6 bg-[#ece9d8] max-h-[75vh] overflow-y-auto">
+        <p class="text-xs sm:text-sm text-gray-800 font-semibold mb-4 sm:mb-5 bg-yellow-100 p-2 sm:p-3 border border-yellow-400 rounded-lg shadow-sm flex items-start gap-2">
+            <i data-lucide="info" class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-700 shrink-0"></i> Anda boleh menyunting maklumat di bawah. Ia akan terus dikemas kini kepada penerima.
+        </p>
+        <input type="hidden" id="editDocId">
+        <div class="space-y-4 sm:space-y-5">
+          <div class="flex flex-col gap-1 sm:gap-1.5">
+              <label class="text-xs sm:text-sm font-bold text-black">Tajuk Dokumen:</label>
+              <input type="text" id="editTajuk" class="xp-input font-bold text-xs sm:text-sm w-full" title="Ubah tajuk surat di sini">
+          </div>
+          <div class="flex flex-col gap-1 sm:gap-1.5" id="editDestinasiWrapper">
+              <label class="text-xs sm:text-sm font-bold text-black">Destinasi Baru (Boleh tambah/buang penerima):</label>
+              <div id="edit-destinasi-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-white p-3 sm:p-4 rounded-lg border border-[#a9a9a9] max-h-[30vh] sm:max-h-40 overflow-y-auto shadow-inner">
+                  <!-- Checkbox Dijana Oleh JS -->
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-4 sm:p-5 bg-[#ece9d8] border-t border-[#a9a9a9] rounded-b-[12px] flex justify-between items-center flex-col sm:flex-row gap-2 sm:gap-3">
+          <button onclick="batalSuratKeluar()" class="xp-button font-bold text-white bg-[#e53935] border-[#b71c1c] hover:bg-red-700 text-xs sm:text-sm px-4 sm:px-5 py-2 shadow-sm w-full sm:w-auto justify-center" title="Tarik balik dan batalkan surat ini"><i data-lucide="ban" class="w-4 h-4"></i> Batal Penghantaran</button>
+          <div class="flex gap-2 sm:gap-3 w-full sm:w-auto sm:ml-auto flex-wrap sm:flex-nowrap">
+            <button onclick="tutupModalSuratEdit()" class="xp-button text-xs sm:text-sm px-4 sm:px-6 py-2 w-full sm:w-auto justify-center" title="Tutup paparan pembetulan">Tutup</button>
+            <button onclick="simpanEditSurat()" class="xp-button font-bold text-white bg-[#e65c00] border-[#b34700] text-xs sm:text-sm px-4 sm:px-6 py-2 shadow-sm w-full sm:w-auto justify-center" title="Simpan perubahan dan kemaskini dokumen"><i data-lucide="save" class="w-4 h-4"></i> Simpan Perubahan</button>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIREBASE INITIALIZATION & DB API -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB8XX20lI2qvK4vcmTFR8Idk_YYr7c3VqA",
+      authDomain: "pengurusan-kalendar-aktiviti.firebaseapp.com",
+      projectId: "pengurusan-kalendar-aktiviti",
+      storageBucket: "pengurusan-kalendar-aktiviti.firebasestorage.app",
+      messagingSenderId: "562353215762",
+      appId: "1:562353215762:web:39c7b7d9e10c2a3847bbcb",
+      measurementId: "G-JGRLJDRFEK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.dbAPI = {
+      async getActivities() {
+        const snap = await getDocs(collection(db, "activities"));
+        return snap.docs.map(d => d.data());
+      },
+      async saveActivity(data) {
+        await setDoc(doc(db, "activities", data.id), data);
+      },
+      async deleteActivity(id) {
+        await deleteDoc(doc(db, "activities", id));
+      },
+      async getUsers() {
+        const snap = await getDocs(collection(db, "users"));
+        return snap.docs.map(d => d.data());
+      },
+      async saveUser(data) {
+        await setDoc(doc(db, "users", data.id), data);
+      },
+      async deleteUser(id) {
+        await deleteDoc(doc(db, "users", id));
+      },
+      async getDocuments() {
+        const snap = await getDocs(collection(db, "surat_documents"));
+        return snap.docs.map(d => d.data());
+      },
+      async saveDocument(data) {
+        await setDoc(doc(db, "surat_documents", data.id), data);
+      },
+      async deleteDocument(id) {
+        await deleteDoc(doc(db, "surat_documents", id));
+      }
+    };
+
+    if(typeof window.initAppFromDB === 'function') window.initAppFromDB();
+  </script>
+
+  <!-- JAVASCRIPT LOGIK & DATA -->
+  <script>
+    // --- FUNGSI CUSTOM CONFIRM MODAL ---
+    let confirmCallback = null;
+    function showConfirmModal(title, subtitle, callback) {
+        document.getElementById('confirm-msg').innerText = title;
+        document.getElementById('confirm-sub-msg').innerText = subtitle;
+        confirmCallback = callback;
+        document.getElementById('custom-confirm-modal').classList.remove('hidden');
+        lucide.createIcons();
+    }
+    
+    function closeConfirmModal() {
+        document.getElementById('custom-confirm-modal').classList.add('hidden');
+        confirmCallback = null;
+    }
+
+    function executeConfirm() {
+        if(confirmCallback) confirmCallback();
+        closeConfirmModal();
+    }
+
+    // --- FUNGSI UTILITI GLOBAL ---
+    function checkSamaHari(d1, d2) {
+        if (!d1 || !d2) return false;
+        const date1 = new Date(d1);
+        const date2 = new Date(d2);
+        return date1.getFullYear() === date2.getFullYear() && 
+               date1.getMonth() === date2.getMonth() && 
+               date1.getDate() === date2.getDate();
+    }
+
+    // --- KONFIGURASI DAN DATA ASAS MOCKUP --- //
+    const availableIcons = ['user', 'users', 'briefcase', 'folder', 'monitor', 'hard-drive', 'building', 'clipboard-list', 'award'];
+    const meetingRooms = [
+      "Menara 1, Aras 17, Dewan Makan Eksekutif",
+      "Menara 1, Aras 17, Bilik Mesyuarat Kembang Semangkuk",
+      "Menara 1, Aras 17, Bilik Mesyuarat Jemaah Lembaga",
+      "Menara 1, Aras 16, Bilik Mesyuarat Ramin",
+      "Menara 1, Aras 16, Bilik Bincang",
+      "Menara 1, Aras 14, Surau MTIB",
+      "Menara 1, Aras 13, Bilik Mesyuarat Geronggang",
+      "Menara 1, Aras 13, Bilik Latihan ICT",
+      "Menara 1, Aras 13, Dewan Persidangan MTIB",
+      "Menara 2, Aras 12, Bilik Mesyuarat Meranti",
+      "Menara 2, Aras 10, Bilik Mesyuarat Nyatoh",
+      "Menara 2, Aras 10, Bilik Bincang Perdagangan",
+      "Menara 2, Aras 10, Bilik Bincang CB",
+      "Menara 2, Aras 09, Bilik Mesyuarat Kelampayan",
+      "Menara 2, Aras 09, Bilik Mesyuarat Chengal",
+      "Lain-lain / Luar Kawasan"
+    ];
+
+    let users = [
+      { id: 'u1', username: 'Setiausaha BPS', departmentName: 'Bahagian Perancangan Strategik', password: '', isActive: true, icon: 'briefcase', secretaryName: '', phoneExt: '', directorName: '' },
+      { id: 'u2', username: 'Setiausaha BTM', departmentName: 'Bahagian Teknologi Maklumat', password: '', isActive: true, icon: 'monitor', secretaryName: '', phoneExt: '', directorName: '' }
+    ];
+
+    const pegawaiList = {
+      "Bahagian Perancangan Strategik": ["Dato' Pengarah", "Timbalan Pengarah"],
+      "Bahagian Teknologi Maklumat": ["Pengurus IT", "Pegawai Sistem"],
+    };
+
+    let activities = [];
+    let documents = []; 
+
+    let currentUserRole = null; 
+    let currentUserId = null; 
+    let currentDept = null; 
+    
+    // TAB STATE LOGIC
+    let mainTab = 'kalendar'; 
+    let subTabKalendar = 'weekly'; 
+    let subTabSurat = 'surat-dashboard';
+    let viewMode = 'weekly'; 
+    
+    let suratReportMode = 'weekly';
+    let suratReportDate = new Date();
+
+    function getStartOfWeek(date) {
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0); 
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1); 
+      return new Date(d.setDate(diff));
+    }
+    let baseDate = getStartOfWeek(new Date());
+    let suratSelectedDate = new Date(); 
+    let printMonth = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
+
+    let editingId = null;
+    let editingSAUserId = null;
+    let selectedIconTemp = 'user';
+    let tempAuthUserId = null; 
+    let impersonatingFromSA = false;
+    let statusTimeout = null;
+    let currentClockTarget = null;
+    let suratCounter = 1003; 
+
+    const dayNamesList = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+    const monthNamesList = ['JAN', 'FEB', 'MAC', 'APR', 'MEI', 'JUN', 'JUL', 'OGO', 'SEP', 'OKT', 'NOV', 'DIS'];
+
+    window.initAppFromDB = async () => {
+      setAppStatus('Memuat turun data...', 'normal');
+      initClockMarkers();
+      populateLocationDropdown();
+
+      try {
+        if (window.dbAPI) {
+          const dbUsers = await window.dbAPI.getUsers();
+          if (dbUsers && dbUsers.length > 0) users = dbUsers; 
+          else if (dbUsers && dbUsers.length === 0) for (const u of users) await window.dbAPI.saveUser(u);
+
+          const dbActs = await window.dbAPI.getActivities();
+          if (dbActs && dbActs.length > 0) {
+            activities = dbActs.map(a => {
+              if(!a.startDate) a.startDate = a.date;
+              if(!a.endDate) a.endDate = a.date;
+              return a;
+            });
+          }
+
+          const dbDocs = await window.dbAPI.getDocuments();
+          if (dbDocs && dbDocs.length > 0) documents = dbDocs;
+          else if (dbDocs && dbDocs.length === 0) {
+            janaDataSuratDummy();
+            for (const d of documents) await window.dbAPI.saveDocument(d);
+          }
+        }
+        setAppStatus('Sedia', 'normal');
+      } catch(e) {
+        console.error("Firebase Error:", e);
+        setAppStatus('Gagal menyambung (Mod Tempatan)', 'error');
+        if (documents.length === 0) janaDataSuratDummy();
+      }
+      
+      updateCurrentDateDisplay();
+      renderProfileGrid();
+      lucide.createIcons();
+    };
+
+    function janaDataSuratDummy() {
+        const tHariIni = new Date().toISOString();
+        const tSemalamDate = new Date(); tSemalamDate.setDate(new Date().getDate() - 1);
+        const tSemalam = tSemalamDate.toISOString();
+        
+        documents = [
+            {
+                id: '1001', noRuj: 'SRS-2026-0001', tajuk: 'Laporan Perbelanjaan Januari', jenis: '1 - Surat', kategori: 'Edaran Dalaman',
+                aliran: 'Dokumen / Surat Keluar', klasifikasi: 'Sulit', tarikhDokumen: tSemalam.split('T')[0], tarikhEdar: tHariIni.split('T')[0], tarikhTerima: null,
+                pendaftar: 'Bahagian Teknologi Maklumat', lokasiSemasa: 'Bahagian Perancangan Strategik', status: 'Dihantar', tarikhDaftar: tHariIni,
+                timeline: [
+                    { tarikh: tHariIni, tindakan: 'Didaftarkan', oleh: 'Setiausaha BTM', catatan: 'Didaftarkan sebagai Edaran Dalaman.' },
+                    { tarikh: tHariIni, tindakan: 'Dihantar', oleh: 'Setiausaha BTM', kepada: 'Bahagian Perancangan Strategik', catatan: 'Untuk semakan Dato Pengarah.' }
+                ]
+            }
+        ];
+    }
+
+    function initClockMarkers() {
+      const container = document.getElementById('clock-markers');
+      if(!container) return;
+      let html = '';
+      for(let i=1; i<=12; i++) {
+          const angle = i * 30;
+          html += `<div class="absolute inset-0 flex justify-center" style="transform: rotate(${angle}deg); padding-top: 6px;">
+                     <div style="transform: rotate(-${angle}deg); font-size: 14px; color: #27408B;" class="font-extrabold">${i}</div>
+                   </div>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function openClockModal(targetId) {
+      if (document.getElementById('form-isAllDay').checked) return;
+      currentClockTarget = targetId;
+      let val = document.getElementById(targetId).value;
+      if(!val) {
+          const now = new Date();
+          val = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      }
+      document.getElementById('clock-time-input').value = val;
+      updateClockHands(val);
+      document.getElementById('clock-modal').classList.remove('hidden');
+    }
+
+    function closeClockModal() { document.getElementById('clock-modal').classList.add('hidden'); }
+
+    function updateClockHands(timeStr) {
+      if(!timeStr) return;
+      const [h, m] = timeStr.split(':').map(Number);
+      const hAngle = (h % 12) * 30 + (m / 2);
+      const mAngle = m * 6;
+      document.getElementById('hand-h').style.transform = `rotate(${hAngle}deg)`;
+      document.getElementById('hand-m').style.transform = `rotate(${mAngle}deg)`;
+    }
+
+    function applyClockTime() {
+      const val = document.getElementById('clock-time-input').value;
+      if (!val) return showToast("Sila masukkan masa yang sah.", true);
+      document.getElementById(currentClockTarget).value = val;
+      if (currentClockTarget === 'form-startTime') handleAutoEndTime(val);
+      closeClockModal();
+    }
+
+    function handleAutoEndTime(startTimeStr) {
+      if(!startTimeStr) return;
+      let [h, m] = startTimeStr.split(':').map(Number);
+      h += 2;
+      let addDay = false;
+      if (h >= 24) { h %= 24; addDay = true; }
+      document.getElementById('form-endTime').value = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+
+      if (addDay) {
+          let sDate = document.getElementById('form-startDate').value;
+          if (sDate) {
+              let d = new Date(sDate); d.setDate(d.getDate() + 1);
+              document.getElementById('form-endDate').value = d.toISOString().split('T')[0];
+          }
+      } else {
+          const sDate = document.getElementById('form-startDate').value;
+          const eDate = document.getElementById('form-endDate').value;
+          if(!eDate || eDate < sDate) document.getElementById('form-endDate').value = sDate;
+      }
+      showToast("Masa tamat di set auto (+2 Jam)");
+    }
+
+    function populateLocationDropdown() {
+      const select = document.getElementById('form-location');
+      if(select) select.innerHTML = meetingRooms.map(r => `<option value="${r}" class="font-bold">${r}</option>`).join('');
+    }
+
+    function toggleCustomLocation() {
+      const locSelect = document.getElementById('form-location');
+      const customLocContainer = document.getElementById('form-custom-location-container');
+      if (locSelect.value === 'Lain-lain / Luar Kawasan') customLocContainer.classList.remove('hidden');
+      else customLocContainer.classList.add('hidden');
+    }
+
+    function updateCurrentDateDisplay() {
+      const d = new Date();
+      const display = `${dayNamesList[d.getDay()].toUpperCase()}, ${d.getDate()} ${monthNamesList[d.getMonth()]} ${d.getFullYear()}`;
+      if (document.getElementById('current-date-display')) document.getElementById('current-date-display').innerText = display;
+      if (document.getElementById('login-date-display')) document.getElementById('login-date-display').innerText = display;
+    }
+
+    function setAppStatus(msg, type = 'normal') {
+      const el = document.getElementById('app-status-text');
+      if(!el) return;
+      clearTimeout(statusTimeout);
+      
+      if(type === 'success') {
+        el.innerHTML = `<span class="text-[#008000] font-bold flex items-center gap-1"><i data-lucide="check-circle-2" class="w-4 h-4"></i> ${msg}</span>`;
+      } else if (type === 'error') {
+        el.innerHTML = `<span class="text-[#d32f2f] font-bold flex items-center gap-1"><i data-lucide="alert-triangle" class="w-4 h-4"></i> ${msg}</span>`;
+      } else {
+        el.innerHTML = `Status: ${msg}`;
+      }
+      lucide.createIcons();
+
+      if(type !== 'normal') statusTimeout = setTimeout(() => { setAppStatus('Sedia', 'normal'); }, 5000);
+    }
+
+    function showToast(msg, isError = false) {
+      setAppStatus(msg, isError ? 'error' : 'success');
+      const t = document.getElementById('toast');
+      const icon = document.getElementById('toast-icon');
+      t.className = `fixed bottom-4 right-4 sm:top-4 sm:bottom-auto z-[100] text-white px-5 py-4 rounded-lg border-2 border-white shadow-lg flex items-center font-bold text-sm md:text-base no-print toast-anim max-w-[90vw] ${isError ? 'bg-[#d32f2f]' : 'bg-[#008000]'}`;
+      icon.setAttribute('data-lucide', isError ? 'alert-circle' : 'check-circle-2');
+      document.getElementById('toast-msg').innerText = msg;
+      lucide.createIcons();
+      
+      t.classList.remove('hidden');
+      t.classList.remove('toast-anim'); void t.offsetWidth; t.classList.add('toast-anim');
+      setTimeout(() => { t.classList.add('hidden'); }, 3000);
+    }
+
+    function escapeHTML(str) {
+      if(!str) return '';
+      return str.replace(/[&<>'"]/g, tag => ({'&': '&amp;','<': '&lt;','>': '&gt;',"'": '&#39;','"': '&quot;'}[tag]));
+    }
+
+    function formatDateTime(dateStr) {
+        if(!dateStr) return '-';
+        const d = new Date(dateStr);
+        return d.toLocaleString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' });
+    }
+    
+    function formatDateOnly(dateStr) {
+        if(!dateStr) return '-';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function renderProfileGrid() {
+      const grid = document.getElementById('profile-grid');
+      grid.innerHTML = users.filter(u => u.isActive).map(u => `
+          <div onclick="openProfileMenu('${u.id}')" class="profile-card flex flex-col items-center gap-4 cursor-pointer group" title="Log masuk sebagai ${escapeHTML(u.username)}">
+            <div class="profile-img w-28 h-28 md:w-40 md:h-40 bg-[#ece9d8] border-[4px] border-[#27408B] rounded-3xl flex items-center justify-center shadow-xl transition-all">
+               <i data-lucide="${u.icon || 'user'}" class="w-14 h-14 md:w-20 md:h-20 text-[#4169E1] drop-shadow-sm"></i>
+            </div>
+            <span class="text-white font-extrabold text-base md:text-xl group-hover:text-yellow-300 drop-shadow-md tracking-wide text-center">${escapeHTML(u.username)}</span>
+          </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function openProfileMenu(userId) {
+      tempAuthUserId = userId;
+      document.getElementById('login-error').classList.add('hidden');
+      document.getElementById('auth-pass').value = '';
+      
+      const pelawatSection = document.getElementById('auth-pelawat-section');
+      if (userId === 'superadmin') {
+        if(pelawatSection) pelawatSection.classList.add('hidden');
+        document.getElementById('auth-profile-name').innerText = "Sistem Super-Admin";
+        document.getElementById('auth-profile-name').className = "text-xl sm:text-2xl font-black text-red-600 text-center mb-1";
+        document.getElementById('auth-profile-dept').innerText = "Mod Konfigurasi Utama";
+        document.getElementById('auth-profile-icon-container').innerHTML = `<i data-lucide="shield" class="w-8 h-8 sm:w-10 sm:h-10 text-red-600"></i>`;
+        document.getElementById('auth-profile-icon-container').className = "w-16 h-16 sm:w-20 sm:h-20 rounded-xl border-2 sm:border-4 border-red-600 bg-red-50 flex items-center justify-center mb-4 shadow-md shrink-0";
+        document.getElementById('auth-password-label').innerHTML = `Kata Laluan <span class="text-[#888] font-normal">(Taip 'admin' atau biar kosong)</span>:`;
+      } else {
+        if(pelawatSection) pelawatSection.classList.remove('hidden');
+        const user = users.find(u => u.id === userId);
+        document.getElementById('auth-profile-name').innerText = user.username;
+        document.getElementById('auth-profile-name').className = "text-lg sm:text-xl font-bold text-[#4169E1] text-center mb-1";
+        document.getElementById('auth-profile-dept').innerText = user.departmentName;
+        document.getElementById('auth-profile-icon-container').innerHTML = `<i data-lucide="${user.icon || 'user'}" class="w-8 h-8 sm:w-10 sm:h-10 text-[#4169E1]"></i>`;
+        document.getElementById('auth-profile-icon-container').className = "w-16 h-16 sm:w-20 sm:h-20 rounded-xl border-2 sm:border-4 border-[#27408B] bg-white flex items-center justify-center mb-4 shadow-md shrink-0";
+        document.getElementById('auth-password-label').innerHTML = `Kata Laluan Pengesahan:`;
+      }
+      
+      document.getElementById('profile-auth-modal').classList.remove('hidden');
+      lucide.createIcons();
+      setTimeout(()=> document.getElementById('auth-pass').focus(), 100);
+    }
+
+    function closeProfileMenu() { document.getElementById('profile-auth-modal').classList.add('hidden'); }
+
+    function executeLogin(role) {
+      document.getElementById('login-error').classList.add('hidden');
+      const pass = document.getElementById('auth-pass').value;
+      impersonatingFromSA = false;
+
+      if (tempAuthUserId === 'superadmin') {
+        if (pass === 'admin' || pass === '') {
+          currentUserRole = 'superadmin'; currentUserId = null; currentDept = null;
+          finalizeLogin('SUPER ADMIN');
+          return;
+        } else {
+          document.getElementById('login-error').classList.remove('hidden');
+          document.getElementById('login-error-msg').innerText = "Kata laluan Super-Admin salah!";
+          return;
+        }
+      }
+
+      const user = users.find(u => u.id === tempAuthUserId);
+      if (role === 'admin' && user.password && user.password !== '' && pass !== user.password) {
+          document.getElementById('login-error').classList.remove('hidden');
+          document.getElementById('login-error-msg').innerText = "Kata laluan pengguna salah!";
+          return;
+      }
+      
+      currentUserId = tempAuthUserId;
+      currentUserRole = role;
+      currentDept = user.departmentName;
+      finalizeLogin(role === 'admin' ? `Admin (${user.username})` : `Penonton (${user.username})`);
+    }
+
+    function finalizeLogin(statusText) {
+      document.getElementById('status-role-text').innerText = statusText;
+      document.getElementById('profile-auth-modal').classList.add('hidden');
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('main-app-window').classList.remove('hidden');
+      
+      if (currentUserRole === 'superadmin') {
+         document.getElementById('top-nav-controls').classList.add('hidden');
+         document.getElementById('superadmin-nav').classList.remove('hidden');
+         viewMode = 'superadmin';
+      } else {
+         document.getElementById('top-nav-controls').classList.remove('hidden');
+         document.getElementById('superadmin-nav').classList.add('hidden');
+         
+         mainTab = 'kalendar';
+         viewMode = subTabKalendar;
+         updateMainTabUI();
+      }
+      updateBadges();
+      renderApp();
+    }
+
+    function handleLogout() {
+      if (impersonatingFromSA) {
+        impersonatingFromSA = false; currentUserRole = 'superadmin'; currentUserId = null; currentDept = null;
+        finalizeLogin('SUPER ADMIN');
+        return;
+      }
+      currentUserRole = null; currentUserId = null; currentDept = null; tempAuthUserId = null;
+      document.getElementById('main-app-window').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+      renderProfileGrid();
+    }
+
+    // --- FUNGSI PRATONTON (PDF MODE) ---
+    window.enterPreviewMode = function() {
+        document.body.classList.add('preview-mode');
+        
+        let bar = document.createElement('div');
+        bar.id = 'preview-action-bar';
+        bar.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-[300] bg-white p-3 rounded-xl shadow-2xl border-2 border-[#4169E1] flex gap-3 no-print w-[90%] sm:w-auto justify-center flex-wrap';
+        bar.innerHTML = `
+            <button onclick="exitPreviewMode()" class="xp-button text-sm px-4 py-2" title="Kembali ke paparan asal"><i data-lucide="x-circle" class="w-4 h-4"></i> Batal</button>
+            <button onclick="window.print()" class="xp-button font-bold text-white bg-[#008000] border-[#005000] text-sm px-6 py-2 shadow-sm hover:bg-[#006000]" title="Mula proses cetakan"><i data-lucide=\"printer\" class=\"w-4 h-4\"></i> Sahkan Cetakan</button>
+        `;
+        document.body.appendChild(bar);
+        lucide.createIcons();
+    };
+
+    window.exitPreviewMode = function() {
+        document.body.classList.remove('preview-mode');
+        let bar = document.getElementById('preview-action-bar');
+        if(bar) bar.remove();
+    };
+
+    function openSAModal(userId = null) {
+      document.getElementById('sa-modal').classList.remove('hidden');
+      document.getElementById('sa-error').classList.add('hidden');
+      
+      if (userId) {
+        editingSAUserId = userId;
+        const u = users.find(x => x.id === userId);
+        document.getElementById('sa-modal-title').innerText = 'Pindaan Profil Setiausaha';
+        document.getElementById('sa-username').value = u.username;
+        document.getElementById('sa-department').value = u.departmentName;
+        document.getElementById('sa-password').value = u.password;
+        selectedIconTemp = u.icon || 'user';
+      } else {
+        editingSAUserId = null;
+        document.getElementById('sa-modal-title').innerText = 'Tambah Profil Baharu';
+        document.getElementById('sa-username').value = '';
+        document.getElementById('sa-department').value = '';
+        document.getElementById('sa-password').value = '';
+        selectedIconTemp = 'user';
+      }
+      document.getElementById('sa-icon-grid').innerHTML = buildSAIconGrid(selectedIconTemp);
+      lucide.createIcons();
+    }
+
+    function closeSAModal() { document.getElementById('sa-modal').classList.add('hidden'); editingSAUserId = null; }
+
+    function buildSAIconGrid(selectedIcon) {
+      return availableIcons.map(ic => `
+          <div onclick="selectSAIcon('${ic}')" class="sa-icon-btn w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-200 ${selectedIcon === ic ? 'border-2 border-[#4169E1] bg-[#e6f0ff]' : 'border-2 border-transparent'}" data-icon="${ic}" title="Pilih ikon ${ic}">
+             <i data-lucide="${ic}" class="w-6 h-6 sm:w-7 sm:h-7 text-[#4169E1]"></i>
+          </div>
+      `).join('');
+    }
+
+    function selectSAIcon(iconName) {
+      selectedIconTemp = iconName;
+      const grid = document.getElementById('sa-icon-grid');
+      Array.from(grid.children).forEach(el => {
+         el.className = el.dataset.icon === iconName 
+           ? "sa-icon-btn w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-200 border-2 border-[#4169E1] bg-[#e6f0ff]"
+           : "sa-icon-btn w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-200 border-2 border-transparent";
+      });
+    }
+
+    function saveSAUser() {
+      document.getElementById('sa-error').classList.add('hidden');
+      const username = document.getElementById('sa-username').value;
+      const dept = document.getElementById('sa-department').value;
+      const pass = document.getElementById('sa-password').value;
+
+      if(!username || !dept) {
+        document.getElementById('sa-error-msg').innerHTML = 'Nama profil dan bahagian wajib diisi.';
+        document.getElementById('sa-error').classList.remove('hidden');
+        return;
+      }
+
+      setAppStatus('Menyimpan ke pangkalan data...', 'normal');
+      try {
+        if (editingSAUserId) {
+          let u = users.find(x => x.id === editingSAUserId);
+          u.username = username; u.departmentName = dept; u.password = pass; u.icon = selectedIconTemp;
+          if (window.dbAPI) window.dbAPI.saveUser(u);
+        } else {
+          const newId = 'u' + Date.now();
+          const newUser = { id: newId, username: username, departmentName: dept, password: pass, isActive: true, icon: selectedIconTemp, secretaryName: '', phoneExt: '', directorName: '' };
+          users.push(newUser);
+          if (window.dbAPI) window.dbAPI.saveUser(newUser);
+        }
+        showToast('Data berjaya disimpan');
+        closeSAModal();
+        renderApp();
+      } catch(e) {
+        document.getElementById('sa-error-msg').innerHTML = 'Ralat Pangkalan Data (Kebenaran disekat?)';
+        document.getElementById('sa-error').classList.remove('hidden');
+      }
+    }
+
+    function toggleSAUserStatus(id) {
+      let u = users.find(x => x.id === id);
+      if(u) {
+        u.isActive = !u.isActive;
+        try { if (window.dbAPI) window.dbAPI.saveUser(u); showToast('Data berjaya disimpan'); renderApp(); } 
+        catch(e) { setAppStatus('Gagal menyimpan pangkalan data', 'error'); }
+      }
+    }
+
+    function deleteSAUser(id) {
+      const u = users.find(x => x.id === id);
+      showConfirmModal(
+          `Padam profil ${u.username}?`,
+          "Data aktiviti yang berkaitan juga akan terkesan.",
+          async () => {
+              try {
+                  setAppStatus('Memadam profil...', 'normal');
+                  if (window.dbAPI) await window.dbAPI.deleteUser(id);
+                  
+                  const actsToDelete = activities.filter(a => a.userId === id);
+                  if (window.dbAPI) { for(let act of actsToDelete) await window.dbAPI.deleteActivity(act.id); }
+
+                  users = users.filter(x => x.id !== id);
+                  activities = activities.filter(a => a.userId !== id);
+                  showToast('Data profil berjaya dipadam');
+                  renderApp();
+              } catch(e) { setAppStatus('Gagal memadam dari pangkalan data', 'error'); }
+          }
+      );
+    }
+
+    function impersonateUser(userId) {
+      const user = users.find(u => u.id === userId);
+      if(!user) return;
+      currentUserId = userId;
+      currentDept = user.departmentName;
+      currentUserRole = 'admin'; 
+      impersonatingFromSA = true;
+
+      document.getElementById('status-role-text').innerText = `SA as: ${user.username}`;
+      document.getElementById('top-nav-controls').classList.remove('hidden');
+      document.getElementById('superadmin-nav').classList.add('hidden');
+      
+      mainTab = 'kalendar';
+      viewMode = 'weekly';
+      updateMainTabUI();
+      renderApp();
+    }
+
+    function switchMainTab(tab) {
+        mainTab = tab;
+        updateMainTabUI();
+        
+        if (tab === 'kalendar') changeView(subTabKalendar);
+        else if (tab === 'surat') changeView(subTabSurat);
+        else if (tab === 'settings') changeView('settings');
+    }
+
+    function updateMainTabUI() {
+        document.querySelectorAll('.main-tab-btn').forEach(btn => btn.classList.remove('active'));
+        if (document.getElementById(`main-tab-${mainTab}`)) {
+            document.getElementById(`main-tab-${mainTab}`).classList.add('active');
+        }
+        updateBadges(); 
+    }
+
+    function changeView(mode) {
+      viewMode = mode;
+      
+      if(['weekly', 'matrix'].includes(mode)) subTabKalendar = mode;
+      if(['surat-dashboard', 'surat-inbox', 'surat-outbox', 'surat-jejak', 'surat-daftar', 'surat-trash', 'surat-laporan'].includes(mode)) subTabSurat = mode;
+      
+      renderApp();
+    }
+
+    function renderApp() {
+      const container = document.getElementById('view-container');
+      const subNavContainer = document.getElementById('sub-tabs-container');
+      
+      if (currentUserRole === 'superadmin') {
+        let userRows = users.map(u => `
+          <tr class="hover:bg-[#ffffe1]">
+            <td class="border border-[#a9a9a9] p-2 sm:p-3">
+              <div class="flex items-center gap-2">
+                <i data-lucide="${u.icon || 'user'}" class="w-4 h-4 sm:w-5 sm:h-5 text-[#4169E1]"></i>
+                <span class="font-bold text-[#4169E1] truncate text-xs sm:text-base">${escapeHTML(u.username)}</span>
+              </div>
+            </td>
+            <td class="border border-[#a9a9a9] p-2 sm:p-3 font-medium text-xs sm:text-sm">
+              <span onclick="impersonateUser('${u.id}')" class="cursor-pointer text-[#4169E1] hover:underline hover:text-blue-800 transition-colors block" title="Klik untuk terus masuk ke Dashboard profil ini">
+                ${escapeHTML(u.departmentName)}
+              </span>
+            </td>
+            <td class="border border-[#a9a9a9] p-2 sm:p-3 font-medium text-red-600 hidden md:table-cell text-xs sm:text-sm">${escapeHTML(u.password) || '<i class="text-gray-400 text-xs">Tiada</i>'}</td>
+            <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center">
+              ${u.isActive 
+                ? '<span class="bg-green-100 text-green-800 font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded text-[10px] sm:text-xs">Aktif</span>' 
+                : '<span class="bg-red-100 text-red-800 font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded text-[10px] sm:text-xs">T.Aktif</span>'
+              }
+            </td>
+            <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center">
+              <div class="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap">
+                <button onclick="openSAModal('${u.id}')" class="xp-button text-[#4169E1] px-2 sm:px-3 h-7 sm:h-8 text-[10px] sm:text-xs" title="Edit Profil">Edit</button>
+                <button onclick="toggleSAUserStatus('${u.id}')" class="xp-button ${u.isActive ? 'text-orange-600' : 'text-green-600'} px-2 sm:px-3 h-7 sm:h-8 hidden lg:inline-flex text-[10px] sm:text-xs" title="Tukar Status">
+                  ${u.isActive ? 'Gantung' : 'Aktif'}
+                </button>
+                <button onclick="deleteSAUser('${u.id}')" class="xp-button text-red-600 px-2 sm:px-3 h-7 sm:h-8 text-[10px] sm:text-xs" title="Padam Kekal">Padam</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+
+        container.innerHTML = `
+          <div class="bg-white p-3 sm:p-4 md:p-6 rounded-lg border border-[#a9a9a9] flex-1 overflow-y-auto w-full">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
+              <p class="text-sm md:text-base font-semibold text-[#555]">Senarai Profil Pengguna & Bahagian</p>
+              <button onclick="openSAModal(null)" class="xp-button h-9 sm:h-10 px-4 sm:px-5 font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] text-xs sm:text-sm w-full sm:w-auto justify-center" title="Tambah akaun setiausaha baharu">
+                <i data-lucide="user-plus" class="w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Setiausaha
+              </button>
+            </div>
+            <div class="w-full overflow-x-auto min-h-0 border border-[#a9a9a9]">
+                <table class="w-full border-collapse sa-table text-sm min-w-[500px]">
+                  <thead>
+                    <tr>
+                      <th class="w-[30%] md:w-[20%] p-2 sm:p-3 text-xs sm:text-sm">Pengguna</th>
+                      <th class="w-[35%] md:w-[25%] p-2 sm:p-3 text-xs sm:text-sm">Bahagian</th>
+                      <th class="w-[15%] hidden md:table-cell p-2 sm:p-3 text-xs sm:text-sm">K. Laluan</th>
+                      <th class="w-[10%] text-center p-2 sm:p-3 text-xs sm:text-sm">Status</th>
+                      <th class="w-[25%] text-center p-2 sm:p-3 text-xs sm:text-sm">Tindakan</th>
+                    </tr>
+                  </thead>
+                  <tbody>${userRows}</tbody>
+                </table>
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      if (mainTab === 'kalendar') {
+        const weekDaysForLabel = getDaysOfWeek(baseDate);
+        const startLabel = weekDaysForLabel[0].displayDate.toUpperCase();
+        const endLabel = weekDaysForLabel[6].displayDate.toUpperCase();
+        const yearLabel = weekDaysForLabel[6].dateStr.substring(0,4);
+        const isCurrentWeek = baseDate.getTime() === getStartOfWeek(new Date()).getTime();
+
+        let btnClass = isCurrentWeek ? "xp-button h-8 sm:h-10 px-3 sm:px-6 font-bold text-[#4169E1] text-[10px] sm:text-[11px]" : "xp-button h-8 sm:h-10 px-3 sm:px-6 font-bold text-[#e53935] text-[10px] sm:text-[11px]";
+
+        subNavContainer.innerHTML = `
+          <div class="flex gap-2 w-full md:w-auto overflow-x-auto hide-scrollbar">
+              <button onclick="changeView('weekly')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='weekly'?'font-extrabold bg-[#e6f0ff] border-[#4169E1] text-[#4169E1]':''}" title="Paparan kalendar mingguan"><i data-lucide="calendar-days" class="w-4 h-4 sm:w-5 sm:h-5"></i> Mingguan</button>
+              <button onclick="changeView('matrix')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='matrix'?'font-extrabold bg-[#e6f0ff] border-[#4169E1] text-[#4169E1]':''}" title="Paparan laporan cetakan kalendar"><i data-lucide="printer" class="w-4 h-4 sm:w-5 sm:h-5"></i> Laporan Cetakan</button>
+          </div>
+          ${['weekly', 'matrix'].includes(viewMode) ? `
+          <div class="flex items-center gap-2 sm:gap-3 w-full lg:w-auto justify-between lg:justify-end shrink-0 mt-2 lg:mt-0">
+              <div class="flex items-center gap-1 xp-panel p-1 bg-white">
+                <button onclick="handlePrevWeek()" class="xp-button h-7 sm:h-8 w-8 sm:w-10 p-0" title="Minggu Sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4 sm:w-5 sm:h-5 text-[#4169E1]"></i></button>
+                <button onclick="handleCurrentWeek()" class="${btnClass}" title="Lompat ke minggu semasa">${startLabel} - ${endLabel} ${yearLabel}</button>
+                <button onclick="handleNextWeek()" class="xp-button h-7 sm:h-8 w-8 sm:w-10 p-0" title="Minggu Seterusnya"><i data-lucide="chevron-right" class="w-4 h-4 sm:w-5 sm:h-5 text-[#4169E1]"></i></button>
+              </div>
+              ${currentUserRole === 'admin' ? `
+              <button onclick="openModalCalendar()" class="xp-button h-8 sm:h-9 px-3 sm:px-5 font-bold text-white bg-[#008000] border-[#005000] shadow-sm text-xs sm:text-sm" title="Tambah Rekod Aktiviti Baru">
+                <i data-lucide="plus" class="w-3 h-3 sm:w-4 sm:h-4"></i> <span class="hidden sm:inline">Tambah Aktiviti</span>
+              </button>` : ''}
+          </div>` : ''}
+        `;
+      } else if (mainTab === 'surat') {
+        subNavContainer.innerHTML = `
+          <div class="flex gap-2 w-full items-center overflow-x-auto hide-scrollbar pb-1">
+              <button onclick="changeView('surat-dashboard')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='surat-dashboard'?'font-extrabold bg-[#e6f0ff] border-[#4169E1] text-[#4169E1]':''}" title="Papan pemuka ringkasan rekod surat"><i data-lucide="home" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+              <button onclick="changeView('surat-inbox')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='surat-inbox'?'font-extrabold bg-[#e6f0ff] border-[#4169E1] text-[#4169E1]':''} relative" title="Senarai dokumen masuk yang memerlukan tindakan anda">
+                  <i data-lucide="inbox" class="w-4 h-4 sm:w-5 sm:h-5"></i> Peti Masuk
+                  <span id="badge-inbox" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full hidden border sm:border-2 border-white shadow-md font-black">0</span>
+              </button>
+              <button onclick="changeView('surat-outbox')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='surat-outbox'?'font-extrabold bg-[#e6f0ff] border-[#4169E1] text-[#4169E1]':''} relative" title="Senarai dokumen keluar yang belum selesai">
+                  <i data-lucide="send" class="w-4 h-4 sm:w-5 sm:h-5"></i> Peti Keluar 
+                  <span id="badge-outbox" class="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full hidden border sm:border-2 border-white shadow-md font-bold">0</span>
+              </button>
+              <button onclick="changeView('surat-jejak')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='surat-jejak'?'font-extrabold bg-[#e6f0ff] border-[#4169E1] text-[#4169E1]':''}" title="Jejak sejarah pergerakan setiap dokumen"><i data-lucide="route" class="w-4 h-4 sm:w-5 sm:h-5"></i> Jejak</button>
+              <button onclick="changeView('surat-laporan')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='surat-laporan'?'font-extrabold bg-[#e6f0ff] border-[#4169E1] text-[#4169E1]':''}" title="Cetak Laporan Surat"><i data-lucide="printer" class="w-4 h-4 sm:w-5 sm:h-5"></i> Laporan Cetakan</button>
+              <button onclick="changeView('surat-trash')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 shrink-0 ${viewMode==='surat-trash'?'font-extrabold bg-[#e6f0ff] border-[#4169E1] text-[#4169E1]':''} relative" title="Senarai dokumen yang telah dibatalkan"><i data-lucide="trash-2" class="w-4 h-4 sm:w-5 sm:h-5 text-red-600"></i><span id="badge-trash" class="absolute -top-1.5 -right-1.5 bg-gray-500 text-white text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full hidden border sm:border-2 border-white shadow-md font-bold">0</span></button>
+              <button onclick="changeView('surat-daftar')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 shrink-0 lg:ml-auto font-bold text-white bg-[#008000] border-[#005000] hover:bg-[#006000] shadow-sm" title="Borang mendaftar dan menghantar surat baharu"><i data-lucide="mail-plus" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i> Daftar Surat Baru</button>
+          </div>
+        `;
+        updateBadges(); 
+      } else if (mainTab === 'settings') {
+          subNavContainer.innerHTML = `<div class="text-xs sm:text-sm font-bold text-[#555] px-2 py-1"><i data-lucide=\"settings-2\" class=\"w-4 h-4 sm:w-5 sm:h-5 inline mb-0.5\"></i> Tetapan & Konfigurasi Profil Pengguna</div>`;
+      }
+
+      if (viewMode === 'weekly') renderKalendarMingguan(container);
+      else if (viewMode === 'matrix') renderKalendarLaporan(container);
+      else if (viewMode === 'settings') renderTetapan(container);
+      else if (viewMode === 'surat-dashboard') renderSuratDashboard(container);
+      else if (viewMode === 'surat-inbox') renderSuratInbox(container);
+      else if (viewMode === 'surat-outbox') renderSuratOutbox(container);
+      else if (viewMode === 'surat-trash') renderSuratTrash(container);
+      else if (viewMode === 'surat-jejak') renderSuratJejak(container);
+      else if (viewMode === 'surat-laporan') renderSuratLaporan(container);
+      else if (viewMode === 'surat-daftar') renderSuratDaftar(container);
+
+      lucide.createIcons();
+    }
+
+    function formatTimeDisplay(time24) {
+      if (!time24) return '';
+      const parts = time24.split(':');
+      let h = parseInt(parts[0], 10);
+      const mStr = parts[1];
+      let period = 'pg';
+      if (h >= 12) {
+        if (h === 12) period = 'tgh';
+        else if (h < 19) period = 'ptg';
+        else period = 'mlm';
+      }
+      const h12 = h % 12 || 12;
+      return `${h12}:${mStr} ${period}`;
+    }
+
+    function getShortDate(dStr) {
+        if(!dStr) return '';
+        const parts = dStr.split('-');
+        if(parts.length === 3) return `${parts[2]}/${parts[1]}`;
+        return dStr;
+    }
+
+    function getDisplayDateTime(act, isMatrix = false) {
+      let sDate = act.startDate || act.date;
+      let eDate = act.endDate || act.date;
+
+      if (act.isAllDay) {
+          if (sDate !== eDate) return isMatrix ? `Spjng Hari\n(${getShortDate(sDate)} - ${getShortDate(eDate)})` : `Spjng Hari (${getShortDate(sDate)} - ${getShortDate(eDate)})`;
+          return 'Sepanjang Hari';
+      }
+      
+      const s = formatTimeDisplay(act.startTime);
+      const e = formatTimeDisplay(act.endTime);
+      const joiner = isMatrix ? ' -\n' : ' - ';
+
+      if (sDate !== eDate) return `${s} (${getShortDate(sDate)})${joiner}${e} (${getShortDate(eDate)})`;
+      if (s && e) return `${s}${joiner}${e}`;
+      return s || e || '-';
+    }
+
+    function timeToMinutes(timeStr) {
+      if (!timeStr) return null;
+      const parts = timeStr.split(':');
+      return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    }
+
+    function getDaysOfWeek(startDate) {
+      const days = [];
+      const start = new Date(startDate);
+      const day = start.getDay();
+      const diff = start.getDate() - day + (day === 0 ? -6 : 1);
+      start.setDate(diff);
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        days.push({
+          dateStr, dayName: dayNamesList[d.getDay()],
+          displayDate: `${d.getDate()} ${monthNamesList[d.getMonth()]}`,
+          isWeekend: d.getDay() === 0 || d.getDay() === 6
+        });
+      }
+      return days;
+    }
+
+    function getDaysOfMonth(year, monthIndex) {
+      const days = [];
+      const date = new Date(year, monthIndex, 1);
+      while (date.getMonth() === monthIndex) {
+        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        days.push({
+          dateStr, dayName: dayNamesList[date.getDay()],
+          displayDate: `${date.getDate()} ${monthNamesList[date.getMonth()]}`,
+          isWeekend: d.getDay() === 0 || d.getDay() === 6
+        });
+        date.setDate(date.getDate() + 1);
+      }
+      return days;
+    }
+
+    function handlePrevWeek() { baseDate = new Date(baseDate.getTime() - 7 * 24 * 60 * 60 * 1000); renderApp(); }
+    function handleNextWeek() { baseDate = new Date(baseDate.getTime() + 7 * 24 * 60 * 60 * 1000); renderApp(); }
+    function handleCurrentWeek() { baseDate = getStartOfWeek(new Date()); renderApp(); }
+
+    function renderKalendarMingguan(container) {
+      const weekDays = getDaysOfWeek(baseDate);
+      const myActivities = activities.filter(a => {
+          if (a.userId !== currentUserId) return false;
+          if (currentUserRole === 'viewer' && a.isPrivate) return false;
+          return true;
+      });
+
+      let html = `<div class="flex flex-col bg-white overflow-y-auto overflow-x-hidden rounded-xl border border-[#a9a9a9] w-full flex-1">`;
+      weekDays.forEach(dayObj => {
+        const dayActivities = myActivities.filter(a => {
+          let sDate = a.startDate || a.date;
+          let eDate = a.endDate || a.date;
+          return dayObj.dateStr >= sDate && dayObj.dateStr <= eDate;
+        }).sort((a,b) => {
+          if(a.isAllDay) return -1;
+          return timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
+        });
+        
+        const bgRow = dayObj.isWeekend ? 'bg-[#e2dfd3]' : 'bg-white';
+        const bgHeader = dayObj.isWeekend ? 'bg-[#d2cbbb]' : 'bg-[#ece9d8]';
+        
+        html += `
+          <div class="flex flex-col md:flex-row border-b border-[#a9a9a9] last:border-0 min-h-[160px] md:min-h-[180px] shrink-0 ${bgRow}">
+            <div class="w-full md:w-36 lg:w-44 m-0 md:m-3 p-3 md:p-4 flex md:flex-col justify-between md:justify-center border-b md:border-b-0 border-r-0 md:border border-[#a9a9a9] md:rounded-xl ${bgHeader} shadow-sm items-center md:items-start z-10 shrink-0">
+              <h3 class="font-black text-black uppercase text-sm md:text-lg">${dayObj.dayName}</h3>
+              <p class="text-[#333] text-sm md:text-base font-bold">${dayObj.displayDate}</p>
+            </div>
+            <div class="flex-1 p-3 md:p-5 flex gap-4 overflow-x-auto items-stretch snap-x scroll-smooth hide-scrollbar">
+        `;
+
+        if(dayActivities.length > 0) {
+          dayActivities.forEach(act => {
+            let editBtn = currentUserRole === 'admin' 
+              ? `<button onclick="openModalCalendar('${act.id}')" class="p-1.5 xp-button-mini text-black rounded ml-1 shrink-0" title="Pinda Rekod Aktiviti Ini"><i data-lucide="edit" class="w-4 h-4"></i></button>`
+              : '';
+
+            let actBgColor = 'bg-[#ffffe1]'; 
+            let actBorderColor = 'border-[#a9a9a9]';
+            let indicator = '';
+
+            const isOutside = !meetingRooms.includes(act.location);
+            if (act.isGuest) {
+                actBgColor = 'bg-[#f3e5f5]'; 
+                actBorderColor = 'border-[#ce93d8]';
+                indicator += `<span class="bg-[#ce93d8] text-[#4a148c] px-2 py-0.5 rounded text-[10px] font-black uppercase ml-2 border border-[#ba68c8] shadow-sm tracking-wide shrink-0" title="Status sebagai tetamu">Jemputan</span>`;
+            } else if (isOutside) {
+                actBgColor = 'bg-[#e0f7fa]'; 
+                actBorderColor = 'border-[#80deea]';
+                indicator += `<span class="bg-[#80deea] text-[#006064] px-2 py-0.5 rounded text-[10px] font-black uppercase ml-2 border border-[#4dd0e1] shadow-sm tracking-wide shrink-0" title="Lokasi di luar kawasan rasmi">Luar Kawasan</span>`;
+            }
+
+            if (act.isPrivate) {
+                indicator += `<span class="bg-red-50 text-red-700 px-2 py-0.5 rounded text-[10px] font-black uppercase ml-2 border border-red-300 shadow-sm tracking-wide shrink-0" title="Aktiviti Sulit"><i data-lucide="lock" class="w-3 h-3 inline mb-0.5"></i> Sulit</span>`;
+            }
+
+            html += `
+              <div class="w-[85vw] sm:w-[280px] md:w-[340px] snap-start p-4 md:p-5 ${actBgColor} border-2 ${actBorderColor} rounded-xl shadow-[0_3px_8px_rgba(0,0,0,0.1)] flex flex-col shrink-0 min-h-full">
+                <div class="flex justify-between items-start mb-3 gap-2">
+                  <span class="inline-flex items-start flex-wrap gap-y-1.5 text-xs font-bold text-[#4169E1] leading-tight">
+                    <span class="flex items-center"><i data-lucide="clock" class="w-4 h-4 mr-1.5 shrink-0"></i>${getDisplayDateTime(act)}</span> ${indicator}
+                  </span>
+                  <div class="flex shrink-0">${editBtn}</div>
+                </div>
+                <h4 class="font-extrabold text-black text-[13px] md:text-[14px] lg:text-[15px] mb-3 leading-snug whitespace-normal break-words">${escapeHTML(act.program)}</h4>
+                
+                <div class="mt-auto space-y-2.5 pt-3 border-t border-black/10">
+                  ${act.chairman ? `<div class="flex items-start text-xs text-[#4169E1] font-bold leading-tight"><i data-lucide="user" class="w-4 h-4 mr-1.5 mt-0.5 text-[#4169E1] shrink-0"></i><span class="whitespace-normal break-words">Peng: ${escapeHTML(act.chairman)}</span></div>` : ''}
+                  <div class="flex items-start text-xs text-black font-semibold">
+                    <i data-lucide="map-pin" class="w-4 h-4 mr-1.5 mt-0.5 text-[#555] shrink-0"></i>
+                    <span class="whitespace-normal break-words">${escapeHTML(act.location)}</span>
+                  </div>
+                  <div class="flex items-start text-xs text-black font-semibold">
+                    <i data-lucide="users" class="w-4 h-4 mr-1.5 mt-0.5 text-[#555] shrink-0"></i>
+                    <span class="whitespace-pre-line break-words">${escapeHTML(act.officers).replace(/\n/g, ', ')}</span>
+                  </div>
+                  ${act.notes ? `
+                  <div class="flex items-start text-xs text-gray-700 font-medium pt-1.5 mt-1.5 border-t border-black/5">
+                    <i data-lucide="info" class="w-4 h-4 mr-1.5 mt-0.5 text-gray-500 shrink-0"></i>
+                    <span class="whitespace-pre-line break-words italic">${escapeHTML(act.notes)}</span>
+                  </div>` : ''}
+                </div>
+              </div>
+            `;
+          });
+          if(currentUserRole === 'admin') {
+            html += `<div onclick="openModalCalendar(null, '${dayObj.dateStr}')" class="min-w-[60px] h-auto border-2 border-dashed border-[#a9a9a9] rounded-xl flex items-center justify-center text-[#888] hover:text-[#4169E1] hover:bg-[#e6f0ff] hover:border-[#4169E1] cursor-pointer transition-colors shrink-0" title="Klik untuk tambah aktiviti pada hari ini"><i data-lucide="plus" class="w-6 h-6"></i></div>`;
+          }
+        } else {
+          if(currentUserRole === 'admin') {
+            html += `<div onclick="openModalCalendar(null, '${dayObj.dateStr}')" class="w-full flex-1 border-2 border-dashed border-[#a9a9a9] rounded-xl flex items-center justify-center text-[#888] hover:text-[#4169E1] hover:bg-[#e6f0ff] hover:border-[#4169E1] cursor-pointer transition-colors min-h-[100px] md:min-h-[120px]" title="Klik untuk tambah aktiviti pada hari ini"><i data-lucide="plus" class="w-6 h-6 mr-2"></i> <span class="text-sm font-bold">Tambah Aktiviti</span></div>`;
+          } else {
+             html += `<div class="w-full flex items-center justify-center text-[#888] italic text-sm font-semibold py-8 md:py-10">Tiada Aktiviti Didaftarkan</div>`;
+          }
+        }
+        html += `</div></div>`;
+      });
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    function buildMatrixHTML(days, actsData, title, dateRangeText, includeOverlayBtn) {
+      const user = users.find(u => u.id === currentUserId);
+      const deptName = user ? user.departmentName : '';
+      const groupedData = {};
+      days.forEach(day => { groupedData[day.dateStr] = { dayInfo: day, activities: [] }; });
+      
+      actsData.forEach(act => { 
+        for(let d in groupedData) {
+            let sDate = act.startDate || act.date;
+            let eDate = act.endDate || act.date;
+            if(d >= sDate && d <= eDate) groupedData[d].activities.push(act);
+        }
+      });
+
+      let tbodyHTML = '';
+      let dayIndex = 0;
+      
+      Object.values(groupedData).forEach((group) => {
+        const acts = group.activities.sort((a,b) => {
+           if(a.isAllDay) return -1;
+           return timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
+        });
+        const rowActs = acts.length > 0 ? acts : [null];
+        const isWeekend = group.dayInfo.isWeekend;
+        
+        // Tema warna lembut untuk baris (selang-seli)
+        const rowBg = isWeekend ? 'bg-[#fff5f5]' : (dayIndex % 2 === 0 ? 'bg-white' : 'bg-[#f4f9ff]');
+        
+        rowActs.forEach((act, idx) => {
+          tbodyHTML += `<tr class="${rowBg}" style="print-color-adjust: exact; -webkit-print-color-adjust: exact;">`;
+          if(idx === 0) {
+            // Latar sel tarikh lebih menonjol sedikit
+            const dateBg = isWeekend ? 'bg-[#ffebeb]' : 'bg-[#e6f0ff]';
+            tbodyHTML += `
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center align-top text-black ${dateBg}" rowspan="${rowActs.length}">
+                <div class="font-bold text-gray-600 text-[10px] sm:text-xs md:text-sm mb-1">${group.dayInfo.dayName}</div>
+                <div class="text-base sm:text-lg md:text-xl text-[#4169E1] font-black leading-none">${group.dayInfo.displayDate.split(' ')[0]}</div>
+                <div class="text-[9px] sm:text-[10px] md:text-xs uppercase text-gray-500 font-bold mt-1 tracking-wider">${group.dayInfo.displayDate.split(' ')[1]}</div>
+              </td>
+            `;
+          }
+
+          if (act) {
+            let editBtnHTML = (includeOverlayBtn && currentUserRole === 'admin') ? `
+              <button onclick="openModalCalendar('${act.id}')" class="absolute top-1 right-1 xp-button-mini no-print opacity-0 group-hover:opacity-100 p-1 sm:p-1.5 rounded" title="Edit aktiviti ini"><i data-lucide="edit" class="w-3 h-3 sm:w-4 sm:h-4 text-black"></i></button>
+            ` : '';
+
+            let indicator = '';
+            if (act.isPrivate) {
+                indicator += `<br><span class="bg-red-50 text-red-700 px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-bold uppercase border border-red-300 inline-block mt-1.5" title="Aktiviti Sulit"><i data-lucide="lock" class="w-2 h-2 inline"></i> Sulit</span>`;
+            }
+
+            tbodyHTML += `
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center align-top text-black">
+                <div class="font-bold text-[#4169E1] text-[11px] sm:text-xs md:text-sm leading-normal whitespace-pre-line">${getDisplayDateTime(act, true)}</div>
+              </td>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 align-top group relative">
+                <div class="font-black text-black text-xs sm:text-sm leading-normal whitespace-pre-line">${escapeHTML(act.program)}${indicator}</div>
+                ${act.chairman ? `<div class="mt-1.5 sm:mt-2 text-[9px] sm:text-[10px] md:text-xs text-[#4169E1] font-bold leading-normal"><i data-lucide="user" class="w-3 h-3 inline text-gray-500 mr-1"></i>Pengerusi: ${escapeHTML(act.chairman)}</div>` : ''}
+                ${act.notes ? `<div class="mt-1.5 sm:mt-2 text-[9px] sm:text-[10px] md:text-xs text-gray-700 font-bold whitespace-pre-line leading-normal bg-white/60 p-1.5 rounded border border-gray-200 shadow-sm">${escapeHTML(act.notes)}</div>` : ''}
+                ${editBtnHTML}
+              </td>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 align-top text-center text-black">
+                <div class="text-[11px] sm:text-xs md:text-sm font-bold leading-normal whitespace-pre-line">${escapeHTML(act.location)}</div>
+              </td>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 align-top text-black">
+                 <div class="text-[11px] sm:text-xs md:text-sm font-bold leading-normal whitespace-pre-line">${escapeHTML(act.officers)}</div>
+              </td>
+            `;
+          } else {
+            tbodyHTML += `
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center align-top text-gray-400"><div class="text-[11px] sm:text-xs md:text-sm font-bold leading-normal">-</div></td>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center align-top italic text-gray-400 font-bold"><div class="text-[11px] sm:text-xs md:text-sm font-bold leading-normal">Tiada Aktiviti</div></td>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center align-top text-gray-400"><div class="text-[11px] sm:text-xs md:text-sm font-bold leading-normal">-</div></td>
+              <td class="border border-[#a9a9a9] p-2 sm:p-3 text-center align-top text-gray-400"><div class="text-[11px] sm:text-xs md:text-sm font-bold leading-normal">-</div></td>
+            `;
+          }
+          tbodyHTML += `</tr>`;
+        });
+        dayIndex++;
+      });
+
+      let overlayBtn = includeOverlayBtn ? `
+        <div class="absolute top-2 right-2 sm:top-4 sm:right-4 no-print z-10">
+          <button onclick="enterPreviewMode()" class="xp-button h-8 sm:h-10 rounded-lg font-bold px-3 sm:px-4 text-xs sm:text-sm shadow-sm" title="Papar dialog untuk cetak atau jana PDF laporan"><i data-lucide="printer" class="w-4 h-4 sm:w-5 sm:h-5 text-black"></i> <span class="hidden md:inline">Cetak / Jana PDF</span></button>
+        </div>
+      ` : '';
+
+      return `
+        <div class="bg-white p-3 sm:p-5 md:p-8 overflow-y-auto flex-1 relative border border-[#a9a9a9] shadow-inner printable-container rounded-xl w-full" id="print-area">
+          ${overlayBtn}
+          <div class="text-center mb-6 sm:mb-8 md:mb-10 mt-8 sm:mt-4 md:mt-0 report-header">
+            <h2 class="font-black text-lg sm:text-xl md:text-2xl uppercase text-[#4169E1] tracking-wide">${title}</h2>
+            <h3 class="font-bold text-base sm:text-lg md:text-xl uppercase text-black mt-1" id="matrix-dept-name">${escapeHTML(deptName)}</h3>
+            <p class="mt-2 text-gray-700 font-bold text-xs sm:text-sm md:text-base bg-gray-100 inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-gray-300 shadow-sm">${dateRangeText}</p>
+          </div>
+          <div class="w-full min-w-[700px] overflow-x-auto">
+              <table class="w-full border-collapse border border-[#a9a9a9] text-[11px] sm:text-sm print-table shadow-sm">
+                <thead>
+                  <tr class="bg-[#cce0ff]" style="print-color-adjust: exact; -webkit-print-color-adjust: exact;">
+                    <th class="border border-[#a9a9a9] p-2 sm:p-3 font-black text-center w-[12%] uppercase text-[#4169E1]">TARIKH</th>
+                    <th class="border border-[#a9a9a9] p-2 sm:p-3 font-black text-center w-[15%] uppercase text-[#4169E1]">MASA</th>
+                    <th class="border border-[#a9a9a9] p-2 sm:p-3 font-black text-center w-[33%] uppercase text-[#4169E1]">MESYUARAT / PROGRAM</th>
+                    <th class="border border-[#a9a9a9] p-2 sm:p-3 font-black text-center w-[20%] uppercase text-[#4169E1]">TEMPAT</th>
+                    <th class="border border-[#a9a9a9] p-2 sm:p-3 font-black text-center w-[20%] uppercase text-[#4169E1]">PEGAWAI</th>
+                  </tr>
+                </thead>
+                <tbody>${tbodyHTML}</tbody>
+              </table>
+          </div>
+          <p class="mt-4 text-[9px] sm:text-[10px] md:text-xs italic text-gray-500 font-semibold text-center md:text-left report-footer">* (Tertakluk kepada sebarang pindaan)</p>
+        </div>
+      `;
+    }
+
+    function renderKalendarLaporan(container) {
+      const weekDays = getDaysOfWeek(baseDate);
+      const myActivities = activities.filter(a => {
+          if(a.userId !== currentUserId) return false;
+          if(currentUserRole === 'viewer' && a.isPrivate) return false;
+          return true;
+      });
+      const titleText = `${weekDays[0].displayDate} - ${weekDays[6].displayDate} ${weekDays[0].dateStr.substring(0,4)}`;
+      container.innerHTML = buildMatrixHTML(weekDays, myActivities, "Kalendar Aktiviti", titleText, true);
+    }
+
+    function openModalCalendar(actId = null, specificDateStr = null) {
+      if(currentUserRole !== 'admin') return; 
+      
+      document.getElementById('conflict-error').classList.add('hidden');
+      document.getElementById('guest-override-container').classList.add('hidden');
+      document.getElementById('form-is-guest').checked = false;
+      
+      const formStartDate = document.getElementById('form-startDate');
+      const formEndDate = document.getElementById('form-endDate');
+      const formStartTime = document.getElementById('form-startTime');
+      const formEndTime = document.getElementById('form-endTime');
+      const formIsAllDay = document.getElementById('form-isAllDay');
+      const formIsPrivate = document.getElementById('form-is-private');
+      const formProgram = document.getElementById('form-program');
+      const formChairman = document.getElementById('form-chairman');
+      const formLocation = document.getElementById('form-location');
+      const formCustomLocation = document.getElementById('form-custom-location');
+      const formOfficers = document.getElementById('form-officers');
+      const formNotes = document.getElementById('form-notes');
+      
+      const modalTitle = document.getElementById('modal-title');
+      const btnDelete = document.getElementById('btn-delete');
+
+      if (actId) {
+        editingId = actId;
+        const act = activities.find(a => a.id === actId);
+        
+        modalTitle.innerHTML = `<i data-lucide="edit" class="w-4 h-4 sm:w-5 sm:h-5"></i> Pindaan Rekod Aktiviti`;
+        btnDelete.classList.remove('hidden');
+
+        formStartDate.value = act.startDate || act.date;
+        formEndDate.value = act.endDate || act.date;
+        formStartTime.value = act.startTime || '';
+        formEndTime.value = act.endTime || '';
+        formIsAllDay.checked = act.isAllDay;
+        formIsPrivate.checked = act.isPrivate || false;
+        formProgram.value = act.program;
+        formChairman.value = act.chairman || '';
+        
+        if (act.isGuest) {
+            document.getElementById('guest-override-container').classList.remove('hidden');
+            document.getElementById('form-is-guest').checked = true;
+        }
+        
+        if (meetingRooms.includes(act.location)) {
+          formLocation.value = act.location; formCustomLocation.value = '';
+          document.getElementById('form-custom-location-container').classList.add('hidden');
+        } else {
+          formLocation.value = 'Lain-lain / Luar Kawasan'; formCustomLocation.value = act.location;
+          document.getElementById('form-custom-location-container').classList.remove('hidden');
+        }
+        
+        formOfficers.value = act.officers; formNotes.value = act.notes;
+      } else {
+        editingId = Date.now().toString();
+        
+        modalTitle.innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4 sm:w-5 sm:h-5"></i> Daftar Aktiviti Baharu`;
+        btnDelete.classList.add('hidden');
+        
+        const weekDays = getDaysOfWeek(baseDate);
+        const targetDate = specificDateStr || weekDays[0].dateStr;
+        formStartDate.value = targetDate;
+        formEndDate.value = targetDate;
+        
+        let defaultStart = '09:00';
+        let defaultEnd = '11:00';
+
+        const actsOnDate = activities.filter(a =>
+            a.userId === currentUserId &&
+            !a.isAllDay &&
+            a.endDate >= targetDate &&
+            a.startDate <= targetDate
+        );
+
+        if (actsOnDate.length > 0) {
+            let latestEnd = '00:00';
+            actsOnDate.forEach(a => {
+                if (a.endTime && a.endTime > latestEnd) {
+                    latestEnd = a.endTime;
+                }
+            });
+            if (latestEnd !== '00:00') {
+                defaultStart = latestEnd;
+                let [h, m] = latestEnd.split(':').map(Number);
+                h += 2; 
+                if (h > 23) h = 23;
+                defaultEnd = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+            }
+        }
+
+        formStartTime.value = defaultStart;
+        formEndTime.value = defaultEnd;
+
+        formIsAllDay.checked = false; formIsPrivate.checked = false;
+        formProgram.value = ''; formChairman.value = '';
+        formLocation.value = meetingRooms[0]; formCustomLocation.value = '';
+        document.getElementById('form-custom-location-container').classList.add('hidden');
+        formOfficers.value = ''; formNotes.value = '';
+      }
+
+      toggleTimeFields();
+      document.getElementById('modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); editingId = null; }
+
+    function toggleTimeFields() {
+      const isAllDay = document.getElementById('form-isAllDay').checked;
+      const sTime = document.getElementById('form-startTime');
+      const eTime = document.getElementById('form-endTime');
+      const clockBtns = document.querySelectorAll('.clock-btn');
+      
+      if(isAllDay) {
+        sTime.disabled = true; eTime.disabled = true;
+        sTime.classList.add('bg-slate-200', 'text-slate-400'); eTime.classList.add('bg-slate-200', 'text-slate-400');
+        sTime.value = ''; eTime.value = ''; clockBtns.forEach(b => b.disabled = true);
+      } else {
+        sTime.disabled = false; eTime.disabled = false;
+        sTime.classList.remove('bg-slate-200', 'text-slate-400'); eTime.classList.remove('bg-slate-200', 'text-slate-400');
+        clockBtns.forEach(b => b.disabled = false);
+      }
+    }
+
+    window.toggleDestinasiSurat = function() {
+        const kategori = document.getElementById('sr-kategori').value;
+        const containerCb = document.getElementById('sr-destinasi-container');
+        const containerLuar = document.getElementById('sr-destinasi-luar-container');
+        const inputLuar = document.getElementById('sr-destinasi-luar');
+        const labelDestinasi = document.getElementById('label-destinasi');
+
+        if (kategori === 'Surat Keluar Luar (Luar Agensi)') {
+            containerCb.classList.add('hidden');
+            containerLuar.classList.remove('hidden');
+            inputLuar.required = true;
+            labelDestinasi.innerText = "Nyatakan Destinasi Agensi Luar:";
+            labelDestinasi.classList.remove('hidden');
+        } else if (kategori === 'Disimpan ke dalam fail') {
+            containerCb.classList.add('hidden');
+            containerLuar.classList.add('hidden');
+            inputLuar.required = false;
+            labelDestinasi.classList.add('hidden');
+        } else { // Edaran Dalaman
+            containerCb.classList.remove('hidden');
+            containerLuar.classList.add('hidden');
+            inputLuar.required = false;
+            labelDestinasi.innerText = "Destinasi Penghantaran Dalaman (Boleh Pilih Lebih Dari Satu):";
+            labelDestinasi.classList.remove('hidden');
+        }
+    };
+
+    async function saveActivity() {
+      const form = document.getElementById('activityForm');
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+
+      const isGuestOverride = document.getElementById('form-is-guest').checked;
+      const startDateVal = document.getElementById('form-startDate').value;
+      const endDateVal = document.getElementById('form-endDate').value;
+      const isAllDay = document.getElementById('form-isAllDay').checked;
+      const isPrivateVal = document.getElementById('form-is-private').checked;
+      const startVal = document.getElementById('form-startTime').value;
+      const endVal = document.getElementById('form-endTime').value;
+      
+      const locationDropdownValue = document.getElementById('form-location').value;
+      let locationVal = locationDropdownValue;
+      if (locationDropdownValue === 'Lain-lain / Luar Kawasan') {
+        locationVal = document.getElementById('form-custom-location').value.trim();
+        if (!locationVal) {
+          document.getElementById('conflict-error-msg').innerHTML = 'Sila nyatakan lokasi terperinci!';
+          document.getElementById('conflict-error').classList.remove('hidden');
+          return;
+        }
+      }
+      
+      document.getElementById('conflict-error').classList.add('hidden');
+
+      if (startDateVal > endDateVal) {
+        document.getElementById('conflict-error-msg').innerHTML = 'Tarikh tamat tidak boleh sebelum tarikh mula!';
+        document.getElementById('conflict-error').classList.remove('hidden');
+        return;
+      }
+
+      const parseTS = (dStr, tStr, isEnd) => {
+        if (isEnd && (!tStr || tStr.trim() === '')) return new Date(`${dStr}T23:59:59`).getTime();
+        let t = tStr || '00:00'; if (t.split(':').length === 2) t += ':00'; 
+        return new Date(`${dStr}T${t}`).getTime();
+      };
+
+      const newStartTS = isAllDay ? parseTS(startDateVal, null, false) : parseTS(startDateVal, startVal, false);
+      const newEndTS = isAllDay ? parseTS(endDateVal, null, true) : parseTS(endDateVal, endVal, true);
+
+      if (!isAllDay && newStartTS >= newEndTS) {
+        document.getElementById('conflict-error-msg').innerHTML = 'Masa tamat mestilah selepas masa mula!';
+        document.getElementById('conflict-error').classList.remove('hidden');
+        return;
+      }
+
+      const otherActivities = activities.filter(a => a.id !== editingId);
+      for (let act of otherActivities) {
+        const actStartD = act.startDate || act.date;
+        const actEndD = act.endDate || act.date;
+        const extStartTS = act.isAllDay ? parseTS(actStartD, null, false) : parseTS(actStartD, act.startTime, false);
+        const extEndTS = act.isAllDay ? parseTS(actEndD, null, true) : parseTS(actEndD, act.endTime, true);
+        const isOverlapping = (newStartTS < extEndTS) && (newEndTS > extStartTS);
+        
+        if (isOverlapping && locationDropdownValue !== 'Lain-lain / Luar Kawasan' && act.location === locationVal) {
+           if (!isGuestOverride) {
+              const conflictUser = users.find(u => u.id === act.userId);
+              const deptName = conflictUser ? conflictUser.departmentName : 'Bahagian Lain';
+              document.getElementById('guest-override-container').classList.remove('hidden');
+              document.getElementById('conflict-error-msg').innerHTML = `
+                <div class="flex flex-col gap-1 w-full">
+                  <span class="text-sm uppercase tracking-wider font-black text-red-700">Slot Telah Ditempah!</span>
+                  <span class="text-xs leading-tight">Bilik mesyuarat ini telah ditempah. Jika anda hadir sebagai tetamu, tandakan amaran di bawah dan klik simpan semula.</span>
+                  <div class="bg-white p-3 rounded-lg border border-red-200 mt-2 shadow-sm w-full">
+                    <p class="text-[10px] text-black font-bold mb-2 border-b border-slate-200 pb-1">Tempahan Sedia Ada (Hos/Urusetia):</p>
+                    <ul class="text-xs text-slate-700 space-y-1">
+                      <li><b class="text-black">Oleh:</b> ${escapeHTML(deptName)}</li>
+                      <li><b class="text-black">Program:</b> ${escapeHTML(act.program)}</li>
+                      <li><b class="text-black">Waktu:</b> ${getDisplayDateTime(act)}</li>
+                    </ul>
+                  </div>
+                </div>
+              `;
+              document.getElementById('conflict-error').classList.remove('hidden');
+              document.getElementById('modal').scrollTo({ top: 0, behavior: 'smooth' });
+              return;
+           }
+        }
+      }
+
+      const dateObj = new Date(startDateVal);
+      const updatedData = {
+        id: editingId, userId: currentUserId, date: startDateVal, startDate: startDateVal, endDate: endDateVal,
+        day: dayNamesList[dateObj.getDay()], startTime: isAllDay ? '' : startVal, endTime: isAllDay ? '' : endVal,
+        isAllDay: isAllDay, program: document.getElementById('form-program').value, chairman: document.getElementById('form-chairman').value,
+        location: locationVal, officers: document.getElementById('form-officers').value, notes: document.getElementById('form-notes').value, isGuest: isGuestOverride,
+        isPrivate: isPrivateVal
+      };
+
+      const isExisting = activities.find(a => a.id === editingId);
+      
+      setAppStatus('Menyimpan ke pangkalan data...', 'normal');
+      try {
+        if (window.dbAPI) await window.dbAPI.saveActivity(updatedData);
+        if (isExisting) activities = activities.map(a => a.id === editingId ? updatedData : a);
+        else {
+          activities.push(updatedData);
+          activities.sort((a, b) => new Date(a.startDate || a.date) - new Date(b.startDate || b.date));
+        }
+        showToast('Rekod aktiviti berjaya disimpan.');
+        closeModal();
+        renderApp();
+      } catch(e) {
+        document.getElementById('conflict-error-msg').innerHTML = 'Pangkalan data ralat (Semak kebenaran Rules DB anda)';
+        document.getElementById('conflict-error').classList.remove('hidden');
+      }
+    }
+
+    function handleDelete() {
+        showConfirmModal(
+            "Padam Rekod Aktiviti?",
+            "Rekod ini akan dipadam secara kekal.",
+            async () => {
+                setAppStatus('Memadam data...', 'normal');
+                try {
+                    if (window.dbAPI) await window.dbAPI.deleteActivity(editingId);
+                    activities = activities.filter(a => a.id !== editingId);
+                    showToast('Rekod aktiviti berjaya dipadam.');
+                    closeModal();
+                    renderApp();
+                } catch (e) {
+                    setAppStatus('Gagal memadam dari pangkalan data', 'error');
+                }
+            }
+        );
+    }
+
+    function renderTetapan(container) {
+        const user = users.find(u => u.id === currentUserId);
+        const iconHTML = availableIcons.map(ic => `
+          <div onclick="selectTenantIcon('${ic}')" class="icon-picker-btn w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-100 ${user.icon === ic ? 'selected border-2 border-[#4169E1] bg-[#e6f0ff]' : 'border-2 border-transparent'}" data-icon="${ic}" title="Pilih ikon ini">
+             <i data-lucide="${ic}" class="w-6 h-6 sm:w-7 sm:h-7 text-[#4169E1]"></i>
+          </div>
+        `).join('');
+
+        container.innerHTML = `
+          <div class="bg-white border-none p-3 sm:p-6 rounded-lg overflow-y-auto flex-1 w-full">
+            <div class="max-w-3xl mx-auto space-y-4 sm:space-y-6">
+              
+              <div class="bg-[#ece9d8] p-4 sm:p-6 rounded-xl border border-[#a9a9a9] shadow-inner">
+                <h2 class="font-black text-sm sm:text-base text-[#4169E1] border-b-2 border-[#a9a9a9] pb-2 sm:pb-3 mb-4 sm:mb-5 flex items-center gap-2"><i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5"></i> Tetapan Profil Anda</h2>
+                <div class="flex flex-col gap-4 sm:gap-5">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                    <div class="md:col-span-2 flex flex-col gap-1.5">
+                      <label class="font-bold text-xs sm:text-sm text-black">Nama Bahagian / Unit:</label>
+                      <input type="text" id="setting-dept" value="${escapeHTML(user.departmentName)}" class="xp-input text-sm sm:text-base font-bold" title="Kemaskini nama bahagian anda" />
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                      <label class="font-bold text-xs sm:text-sm text-black">Nama Pengarah / Ketua Unit:</label>
+                      <input type="text" id="setting-director" value="${escapeHTML(user.directorName || '')}" class="xp-input text-sm sm:text-base" placeholder="Cth: Pengarah Kanan..." title="Kemaskini nama Pengarah/Ketua anda" />
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                      <label class="font-bold text-xs sm:text-sm text-black">Nama Setiausaha / Admin:</label>
+                      <input type="text" id="setting-secretary" value="${escapeHTML(user.secretaryName || '')}" class="xp-input text-sm sm:text-base" placeholder="Nama anda..." title="Kemaskini nama anda selaku pengguna sistem" />
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                      <label class="font-bold text-xs sm:text-sm text-black">No. Sambungan Telefon:</label>
+                      <input type="text" id="setting-phone" value="${escapeHTML(user.phoneExt || '')}" class="xp-input text-sm sm:text-base" placeholder="Cth: 4321 / 03-88884321" title="Kemaskini nombor telefon bahagian" />
+                    </div>
+                  </div>
+                  <div class="flex justify-end border-t border-[#a9a9a9] pt-3 sm:pt-4 mt-1 sm:mt-2">
+                     <button onclick="updateProfileDetails()" class="xp-button font-bold px-6 sm:px-8 py-2 text-xs sm:text-sm text-white bg-[#4169E1] border-[#27408B] shadow-sm w-full sm:w-auto justify-center" title="Simpan perubahan tetapan profil"><i data-lucide="save" class="w-4 h-4"></i> Simpan Profil</button>
+                  </div>
+                  <div class="mt-2 sm:mt-4">
+                    <label class="font-bold text-xs sm:text-sm text-black block mb-2">Pilih Ikon Profil Visual:</label>
+                    <div class="flex flex-wrap gap-2 sm:gap-3 p-3 sm:p-4 border border-[#a9a9a9] rounded-xl bg-white shadow-inner" id="tenant-icon-grid">${iconHTML}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-white p-4 sm:p-6 rounded-xl border border-red-300 shadow-sm bg-red-50/30">
+                <h2 class="font-black text-sm sm:text-base text-[#e53935] border-b-2 border-red-200 pb-2 sm:pb-3 mb-3 sm:mb-5 flex items-center gap-2"><i data-lucide="key" class="w-4 h-4 sm:w-5 sm:h-5"></i> Keselamatan (Kata Laluan)</h2>
+                <div class="flex flex-col gap-2">
+                  <label class="font-bold text-xs sm:text-sm text-black">Kata Laluan Baharu:</label>
+                  <div class="flex flex-wrap md:flex-nowrap gap-2 sm:gap-3">
+                     <input type="password" id="setting-password" placeholder="Masukkan kata laluan baharu..." class="xp-input text-sm sm:text-base font-bold" title="Taip kata laluan baru jika mahu ditukar" />
+                     <button onclick="updatePassword()" class="xp-button font-bold shrink-0 text-xs sm:text-sm px-4 sm:px-6 h-9 sm:h-10 border-[#a9a9a9] w-full sm:w-auto justify-center" title="Kemaskini kata laluan profil anda">Kemas Kini</button>
+                  </div>
+                  <p class="text-[10px] sm:text-xs text-[#555] font-semibold mt-1">Biarkan kosong jika tidak mahu menggunakan kata laluan (Bypass).</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+    }
+
+    async function updateProfileDetails() { 
+      const newDept = document.getElementById('setting-dept').value;
+      const newDirector = document.getElementById('setting-director').value;
+      const newSecretary = document.getElementById('setting-secretary').value;
+      const newPhone = document.getElementById('setting-phone').value;
+
+      const user = users.find(u => u.id === currentUserId);
+      if(user) {
+        if (currentDept === user.departmentName && newDept !== user.departmentName) {
+            currentDept = newDept;
+        }
+        user.departmentName = newDept; user.directorName = newDirector;
+        user.secretaryName = newSecretary; user.phoneExt = newPhone;
+        try {
+          if (window.dbAPI) await window.dbAPI.saveUser(user);
+          showToast("Profil pengguna berjaya dikemaskini.");
+          renderApp();
+        } catch(e) { setAppStatus('Gagal menyimpan pangkalan data', 'error'); }
+      }
+    }
+
+    async function updatePassword() {
+      const newPass = document.getElementById('setting-password').value;
+      const user = users.find(u => u.id === currentUserId);
+      if(user) {
+        user.password = newPass;
+        try {
+          if (window.dbAPI) await window.dbAPI.saveUser(user);
+          showToast("Kata laluan berjaya dikemaskini.");
+          document.getElementById('setting-password').value = '';
+        } catch(e) { setAppStatus('Gagal menyimpan pangkalan data', 'error'); }
+      }
+    }
+
+    async function selectTenantIcon(iconName) {
+      const user = users.find(u => u.id === currentUserId);
+      if(user) {
+        user.icon = iconName;
+        try {
+          if (window.dbAPI) await window.dbAPI.saveUser(user);
+          const grid = document.getElementById('tenant-icon-grid');
+          Array.from(grid.children).forEach(el => {
+             if(el.dataset.icon === iconName) el.className = "icon-picker-btn w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-100 selected border-2 border-[#4169E1] bg-[#e6f0ff]";
+             else el.className = "icon-picker-btn w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg cursor-pointer hover:bg-slate-100 border-2 border-transparent";
+          });
+          showToast("Ikon profil disimpan.");
+        } catch(e) { setAppStatus('Gagal menyimpan pangkalan data', 'error'); }
+      }
+    }
+
+    // --- FUNGSI PELAPORAN SURAT MENYURAT ---
+    function setSuratReportMode(mode) {
+        suratReportMode = mode;
+        renderApp();
+    }
+
+    function ubahSuratReportDate(step) {
+        if (suratReportMode === 'weekly') {
+            suratReportDate = new Date(suratReportDate.getTime() + step * 7 * 24 * 60 * 60 * 1000);
+        } else {
+            suratReportDate.setMonth(suratReportDate.getMonth() + step);
+        }
+        renderApp();
+    }
+
+    function renderSuratLaporan(container) {
+        let titleText = '';
+        let startD, endD;
+        let filteredDocs = [];
+
+        if (suratReportMode === 'weekly') {
+            const weekStart = getStartOfWeek(suratReportDate);
+            const weekDays = getDaysOfWeek(weekStart);
+            startD = weekDays[0].dateStr;
+            endD = weekDays[6].dateStr;
+            titleText = `Laporan Pendaftaran Surat Mingguan (${weekDays[0].displayDate} - ${weekDays[6].displayDate} ${startD.substring(0,4)})`;
+            
+            filteredDocs = documents.filter(d => {
+                const dDate = d.tarikhDaftar.split('T')[0];
+                return dDate >= startD && dDate <= endD;
+            });
+        } else {
+            const y = suratReportDate.getFullYear();
+            const m = suratReportDate.getMonth();
+            titleText = `Laporan Pendaftaran Surat Bulanan (${monthNamesList[m]} ${y})`;
+            
+            filteredDocs = documents.filter(d => {
+                const dDate = new Date(d.tarikhDaftar);
+                return dDate.getFullYear() === y && dDate.getMonth() === m;
+            });
+        }
+
+        // Tapis Surat Masuk
+        const dMasuk = filteredDocs.filter(d => 
+            d.status !== 'Dibatalkan' &&
+            ((d.lokasiSemasa === currentDept && d.pendaftar !== currentDept) || 
+            (d.pendaftar === currentDept && d.aliran === 'Dokumen / Surat Masuk'))
+        ).map(d => ({ ...d, reportType: 'masuk' }));
+
+        // Tapis Surat Keluar (dan gabungkan rekod berkelompok)
+        const dKeluarMap = {};
+        filteredDocs.filter(d => d.status !== 'Dibatalkan' && d.pendaftar === currentDept && d.aliran !== 'Dokumen / Surat Masuk').forEach(d => {
+            if(!dKeluarMap[d.noRuj]) {
+                dKeluarMap[d.noRuj] = { ...d, allDestinasi: [d.lokasiSemasa], reportType: 'keluar' };
+            } else {
+                if(!dKeluarMap[d.noRuj].allDestinasi.includes(d.lokasiSemasa)) {
+                    dKeluarMap[d.noRuj].allDestinasi.push(d.lokasiSemasa);
+                }
+            }
+        });
+        const dKeluar = Object.values(dKeluarMap);
+
+        // Gabungkan Masuk dan Keluar ke dalam 1 senarai, susun mengikut tarikh pendaftaran
+        const allDocs = [...dMasuk, ...dKeluar].sort((a,b) => new Date(b.tarikhDaftar) - new Date(a.tarikhDaftar));
+
+        // Group dokumen mengikut Hari (Tarikh)
+        const groupedByDate = {};
+        allDocs.forEach(d => {
+            const dateStr = d.tarikhDaftar.split('T')[0];
+            if(!groupedByDate[dateStr]) groupedByDate[dateStr] = [];
+            groupedByDate[dateStr].push(d);
+        });
+
+        let tbodyHtml = '';
+        const sortedDates = Object.keys(groupedByDate).sort((a,b) => new Date(b) - new Date(a));
+        
+        if (sortedDates.length === 0) {
+            tbodyHtml = `<tr><td colspan=\"5\" class=\"border border-[#a9a9a9] p-5 text-center font-semibold italic text-gray-500\">Tiada sebarang rekod didaftarkan pada tempoh ini.</td></tr>`;
+        } else {
+            sortedDates.forEach(dateStr => {
+                const docsForDate = groupedByDate[dateStr];
+                const dObj = new Date(dateStr);
+                const dayName = dayNamesList[dObj.getDay()];
+                const displayDate = formatDateOnly(dateStr); 
+                
+                docsForDate.forEach((d, idx) => {
+                    const isMasuk = d.reportType === 'masuk';
+                    const bgClass = isMasuk ? 'bg-red-50' : 'bg-blue-50';
+                    const borderClass = isMasuk ? 'border-red-300' : 'border-blue-300';
+                    const textTypeClass = isMasuk ? 'text-red-700' : 'text-blue-700';
+                    const typeLabel = isMasuk ? 'SURAT MASUK / DITERIMA' : 'SURAT KELUAR / EDARAN';
+                    
+                    let destLabel = '';
+                    let destVal = '';
+                    if (isMasuk) {
+                        destLabel = 'DARI PENGHANTAR:';
+                        destVal = d.pendaftar === currentDept ? currentDept : d.pendaftar;
+                    } else {
+                        destLabel = 'DIEDAR KEPADA:';
+                        destVal = d.allDestinasi ? d.allDestinasi.join(', ') : d.lokasiSemasa;
+                    }
+                    
+                    const statusVal = isMasuk ? d.status : (d.allDestinasi && d.allDestinasi.length > 1 ? 'Berkelompok' : d.status);
+                    
+                    let dateCell = '';
+                    if (idx === 0) {
+                        dateCell = `<td class="border border-[#a9a9a9] p-2 sm:p-3 text-center text-xs sm:text-sm font-black align-top bg-gray-100" rowspan="${docsForDate.length}">
+                            <div class="uppercase text-[9px] sm:text-[11px] text-gray-500 mb-0.5 font-bold tracking-wider">${dayName}</div>
+                            <div>${displayDate}</div>
+                        </td>`;
+                    }
+                    
+                    // Untuk memastikan warna latar & border dicetak (Print mode)
+                    const trStyle = `print-color-adjust: exact; -webkit-print-color-adjust: exact;`;
+                    
+                    tbodyHtml += `
+                        <tr style="${trStyle}">
+                            ${dateCell}
+                            <td class="p-2 sm:p-3 align-top border-b-[2px] border-t-[2px] border-l-[2px] ${borderClass} ${bgClass}">
+                                <div class="font-black text-[9px] sm:text-[10px] ${textTypeClass} mb-1 uppercase tracking-wider">${typeLabel}</div>
+                                <div class="font-bold text-black text-[11px] sm:text-xs mb-1.5">${d.noRuj}</div>
+                                <div class="text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded inline-block text-white ${d.klasifikasi === 'Sulit' ? 'bg-red-600' : (d.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${d.klasifikasi || 'Biasa'}</div>
+                            </td>
+                            <td class="p-2 sm:p-3 align-top border-b-[2px] border-t-[2px] ${borderClass} ${bgClass}">
+                                <div class="font-bold text-[11px] sm:text-sm text-black">${escapeHTML(d.tajuk)}</div>
+                            </td>
+                            <td class="p-2 sm:p-3 align-top border-b-[2px] border-t-[2px] ${borderClass} ${bgClass}">
+                                <div class="text-[9px] sm:text-[10px] text-gray-600 uppercase font-bold">${destLabel}</div>
+                                <div class="text-[11px] sm:text-xs font-semibold text-black">${destVal}</div>
+                            </td>
+                            <td class="p-2 sm:p-3 text-center align-top font-bold text-[11px] sm:text-xs border-b-[2px] border-t-[2px] border-r-[2px] ${borderClass} ${bgClass}">
+                                ${statusVal}
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        container.innerHTML = `
+            <div class="flex flex-col gap-3 sm:gap-4 no-print mb-4 sm:mb-6 border-b-2 border-[#a9a9a9] pb-4 sm:pb-5 w-full shrink-0">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div class="flex items-center gap-2 sm:gap-4 flex-wrap">
+                        <span class="font-bold text-xs sm:text-sm text-[#4169E1] bg-blue-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded border border-blue-200">Format Paparan:</span>
+                        <div class="flex gap-2">
+                            <button onclick="setSuratReportMode('weekly')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 ${suratReportMode==='weekly'?'font-extrabold bg-[#e6f0ff] border-[#4169E1] text-[#4169E1]':''}">Mingguan</button>
+                            <button onclick="setSuratReportMode('monthly')" class="xp-button text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4 ${suratReportMode==='monthly'?'font-extrabold bg-[#e6f0ff] border-[#4169E1] text-[#4169E1]':''}">Bulanan</button>
+                        </div>
+                        <div class="w-px h-6 sm:h-8 bg-[#a9a9a9] mx-1 sm:mx-2 hidden md:block"></div>
+                        <div class="flex items-center gap-1 xp-panel p-1 bg-white">
+                            <button onclick="ubahSuratReportDate(-1)" class="xp-button h-7 sm:h-8 w-8 sm:w-10 p-0" title="Tempoh Sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4 sm:w-5 sm:h-5 text-[#4169E1]"></i></button>
+                            <span class="font-bold text-[#4169E1] text-[10px] sm:text-xs px-2 sm:px-4 min-w-[150px] sm:min-w-[200px] text-center">${titleText.split('(')[1].replace(')','')}</span>
+                            <button onclick="ubahSuratReportDate(1)" class="xp-button h-7 sm:h-8 w-8 sm:w-10 p-0" title="Tempoh Seterusnya"><i data-lucide="chevron-right" class="w-4 h-4 sm:w-5 sm:h-5 text-[#4169E1]"></i></button>
+                        </div>
+                    </div>
+                    <button onclick="enterPreviewMode()" class="xp-button font-bold text-black h-8 sm:h-10 px-4 sm:px-6 shadow-sm w-full lg:w-auto mt-2 lg:mt-0 justify-center" title="Jana PDF untuk laporan ini"><i data-lucide=\"printer\" class=\"w-4 h-4 sm:w-5 sm:h-5 text-black\"></i> Cetak / Jana PDF</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-3 sm:p-5 md:p-8 flex-1 overflow-y-auto relative shadow-inner printable-container rounded-xl border border-[#a9a9a9] w-full" id="print-area">
+                <div class="text-center mb-6 sm:mb-8 report-header">
+                    <h2 class="font-black text-lg sm:text-xl md:text-2xl uppercase text-black tracking-wide">Rekod Pendaftaran Surat Keluar & Masuk</h2>
+                    <h3 class="font-bold text-base sm:text-lg md:text-xl uppercase text-black mt-1">${escapeHTML(currentDept)}</h3>
+                    <p class="mt-2 text-black font-semibold text-xs sm:text-sm">${titleText}</p>
+                </div>
+
+                <div class="mb-6 sm:mb-8 w-full min-w-[700px] overflow-x-auto">
+                    <table class="w-full border-collapse border border-[#a9a9a9] text-[11px] sm:text-sm print-table border-spacing-y-2" style="border-spacing: 0 4px;">
+                        <thead>
+                            <tr class="bg-gray-300" style="print-color-adjust: exact; -webkit-print-color-adjust: exact;">
+                                <th class="border border-[#a9a9a9] p-2 sm:p-3 font-extrabold text-center w-[12%]">TARIKH</th>
+                                <th class="border border-[#a9a9a9] p-2 sm:p-3 font-extrabold text-left w-[20%]">JENIS & NO. RUJUKAN</th>
+                                <th class="border border-[#a9a9a9] p-2 sm:p-3 font-extrabold text-left w-[35%]">TAJUK SURAT / PERKARA</th>
+                                <th class="border border-[#a9a9a9] p-2 sm:p-3 font-extrabold text-left w-[20%]">DARI / KEPADA</th>
+                                <th class="border border-[#a9a9a9] p-2 sm:p-3 font-extrabold text-center w-[13%]">STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tbodyHtml}</tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-6 sm:mt-8 pt-4 border-t border-dashed border-gray-400 text-[10px] sm:text-xs text-center text-gray-500 italic report-footer">
+                    Laporan ini dijana oleh Sistem Pengurusan Kalendar & Rekod Surat pada ${formatDateTime(new Date().toISOString())}
+                </div>
+            </div>
+        `;
+    }
+
+    function updateBadges() {
+        if(!currentDept) return;
+        
+        // Inbox Badge
+        const countInbox = documents.filter(d => d.lokasiSemasa === currentDept && d.status === 'Dihantar' && d.pendaftar !== currentDept).length;
+        const bInbox = document.getElementById('badge-inbox');
+        if(bInbox) {
+            bInbox.innerText = countInbox;
+            if(countInbox > 0) bInbox.classList.remove('hidden');
+            else bInbox.classList.add('hidden');
+        }
+
+        // Outbox Badge
+        const outboxDocs = documents.filter(d => d.pendaftar === currentDept && !['Selesai', 'Dibatalkan'].includes(d.status) && d.aliran !== 'Dokumen / Surat Masuk');
+        const outboxGroups = new Set(outboxDocs.map(d => d.noRuj)).size;
+        const bOutbox = document.getElementById('badge-outbox');
+        if(bOutbox) {
+            bOutbox.innerText = outboxGroups;
+            if(outboxGroups > 0) bOutbox.classList.remove('hidden');
+            else bOutbox.classList.add('hidden');
+        }
+
+        // Trash Badge
+        const trashDocs = documents.filter(d => d.pendaftar === currentDept && d.status === 'Dibatalkan');
+        const trashGroups = new Set(trashDocs.map(d => d.noRuj)).size;
+        const bTrash = document.getElementById('badge-trash');
+        if(bTrash) {
+            bTrash.innerText = trashGroups;
+            if(trashGroups > 0) bTrash.classList.remove('hidden');
+            else bTrash.classList.add('hidden');
+        }
+
+        // Main Tab Badge (Combined)
+        const bMain = document.getElementById('badge-surat-main');
+        if(bMain) {
+            const totalMain = countInbox + outboxGroups;
+            bMain.innerText = totalMain;
+            if(totalMain > 0) bMain.classList.remove('hidden');
+            else bMain.classList.add('hidden');
+        }
+    }
+
+    function renderSuratDashboard(container) {
+        const year = suratSelectedDate.getFullYear();
+        const month = suratSelectedDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        let calHtml = '';
+        for (let i = 0; i < firstDay; i++) calHtml += `<div class="p-1 surat-cal-day empty"></div>`;
+        for (let i = 1; i <= daysInMonth; i++) {
+            const thisDate = new Date(year, month, i);
+            const isSelected = checkSamaHari(thisDate, suratSelectedDate);
+            const isToday = checkSamaHari(thisDate, new Date());
+            
+            let classes = "p-1.5 sm:p-2 flex flex-col items-center justify-center text-[10px] sm:text-xs surat-cal-day ";
+            if(isSelected) classes += "active shadow-sm";
+            else if(isToday) classes += "bg-blue-50 text-[#4169E1] font-extrabold border border-blue-200";
+
+            const adaSurat = documents.some(d => checkSamaHari(new Date(d.tarikhDaftar), thisDate) && (d.lokasiSemasa === currentDept || d.pendaftar === currentDept) && d.status !== 'Dibatalkan');
+            const dot = adaSurat ? `<div class="w-1.5 h-1.5 bg-red-600 rounded-full mt-0.5"></div>` : `<div class="w-1.5 h-1.5 mt-0.5"></div>`;
+
+            calHtml += `<div class="${classes}" onclick="setSuratDate(${year}, ${month}, ${i})" title="Klik untuk papar surat pada tarikh ini"><span>${i}</span>${dot}</div>`;
+        }
+
+        const dMasuk = documents.filter(d => 
+            checkSamaHari(new Date(d.tarikhDaftar), suratSelectedDate) && 
+            d.status !== 'Dibatalkan' &&
+            (
+                (d.lokasiSemasa === currentDept && d.pendaftar !== currentDept) || 
+                (d.pendaftar === currentDept && d.aliran === 'Dokumen / Surat Masuk')
+            )
+        );
+        
+        const dKeluarMap = {};
+        documents.forEach(d => {
+            if (d.status === 'Dibatalkan') return;
+
+            if (!checkSamaHari(new Date(d.tarikhDaftar), suratSelectedDate)) {
+                const wasReturnedToday = d.timeline.some(t => checkSamaHari(new Date(t.tarikh), suratSelectedDate) && t.tindakan === 'Dikembalikan' && t.oleh === currentDept);
+                if(!wasReturnedToday) return;
+            }
+
+            const isSentNormally = checkSamaHari(new Date(d.tarikhDaftar), suratSelectedDate) && d.pendaftar === currentDept && d.aliran !== 'Dokumen / Surat Masuk';
+            const isReturned = d.timeline.some(t => checkSamaHari(new Date(t.tarikh), suratSelectedDate) && t.tindakan === 'Dikembalikan' && t.oleh === currentDept);
+
+            if (isSentNormally || isReturned) {
+                const key = d.noRuj + '|' + d.tajuk;
+                if(!dKeluarMap[key]) {
+                    dKeluarMap[key] = { ...d, allDestinasi: [d.lokasiSemasa], dipulangkan: isReturned, baseId: d.id };
+                } else {
+                    if(!dKeluarMap[key].allDestinasi.includes(d.lokasiSemasa)) {
+                        dKeluarMap[key].allDestinasi.push(d.lokasiSemasa);
+                    }
+                    if(isReturned) dKeluarMap[key].dipulangkan = true;
+                }
+            }
+        });
+
+        const dKeluar = Object.values(dKeluarMap).sort((a,b) => new Date(b.tarikhDaftar) - new Date(a.tarikhDaftar));
+
+        const buildList = (list, type) => list.length === 0 ? `<div class="text-center text-[#888] text-[11px] sm:text-xs italic py-6 sm:py-8">Tiada rekod pada tarikh ini.</div>` : list.map(d => {
+            const destText = d.allDestinasi ? d.allDestinasi.join(', ') : d.lokasiSemasa;
+            let badgeStatus = d.status;
+            let labelBawah = '';
+            
+            if (type === 'masuk') {
+                if (d.pendaftar === currentDept) {
+                    badgeStatus = 'Fail / Simpanan Rekod';
+                    labelBawah = `<i data-lucide="archive" class="w-3 h-3 inline text-green-600"></i> Disimpan Oleh: ${currentDept}`;
+                } else {
+                    labelBawah = `<i data-lucide="arrow-down-left" class="w-3 h-3 inline text-green-600"></i> Dari: ${d.pendaftar}`;
+                }
+            } else {
+                if (d.dipulangkan) {
+                    badgeStatus = 'Dipulangkan Semula';
+                    labelBawah = `<i data-lucide="corner-up-left" class="w-3 h-3 inline text-orange-600"></i> Kepada Penghantar Asal: ${d.pendaftar}`;
+                } else {
+                    badgeStatus = d.allDestinasi && d.allDestinasi.length > 1 ? 'Berkelompok' : d.status;
+                    labelBawah = `<i data-lucide="arrow-up-right" class="w-3 h-3 inline text-blue-600"></i> Kepada: ${destText}`;
+                }
+            }
+
+            return `
+            <div class="border border-[#a9a9a9] bg-white rounded-lg p-2.5 sm:p-3 mb-2 sm:mb-3 shadow-sm cursor-pointer hover:bg-[#e6f0ff] transition" onclick="jumpToSuratJejak('${d.baseId || d.id}')" title="Klik untuk papar pergerakan dan butiran dokumen ini">
+                <div class="flex justify-between items-center mb-1 sm:mb-1.5">
+                    <span class="font-bold text-[#4169E1] text-[10px] sm:text-xs">${d.noRuj}</span>
+                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${d.dipulangkan ? 'bg-orange-100 text-orange-800' : 'bg-gray-200 text-gray-800'}">${badgeStatus}</span>
+                </div>
+                <p class="text-[11px] sm:text-xs text-black font-bold truncate">${escapeHTML(d.tajuk)}</p>
+                <div class="flex justify-between items-end mt-1.5 gap-2">
+                    <p class="text-[8px] sm:text-[9px] text-[#555] font-semibold truncate flex-1">${labelBawah}</p>
+                    <span class="text-[8px] sm:text-[9px] font-bold text-white px-1.5 py-0.5 rounded shrink-0 ${d.klasifikasi === 'Sulit' ? 'bg-red-600' : (d.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${d.klasifikasi || 'Biasa'}</span>
+                </div>
+            </div>
+            `;
+        }).join('');
+
+        container.innerHTML = `
+            <div class="flex flex-col lg:flex-row gap-3 sm:gap-4 h-full pb-2 overflow-hidden w-full">
+                
+                <div class="flex-1 flex flex-col md:flex-row lg:flex-col xl:flex-row gap-3 sm:gap-4 min-h-0 overflow-hidden order-2 lg:order-1 w-full">
+                    <div class="flex-1 min-w-0 min-h-[30vh] xl:min-h-0 xp-panel bg-[#ece9d8] flex flex-col p-3 sm:p-4 shadow-inner border-t-[6px] border-t-red-600 rounded-t-xl">
+                        <h3 class="font-black text-sm sm:text-base text-red-700 mb-1 sm:mb-2 flex items-center gap-2 shrink-0"><i data-lucide="log-in" class="w-4 h-4 sm:w-5 sm:h-5"></i> Rekod Surat Masuk</h3>
+                        <p class="text-[9px] sm:text-[10px] text-[#555] font-bold mb-2 sm:mb-3 border-b-2 border-[#a9a9a9] pb-1.5 sm:pb-2 shrink-0">Tarikh: <span class="text-black">${suratSelectedDate.toLocaleDateString('ms-MY')}</span></p>
+                        <div class="overflow-y-auto flex-1 pr-1 w-full relative">
+                            <div class="absolute w-full pb-2">${buildList(dMasuk, 'masuk')}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 min-w-0 min-h-[30vh] xl:min-h-0 xp-panel bg-[#ece9d8] flex flex-col p-3 sm:p-4 shadow-inner border-t-[6px] border-t-blue-600 rounded-t-xl mt-2 md:mt-0 lg:mt-2 xl:mt-0">
+                        <h3 class="font-black text-sm sm:text-base text-[#4169E1] mb-1 sm:mb-2 flex items-center gap-2 shrink-0"><i data-lucide="log-out" class="w-4 h-4 sm:w-5 sm:h-5"></i> Rekod Surat Keluar</h3>
+                        <p class="text-[9px] sm:text-[10px] text-[#555] font-bold mb-2 sm:mb-3 border-b-2 border-[#a9a9a9] pb-1.5 sm:pb-2 shrink-0">Tarikh: <span class="text-black">${suratSelectedDate.toLocaleDateString('ms-MY')}</span></p>
+                        <div class="overflow-y-auto flex-1 pr-1 w-full relative">
+                            <div class="absolute w-full pb-2">${buildList(dKeluar, 'keluar')}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-[260px] xp-panel bg-white flex flex-col p-2.5 sm:p-3 shadow-inner order-1 lg:order-2 shrink-0 h-max lg:max-h-full lg:overflow-y-auto hide-scrollbar">
+                    <div class="flex justify-between items-center mb-2 sm:mb-3 pb-2 border-b-2 border-[#a9a9a9] shrink-0">
+                        <button onclick="ubahBulanSurat(-1)" class="xp-button px-1.5 sm:px-2 py-0.5" title="Bulan sebelumnya"><i data-lucide="chevron-left" class="w-3 h-3 sm:w-4 sm:h-4 text-[#4169E1]"></i></button>
+                        <span class="font-black text-[10px] sm:text-[11px] text-[#4169E1] uppercase tracking-wide">${monthNamesList[month]} ${year}</span>
+                        <button onclick="ubahBulanSurat(1)" class="xp-button px-1.5 sm:px-2 py-0.5" title="Bulan seterusnya"><i data-lucide="chevron-right" class="w-3 h-3 sm:w-4 sm:h-4 text-[#4169E1]"></i></button>
+                    </div>
+                    <div class="grid grid-cols-7 gap-0.5 text-center text-[9px] sm:text-[10px] font-bold text-[#555] mb-1 sm:mb-1.5 uppercase shrink-0">
+                        <div>Ahd</div><div>Isn</div><div>Sel</div><div>Rab</div><div>Kha</div><div>Jum</div><div>Sab</div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-0.5 text-center shrink-0">${calHtml}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    function ubahBulanSurat(step) { suratSelectedDate.setMonth(suratSelectedDate.getMonth() + step); renderApp(); }
+    function setSuratDate(y, m, d) { suratSelectedDate = new Date(y, m, d); renderApp(); }
+    window.jumpToSuratJejak = function(baseId) { changeView('surat-jejak'); setTimeout(() => paparkanJejakGroupById(baseId), 100); };
+
+    function renderSuratInbox(container) {
+        const myDocs = documents.filter(d => d.lokasiSemasa === currentDept && d.pendaftar !== currentDept && d.status !== 'Dibatalkan').sort((a,b) => new Date(b.tarikhDaftar) - new Date(a.tarikhDaftar));
+        
+        if(myDocs.length === 0) {
+            container.innerHTML = `<div class="flex flex-col items-center justify-center h-[50vh] text-[#888]"><i data-lucide="inbox" class="w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 text-[#a9a9a9]"></i><p class="text-sm sm:text-base font-bold">Peti masuk anda kosong buat masa ini.</p></div>`;
+            return;
+        }
+
+        container.innerHTML = `<div class="flex flex-col gap-3 sm:gap-4 pb-4 overflow-y-auto flex-1 w-full">` + myDocs.map(doc => {
+            const isBaru = doc.status === 'Dihantar';
+            const bgClass = isBaru ? 'bg-[#ffffe1] border-[#4169E1] shadow-[0_4px_10px_rgba(65,105,225,0.15)]' : 'bg-white border-[#a9a9a9] shadow-sm';
+            
+            let actionBtn = '';
+            if(isBaru) {
+                actionBtn = `<button onclick="terimaSurat('${doc.id}')" class="xp-button font-bold text-white bg-[#008000] border-[#005000] px-4 sm:px-5 py-1.5 sm:py-2 text-[11px] sm:text-sm w-full sm:w-auto justify-center" title="Klik untuk sahkan penerimaan dokumen ini"><i data-lucide="check-square" class="w-3 h-3 sm:w-4 sm:h-4"></i> Sahkan Penerimaan</button>`;
+            } else if (['Diterima', 'KIV'].includes(doc.status)) {
+                actionBtn = `
+                    <div class="flex flex-col items-end gap-1.5 w-full sm:w-auto">
+                        <button onclick="bukaModalTindakanSurat('${doc.id}', false)" class="xp-button font-bold text-white bg-[#4169E1] border-[#27408B] px-4 sm:px-5 py-1.5 sm:py-2 text-[11px] sm:text-sm w-full sm:w-auto justify-center" title="Rekod tindakan ke atas surat ini"><i data-lucide="file-check-2" class="w-3 h-3 sm:w-4 sm:h-4"></i> Ambil Tindakan</button>
+                        ${doc.status === 'KIV' ? `<button onclick="bukaModalTindakanSurat('${doc.id}', true)" class="text-[10px] sm:text-[11px] font-bold text-[#4169E1] hover:text-[#e53935] hover:underline flex items-center justify-center sm:justify-end gap-1 mt-1 w-full sm:w-auto" title="Pinda status KIV"><i data-lucide="edit-3" class="w-3 h-3"></i> Pinda KIV (Pembetulan)</button>` : ''}
+                    </div>
+                `;
+            } else {
+                actionBtn = `
+                    <div class="flex flex-col items-end gap-1.5 w-full sm:w-auto">
+                        <span class="text-[11px] sm:text-xs font-bold text-[#555] bg-gray-200 px-3 py-1 sm:py-1.5 rounded border border-[#a9a9a9] w-full sm:w-auto text-center"><i data-lucide="check-circle" class="w-3 h-3 mr-1 text-green-600"></i> ${doc.status}</span>
+                        <button onclick="bukaModalTindakanSurat('${doc.id}', true)" class="text-[10px] sm:text-[11px] font-bold text-[#4169E1] hover:text-[#e53935] hover:underline flex items-center justify-center sm:justify-end gap-1 mt-1 w-full sm:w-auto" title="Ubah tindakan yang telah direkodkan"><i data-lucide="edit-3" class="w-3 h-3"></i> Pinda Tindakan (Pembetulan)</button>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="xp-panel p-3 sm:p-4 md:p-5 ${bgClass} flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer" onclick="jumpToSuratJejak('${doc.id}')" title="Klik untuk lihat jejak">
+                    <div class="flex-1 w-full mb-3 md:mb-0">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2 flex-wrap">
+                            <span class="font-black text-[#4169E1] text-xs sm:text-sm bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${doc.noRuj}</span>
+                            ${isBaru ? `<span class="text-[9px] sm:text-[10px] font-black tracking-wide text-white bg-red-600 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full animate-pulse shadow-sm">BARU</span>` : ''}
+                            <span class="text-[9px] sm:text-[10px] font-bold text-white px-1.5 sm:px-2 py-0.5 rounded ${doc.klasifikasi === 'Sulit' ? 'bg-red-600' : (doc.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${doc.klasifikasi || 'Biasa'}</span>
+                        </div>
+                        <h4 class="text-sm sm:text-base md:text-lg font-bold text-black mb-1.5 sm:mb-2">${escapeHTML(doc.tajuk)}</h4>
+                        <div class="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-[10px] sm:text-xs text-[#555] font-semibold mt-1.5 sm:mt-2">
+                            <span class="bg-[#ece9d8] px-2 py-1 rounded border border-[#ccc] w-max"><i data-lucide="tag" class="w-3 h-3 sm:w-3.5 sm:h-3.5 inline mr-1"></i> ${doc.jenis}</span>
+                            <span class="bg-[#ece9d8] px-2 py-1 rounded border border-[#ccc] w-max"><i data-lucide="building" class="w-3 h-3 sm:w-3.5 sm:h-3.5 inline mr-1"></i> Dari: <span class="text-black">${doc.pendaftar}</span></span>
+                            ${doc.tarikhTerima ? `<span class="text-green-700 bg-green-50 px-2 py-1 rounded border border-green-200 w-max"><i data-lucide="calendar-check" class="w-3 h-3 sm:w-3.5 sm:h-3.5 inline mr-1"></i> Diterima: ${formatDateOnly(doc.tarikhTerima)}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:items-end gap-2 sm:gap-3 shrink-0 border-t md:border-t-0 md:border-l border-[#a9a9a9] pt-2 sm:pt-3 md:pt-0 md:pl-5 w-full md:w-auto" onclick="event.stopPropagation()">
+                        <span class="text-[10px] sm:text-xs text-[#888] font-bold">Dihantar Pada: <span class="text-black block md:inline">${formatDateTime(doc.tarikhDaftar)}</span></span>
+                        ${actionBtn}
+                    </div>
+                </div>
+            `;
+        }).join('') + `</div>`;
+    }
+
+    function renderSuratOutbox(container) {
+        const outboxDocs = documents.filter(d => d.pendaftar === currentDept && !['Selesai', 'Dibatalkan'].includes(d.status) && d.aliran !== 'Dokumen / Surat Masuk');
+        
+        const grouped = {};
+        outboxDocs.forEach(d => {
+            const key = d.noRuj + '|' + d.tajuk;
+            if(!grouped[key]) grouped[key] = { ...d, allDocs: [], baseId: d.id };
+            grouped[key].allDocs.push(d);
+        });
+        
+        const list = Object.values(grouped).sort((a,b) => new Date(b.tarikhDaftar) - new Date(a.tarikhDaftar));
+
+        if(list.length === 0) {
+            container.innerHTML = `<div class="flex flex-col items-center justify-center h-[50vh] text-[#888]"><i data-lucide="send" class="w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 text-[#a9a9a9]"></i><p class="text-sm sm:text-base font-bold">Tiada rekod surat yang sedang dalam tindakan (Peti Keluar Kosong).</p></div>`;
+            return;
+        }
+
+        container.innerHTML = `<div class="flex flex-col gap-3 sm:gap-4 pb-4 overflow-y-auto flex-1 w-full">` + list.map(group => {
+            let statusHtml = group.allDocs.map(d => `<div class="text-[10px] sm:text-[11px] font-bold mt-1 ${d.status === 'KIV' ? 'text-orange-600' : (d.status === 'Diterima' ? 'text-green-600' : 'text-blue-600')}"><span class="text-black">${d.lokasiSemasa}:</span> ${d.status}</div>`).join('');
+
+            return `
+                <div class="xp-panel p-3 sm:p-4 md:p-5 bg-white border-[#a9a9a9] shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer hover:bg-blue-50 transition" onclick="jumpToSuratJejak('${group.baseId}')" title="Klik untuk lihat paparan jejak bagi rekod ini">
+                    <div class="flex-1 w-full mb-3 md:mb-0">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2 flex-wrap">
+                            <span class="font-black text-[#4169E1] text-xs sm:text-sm bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${group.noRuj}</span>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-white px-1.5 sm:px-2 py-0.5 rounded ${group.klasifikasi === 'Sulit' ? 'bg-red-600' : (group.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')}">${group.klasifikasi || 'Biasa'}</span>
+                        </div>
+                        <h4 class="text-sm sm:text-base md:text-lg font-bold text-black mb-1.5 sm:mb-2">${escapeHTML(group.tajuk)}</h4>
+                        <div class="flex flex-col text-[10px] sm:text-xs text-[#555] font-semibold mt-1.5 sm:mt-2 bg-gray-50 p-2 sm:p-3 rounded-lg border border-gray-200 w-full md:w-3/4">
+                            <span class="mb-1 sm:mb-1.5 text-black font-extrabold border-b border-gray-300 pb-1">Status Tindakan Penerima:</span>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">${statusHtml}</div>
+                        </div>
+                    </div>
+                    <div class="mt-2 sm:mt-4 md:mt-0 flex flex-col sm:items-end gap-2 shrink-0 border-t md:border-t-0 md:border-l border-[#a9a9a9] pt-2 sm:pt-3 md:pt-0 md:pl-5 w-full md:w-auto">
+                        <span class="text-[10px] sm:text-xs text-[#888] font-bold">Dihantar Pada: <span class="text-black block md:inline">${formatDateTime(group.tarikhDaftar)}</span></span>
+                        <button onclick="event.stopPropagation(); jumpToSuratJejak('${group.baseId}')" class="xp-button font-bold text-[#4169E1] bg-[#e6f0ff] border-[#4169E1] px-4 sm:px-5 py-1.5 sm:py-2 text-[11px] sm:text-xs mt-2 sm:mt-3 w-full sm:w-auto justify-center" title="Buka paparan terperinci jejak dokumen ini"><i data-lucide="route" class="w-3 h-3 sm:w-4 sm:h-4"></i> Jejak Terperinci</button>
+                    </div>
+                </div>
+            `;
+        }).join('') + `</div>`;
+    }
+
+    function renderSuratTrash(container) {
+        const trashDocs = documents.filter(d => d.pendaftar === currentDept && d.status === 'Dibatalkan');
+        const grouped = {};
+        trashDocs.forEach(d => {
+            const key = d.noRuj + '|' + d.tajuk;
+            if(!grouped[key]) grouped[key] = { ...d, allDocs: [], baseId: d.id };
+            grouped[key].allDocs.push(d);
+        });
+        const list = Object.values(grouped).sort((a,b) => new Date(b.tarikhDaftar) - new Date(a.tarikhDaftar));
+
+        if(list.length === 0) {
+            container.innerHTML = `<div class="flex flex-col items-center justify-center h-[50vh] text-[#888]"><i data-lucide="trash-2" class="w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 text-[#a9a9a9]"></i><p class="text-sm sm:text-base font-bold">Tiada rekod surat yang dibatalkan / Tong sampah kosong.</p></div>`;
+            return;
+        }
+
+        container.innerHTML = `<div class="flex flex-col gap-3 sm:gap-4 pb-4 overflow-y-auto flex-1 w-full">` + list.map(group => {
+            return `
+                <div class="xp-panel p-3 sm:p-4 md:p-5 bg-red-50 border-red-300 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div class="flex-1 w-full mb-3 md:mb-0">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2 flex-wrap">
+                            <span class="font-black text-gray-500 line-through text-xs sm:text-sm bg-gray-100 px-2 py-0.5 rounded border border-gray-300">${group.noRuj}</span>
+                            <span class="text-[9px] sm:text-[10px] font-black tracking-wide text-white bg-red-600 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded shadow-sm">DIBATALKAN</span>
+                        </div>
+                        <h4 class="text-sm sm:text-base md:text-lg font-bold text-gray-600 mb-1.5 sm:mb-2">${escapeHTML(group.tajuk)}</h4>
+                    </div>
+                    <div class="mt-2 sm:mt-4 md:mt-0 flex flex-col sm:items-end gap-2 shrink-0 border-t md:border-t-0 md:border-l border-red-200 pt-2 sm:pt-3 md:pt-0 md:pl-5 w-full md:w-auto">
+                        <span class="text-[10px] sm:text-xs text-[#888] font-bold">Asal Dihantar: <span class="text-black block md:inline">${formatDateTime(group.tarikhDaftar)}</span></span>
+                        <button onclick="pulihkanSuratKeluar('${group.baseId}')" class="xp-button font-bold text-white bg-[#008000] border-[#005000] px-4 sm:px-5 py-1.5 sm:py-2 text-[11px] sm:text-xs mt-1.5 sm:mt-2 w-full sm:w-auto justify-center shadow-sm" title="Kembalikan dokumen ini sebagai aktif"><i data-lucide="refresh-cw" class="w-3 h-3 sm:w-4 sm:h-4"></i> Pulihkan Rekod</button>
+                    </div>
+                </div>
+            `;
+        }).join('') + `</div>`;
+    }
+
+    let isPindaanTindakan = false;
+    function bukaModalTindakanSurat(id, isPindaan = false) {
+        isPindaanTindakan = isPindaan;
+        const doc = documents.find(d => d.id === id);
+        if(!doc) return;
+        document.getElementById('modalDocId').value = id;
+        document.getElementById('modalNoRuj').innerText = doc.noRuj;
+        
+        if (isPindaanTindakan) {
+            let lastAction = null;
+            for (let i = doc.timeline.length - 1; i >= 0; i--) {
+                const t = doc.timeline[i];
+                if (t.oleh === currentDept && ['Disimpan Sementara (KIV)', 'Selesai & Direkodkan', 'Dikembalikan', 'Diedar Dalaman', 'Diedar kepada Pegawai'].includes(t.tindakan)) {
+                    lastAction = t;
+                    break;
+                }
+            }
+
+            if (lastAction) {
+                if (lastAction.tindakan.includes('KIV')) document.getElementById('tindakanPilihan').value = 'kiv';
+                else if (lastAction.tindakan.includes('Selesai')) document.getElementById('tindakanPilihan').value = 'selesai';
+                else if (lastAction.tindakan.includes('Kembali')) document.getElementById('tindakanPilihan').value = 'kembali';
+                else if (lastAction.tindakan.includes('Edar')) document.getElementById('tindakanPilihan').value = 'edar';
+                
+                document.getElementById('catatanTindakan').value = lastAction.catatan || '';
+                document.getElementById('pegawaiPilihan').value = lastAction.kepada || '';
+            }
+        } else {
+            document.getElementById('tindakanPilihan').value = 'kiv';
+            document.getElementById('catatanTindakan').value = '';
+            document.getElementById('pegawaiPilihan').value = '';
+        }
+        
+        togglePegawaiSurat();
+        document.getElementById('surat-tindakan-modal').classList.remove('hidden');
+        lucide.createIcons();
+    }
+    
+    function tutupModalSuratTindakan() { document.getElementById('surat-tindakan-modal').classList.add('hidden'); }
+    function togglePegawaiSurat() { document.getElementById('divPegawai').classList.toggle('hidden', document.getElementById('tindakanPilihan').value !== 'edar'); }
+    
+    function renderSuratJejak(container) {
+        container.innerHTML = `
+            <div id="jejak-wrapper">
+                <div id="jejak-sidebar" class="xp-panel bg-[#ece9d8] shadow-inner border-t-[4px] border-[#a9a9a9]">
+                    <div class="jejak-search-container flex items-center gap-2 mb-3 sm:mb-4 px-3 sm:px-4 pt-3 sm:pt-4">
+                        <i data-lucide="search" class="w-4 h-4 sm:w-5 sm:h-5 text-[#4169E1]"></i>
+                        <input type="text" id="carianSurat" onkeyup="tapisSenaraiJejak()" placeholder="Cari No. Ruj / Tajuk..." class="xp-input flex-1 text-xs sm:text-sm font-bold" title="Taip carian untuk mengecilkan senarai">
+                    </div>
+                    <div id="senaraiSuratJejak" class="flex-1 overflow-y-auto px-3 sm:px-4 pb-3 sm:pb-4 relative hide-scrollbar"><div class="absolute w-full px-2 left-0 right-0"></div></div>
+                </div>
+                
+                <div id="jejak-detail" class="xp-panel bg-white shadow-inner relative overflow-y-auto border-t-[6px] border-[#4169E1]">
+                    <div id="placeholderTimeline" class="absolute inset-0 flex flex-col items-center justify-center text-[#888] p-4 text-center">
+                        <i data-lucide="route" class="w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 text-[#a9a9a9]"></i>
+                        <p class="text-sm sm:text-base font-bold">Sila pilih rekod surat di senarai untuk melihat pergerakan.</p>
+                    </div>
+                    
+                    <div id="kandunganTimeline" class="hidden h-full p-4 md:p-6 flex-col w-full max-w-4xl mx-auto">
+                        
+                        <!-- Header with Back Button -->
+                        <div class="flex items-center gap-3 border-b-2 border-[#a9a9a9] pb-3 sm:pb-4 mb-4 sm:mb-5 shrink-0">
+                            <button onclick="kembaliKeSenaraiJejak()" class="xp-button shrink-0 h-8 sm:h-10 px-2 sm:px-3 bg-gray-100 hover:bg-gray-200" title="Kembali ke senarai surat"><i data-lucide="chevron-left" class="w-5 h-5 text-[#4169E1]"></i></button>
+                            <h3 class="font-black text-base sm:text-lg md:text-xl text-black leading-tight flex-1" id="tajukTimeline">Tajuk Surat</h3>
+                            <button id="btnEditPembetulan" onclick="bukaModalEditSurat()" class="xp-button text-white bg-[#e65c00] border-[#b34700] hidden shrink-0 text-[11px] sm:text-xs md:text-sm px-3 sm:px-4 h-8 sm:h-10" title="Pinda butiran surat ini sekiranya terdapat ralat"><i data-lucide="edit" class="w-3 h-3 sm:w-4 sm:h-4"></i> <span class="hidden sm:inline ml-1">Pinda maklumat</span></button>
+                        </div>
+                        
+                        <!-- Top Row: No Ruj & Klasifikasi -->
+                        <div class="flex justify-between items-center mb-1.5 sm:mb-2 flex-wrap gap-2 shrink-0">
+                            <div class="text-[10px] sm:text-xs md:text-sm font-bold text-gray-500 uppercase tracking-wider">No Rujukan: <span id="infoNoRuj" class="ml-1 sm:ml-2 text-xs sm:text-sm md:text-base"></span></div>
+                            <div id="infoKlasifikasiContainer"></div>
+                        </div>
+                        
+                        <!-- Details Box -->
+                        <div id="detailInfoBox" class="p-3 sm:p-4 rounded-xl border-2 mb-4 sm:mb-6 shadow-sm shrink-0">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-2 sm:gap-y-3 gap-x-4 sm:gap-x-6 text-[11px] sm:text-xs md:text-sm font-bold text-black">
+                                <div class="flex justify-between border-b border-black/10 pb-1 flex-col sm:flex-row gap-1 sm:gap-0">
+                                    <span class="text-gray-600">Status Terkini:</span> <div id="infoStatus" class="flex flex-col sm:items-end sm:text-right"></div>
+                                </div>
+                                <div class="flex justify-between items-center border-b border-black/10 pb-1">
+                                    <span class="text-gray-600">Tarikh Dokumen:</span> <span id="infoTrhDokumen" class="font-semibold text-black"></span>
+                                </div>
+                                <div class="flex justify-between items-center border-b border-black/10 pb-1">
+                                    <span class="text-gray-600" id="label-info-edar">Tarikh Edaran Dibuat:</span> <span id="infoTrhEdar" class="font-semibold text-black"></span>
+                                </div>
+                                <div class="flex justify-between border-b border-black/10 pb-1 flex-col sm:flex-row gap-1 sm:gap-0">
+                                    <span class="text-gray-600">Tarikh Diterima:</span> <div id="infoTrhTerima" class="flex flex-col sm:items-end sm:text-right"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="font-black text-xs sm:text-sm text-black mb-3 sm:mb-4 flex items-center gap-2 border-b border-[#a9a9a9] pb-1.5 sm:pb-2 shrink-0"><i data-lucide="history" class="w-4 h-4 sm:w-5 sm:h-5 text-[#555]"></i> Garis Masa Pergerakan Berkelompok:</h4>
+                        <div id="susunanTimeline" class="timeline-container space-y-4 sm:space-y-6 mt-3 sm:mt-4 flex-1"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        tapisSenaraiJejak(); 
+        setTimeout(() => lucide.createIcons(), 50);
+    }
+
+    function tapisSenaraiJejak() {
+        const carian = document.getElementById('carianSurat').value.toLowerCase();
+        const container = document.getElementById('senaraiSuratJejak');
+        
+        const list = documents.filter(d => 
+            (d.pendaftar === currentDept || d.lokasiSemasa === currentDept || d.timeline.some(t => t.oleh.includes(currentDept))) &&
+            (d.noRuj.toLowerCase().includes(carian) || d.tajuk.toLowerCase().includes(carian)) && 
+            d.status !== 'Dibatalkan'
+        );
+
+        const grouped = {};
+        list.forEach(d => {
+            const key = d.noRuj + '|' + d.tajuk;
+            if(!grouped[key]) grouped[key] = { ...d, allDocs: [], baseId: d.id };
+            grouped[key].allDocs.push(d);
+        });
+
+        const sortedGrouped = Object.values(grouped).sort((a,b) => new Date(b.tarikhDaftar) - new Date(a.tarikhDaftar));
+
+        container.firstElementChild.innerHTML = sortedGrouped.length === 0 ? `<div class="text-[11px] sm:text-xs italic text-center text-[#888] mt-4 sm:mt-6">Tiada rekod padanan.</div>` : sortedGrouped.map(group => {
+            let statusHtml = group.allDocs.map(d => `<span class="surat-item-status bg-gray-200 px-1 sm:px-1.5 py-0.5 rounded text-black mr-1 mt-1 inline-block border border-[#ccc]">${d.lokasiSemasa}: ${d.status}</span>`).join('');
+            
+            // Logik pewarnaan (Merah utk Masuk, Biru utk Keluar)
+            let isMasuk = group.aliran === 'Dokumen / Surat Masuk' || group.pendaftar !== currentDept;
+            let badgeClass = isMasuk ? 'text-red-800 bg-red-100 border-red-300' : 'text-[#4169E1] bg-blue-50 border-blue-200';
+
+            return `
+            <div class="surat-item bg-white border-2 border-[#a9a9a9] rounded-lg p-2 sm:p-3 mb-2 sm:mb-3 cursor-pointer hover:bg-[#ffffe1] hover:border-[#4169E1] transition shadow-sm" onclick="paparkanJejakGroupById('${group.baseId}')" title="Papar perincian dokumen">
+                <div class="surat-item-header flex justify-between items-start mb-1 sm:mb-1.5">
+                   <span class="surat-item-noruj font-black text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded border ${badgeClass}">${group.noRuj}</span>
+                   <span class="surat-item-klasifikasi text-[8px] sm:text-[9px] font-bold text-white px-1 sm:px-1.5 py-0.5 rounded ${group.klasifikasi === 'Sulit' ? 'bg-red-600' : (group.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600')} shrink-0">${group.klasifikasi || 'Biasa'}</span>
+                </div>
+                <div class="surat-item-tajuk text-[11px] sm:text-xs text-black font-bold truncate mb-1.5 sm:mb-2 mt-1.5 sm:mt-2" title="${escapeHTML(group.tajuk)}">${escapeHTML(group.tajuk)}</div>
+                <div class="surat-item-status text-[8px] sm:text-[9px] text-[#555] font-semibold border-t border-[#eee] pt-1 sm:pt-1.5 flex flex-wrap">
+                    ${statusHtml}
+                </div>
+            </div>
+        `}).join('');
+    }
+
+    window.kembaliKeSenaraiJejak = function() {
+        const wrapper = document.getElementById('jejak-wrapper');
+        if(wrapper) wrapper.classList.remove('jejak-active');
+    };
+
+    window.paparkanJejakGroupById = function(baseId) {
+        const baseDoc = documents.find(d => d.id === baseId);
+        if(!baseDoc) return;
+        
+        const docs = documents.filter(d => d.noRuj === baseDoc.noRuj && d.tajuk === baseDoc.tajuk && d.status !== 'Dibatalkan');
+        if(docs.length === 0) return;
+        
+        const wrapper = document.getElementById('jejak-wrapper');
+        if(wrapper) wrapper.classList.add('jejak-active');
+        
+        document.getElementById('placeholderTimeline').style.display = 'none';
+        document.getElementById('kandunganTimeline').style.display = 'flex';
+        document.getElementById('editDocId').value = baseDoc.noRuj; 
+        
+        document.getElementById('tajukTimeline').innerText = baseDoc.tajuk;
+        
+        // Logik pewarnaan dalam Jejak
+        const isMasuk = baseDoc.aliran === 'Dokumen / Surat Masuk' || baseDoc.pendaftar !== currentDept;
+        const noRujEl = document.getElementById('infoNoRuj');
+        const detailBox = document.getElementById('detailInfoBox');
+        
+        noRujEl.innerText = baseDoc.noRuj;
+        if(isMasuk) {
+            noRujEl.className = 'font-black px-2 sm:px-3 py-0.5 sm:py-1 rounded-md border-2 bg-red-50 text-red-700 border-red-300';
+            detailBox.className = 'bg-[#fff5f5] p-3 sm:p-4 rounded-xl border-2 border-red-600 mb-4 sm:mb-6 shadow-sm';
+        } else {
+            noRujEl.className = 'font-black px-2 sm:px-3 py-0.5 sm:py-1 rounded-md border-2 bg-blue-50 text-[#4169E1] border-blue-300';
+            detailBox.className = 'bg-[#e6f0ff] p-3 sm:p-4 rounded-xl border-2 border-[#4169E1] mb-4 sm:mb-6 shadow-sm';
+        }
+        
+        const klasColor = baseDoc.klasifikasi === 'Sulit' ? 'bg-red-600' : (baseDoc.klasifikasi === 'Terperingkat' ? 'bg-purple-600' : 'bg-green-600');
+        document.getElementById('infoKlasifikasiContainer').innerHTML = `<span class="text-[10px] sm:text-xs md:text-sm font-black text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md shadow-sm tracking-wide ${klasColor}">${baseDoc.klasifikasi || 'Biasa'}</span>`;
+        
+        let statusHtml = docs.map(d => `<div class="mb-0.5 sm:mb-1"><span class="font-bold text-black">${d.lokasiSemasa}:</span> <span class="${d.status === 'Diterima' ? 'text-green-600' : (d.status === 'Dikembalikan' ? 'text-orange-600' : 'text-red-600')} font-black uppercase">${d.status}</span></div>`).join('');
+        document.getElementById('infoStatus').innerHTML = statusHtml;
+
+        document.getElementById('infoTrhDokumen').innerText = formatDateOnly(baseDoc.tarikhDokumen);
+        document.getElementById('infoTrhEdar').innerText = formatDateOnly(baseDoc.tarikhEdar);
+        
+        document.getElementById('label-info-edar').innerText = baseDoc.aliran === 'Dokumen / Surat Masuk' ? 'Tarikh Surat Diterima:' : 'Tarikh Edaran Dibuat:';
+        
+        let trhTerimaHtml = docs.map(d => `<div class="mb-0.5 sm:mb-1"><span class="font-bold text-black">${d.lokasiSemasa}:</span> <span class="font-semibold text-green-700">${d.tarikhTerima ? formatDateOnly(d.tarikhTerima) : 'Belum'}</span></div>`).join('');
+        document.getElementById('infoTrhTerima').innerHTML = trhTerimaHtml;
+
+        const btnEdit = document.getElementById('btnEditPembetulan');
+        const isEligibleForEdit = docs.some(d => d.pendaftar === currentDept && (d.status === 'Dihantar' || d.status === 'Diterima'));
+        if(isEligibleForEdit) btnEdit.classList.remove('hidden');
+        else btnEdit.classList.add('hidden');
+
+        let allLogs = [];
+        docs.forEach(d => {
+            d.timeline.forEach(log => {
+                allLogs.push({...log, targetDept: d.lokasiSemasa});
+            });
+        });
+
+        allLogs.sort((a,b) => new Date(a.tarikh) - new Date(b.tarikh));
+        
+        let unifiedTimeline = [];
+        allLogs.forEach(log => {
+            let existingLog = unifiedTimeline.find(ul => ul.tarikh === log.tarikh && ul.tindakan === log.tindakan && ul.oleh === log.oleh);
+            
+            let currentStatusForTarget = docs.find(x => x.lokasiSemasa === log.targetDept || x.pendaftar === log.targetDept)?.status || 'Selesai';
+            let targetText = log.targetDept ? `${log.targetDept} <span class="bg-blue-100 text-blue-800 text-[9px] sm:text-[10px] px-1 sm:px-1.5 rounded ml-1 font-bold">[${currentStatusForTarget}]</span>` : log.kepada;
+
+            if (existingLog) {
+                if (targetText && !existingLog.kepadaList.includes(targetText)) {
+                    existingLog.kepadaList.push(targetText);
+                }
+            } else {
+                unifiedTimeline.push({
+                    ...log,
+                    kepadaList: targetText ? [targetText] : []
+                });
+            }
+        });
+
+        unifiedTimeline.sort((a,b) => new Date(b.tarikh) - new Date(a.tarikh));
+
+        document.getElementById('susunanTimeline').innerHTML = unifiedTimeline.map((log, index) => {
+            const isLatest = index === 0;
+            const bgBox = isLatest ? 'bg-[#ffffcc] border-[2px] border-[#ff9900] shadow-md' : 'bg-[#ece9d8] border border-[#a9a9a9] shadow-sm';
+            const highlightBadge = isLatest ? `<span class="bg-yellow-400 text-black px-1 sm:px-1.5 py-0.5 rounded text-[8px] sm:text-[10px] font-black ml-1.5 sm:ml-2 animate-pulse">LOKASI TERKINI</span>` : '';
+            
+            let kepadaHtml = log.kepadaList && log.kepadaList.length > 0 
+                ? log.kepadaList.join(', ') 
+                : log.kepada;
+
+            return `
+                <div class="timeline-item ${isLatest ? 'opacity-100' : 'opacity-70'}">
+                    <div class="flex flex-col mb-1 sm:mb-1.5">
+                        <span class="text-xs sm:text-sm font-black text-[#4169E1] uppercase tracking-wide">${log.tindakan} ${highlightBadge}</span>
+                        <span class="text-[9px] sm:text-[10px] md:text-xs text-[#555] font-bold">${formatDateTime(log.tarikh)}</span>
+                    </div>
+                    <div class="${bgBox} rounded-lg p-2 sm:p-3 mt-1 text-[11px] sm:text-xs text-black">
+                        <p class="mb-1 sm:mb-1.5"><i data-lucide="user" class="w-3 h-3 sm:w-4 sm:h-4 inline text-[#555] align-text-bottom"></i> Oleh: <strong>${log.oleh}</strong></p>
+                        ${kepadaHtml ? `<div class="mb-1 sm:mb-1.5 flex items-start gap-1"><i data-lucide="arrow-right" class="w-3 h-3 sm:w-4 sm:h-4 inline text-blue-600 align-text-bottom shrink-0"></i> <div class="${isLatest ? 'bg-yellow-300 px-1 rounded' : ''} flex-1 leading-relaxed">Kepada: ${kepadaHtml}</div></div>` : ''}
+                        ${log.catatan ? `<div class="bg-white border-l-4 border-[#4169E1] p-1.5 sm:p-2 mt-1.5 sm:mt-2 font-medium italic text-slate-700">"${log.catatan}"</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        lucide.createIcons();
+
+        // Autoscroll pada skrin kecil
+        if (window.innerWidth < 768) {
+            setTimeout(() => {
+                const scrollArea = document.getElementById('jejak-kandungan-scroll');
+                if (scrollArea) scrollArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    };
+
+    function bukaModalEditSurat() {
+        const noRuj = document.getElementById('editDocId').value;
+        const currentTajuk = document.getElementById('tajukTimeline').innerText;
+        
+        const allDocsForGroup = documents.filter(d => d.noRuj === noRuj && d.tajuk === currentTajuk);
+        const targetDocs = allDocsForGroup.filter(d => d.status !== 'Dibatalkan');
+        
+        if(targetDocs.length === 0) return;
+        const baseDoc = targetDocs[0];
+        
+        document.getElementById('editTajuk').value = baseDoc.tajuk;
+        
+        const currentDests = targetDocs.map(d => d.lokasiSemasa);
+        
+        let html = `
+            <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-blue-100 rounded border border-transparent hover:border-blue-300 transition-colors col-span-1 sm:col-span-2">
+                <input type="checkbox" name="edit_destinasi" value="Simpanan Fail" class="w-4 h-4 text-blue-600 rounded" ${currentDests.includes('Simpanan Fail') ? 'checked' : ''}>
+                <span class="text-[11px] sm:text-sm font-extrabold text-[#4169E1]">Simpanan Fail</span>
+            </label>
+        `;
+        
+        const depts = users.filter(u => u.departmentName !== currentDept && u.id !== 'superadmin');
+        depts.forEach(u => {
+            html += `
+                <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-blue-100 rounded border border-transparent hover:border-blue-300 transition-colors">
+                    <input type="checkbox" name="edit_destinasi" value="${u.departmentName}" class="w-4 h-4 text-blue-600 rounded" ${currentDests.includes(u.departmentName) ? 'checked' : ''}>
+                    <span class="text-[11px] sm:text-sm font-bold text-black">${u.departmentName}</span>
+                </label>
+            `;
+        });
+        
+        document.getElementById('edit-destinasi-container').innerHTML = html;
+        document.getElementById('surat-edit-modal').classList.remove('hidden');
+    }
+
+    function tutupModalSuratEdit() { document.getElementById('surat-edit-modal').classList.add('hidden'); }
+
+    window.toggleDestinasiSurat = function() {
+        const kategori = document.getElementById('sr-kategori').value;
+        const containerCb = document.getElementById('sr-destinasi-container');
+        const containerLuar = document.getElementById('sr-destinasi-luar-container');
+        const containerFail = document.getElementById('sr-destinasi-fail-msg');
+        const inputLuar = document.getElementById('sr-destinasi-luar');
+        const labelDestinasi = document.getElementById('label-destinasi');
+
+        if (kategori === 'Surat Keluar Luar (Luar Agensi)') {
+            containerCb.classList.add('hidden');
+            if (containerFail) containerFail.classList.add('hidden');
+            containerLuar.classList.remove('hidden');
+            inputLuar.required = true;
+            labelDestinasi.innerText = "Nyatakan Destinasi Agensi Luar:";
+        } else if (kategori === 'Disimpan ke dalam fail') {
+            containerCb.classList.add('hidden');
+            containerLuar.classList.add('hidden');
+            if (containerFail) containerFail.classList.remove('hidden');
+            inputLuar.required = false;
+            labelDestinasi.innerText = "Tindakan Penyimpanan Rekod:";
+        } else { 
+            containerCb.classList.remove('hidden');
+            containerLuar.classList.add('hidden');
+            if (containerFail) containerFail.classList.add('hidden');
+            inputLuar.required = false;
+            labelDestinasi.innerText = "Destinasi Penghantaran Dalaman (Boleh Pilih Lebih Dari Satu):";
+        }
+    };
+
+    window.toggleTarikhLabel = function() {
+        const aliran = document.getElementById('sr-aliran').value;
+        const label = document.getElementById('label-tarikh-edar');
+        if(label) {
+            label.innerText = aliran === 'Dokumen / Surat Masuk' ? 'Tarikh Surat Diterima:' : 'Tarikh Edaran Dibuat:';
+        }
+    };
+
+    function renderSuratDaftar(container) {
+        container.innerHTML = `
+            <div class="xp-panel bg-[#ece9d8] p-4 sm:p-5 md:p-8 max-w-3xl mx-auto shadow-inner mt-1 sm:mt-2 border-t-[6px] border-[#4169E1] rounded-t-xl w-full overflow-y-auto">
+                <h2 class="font-black text-base sm:text-lg md:text-xl text-[#4169E1] border-b-2 border-[#a9a9a9] pb-2 sm:pb-3 mb-4 sm:mb-6 flex items-center gap-2"><i data-lucide="mail-plus" class="w-5 h-5 sm:w-6 sm:h-6"></i> Rekod Pendaftaran Surat</h2>
+                <form id="formDaftarSurat" onsubmit="handleDaftarSurat(event)">
+                    <div class="space-y-4 sm:space-y-5">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 bg-white p-4 sm:p-5 rounded-xl border border-[#a9a9a9] shadow-inner">
+                            <div class="flex flex-col gap-1.5 sm:gap-2">
+                                <label class="text-xs sm:text-sm font-bold text-[#4169E1]">Aliran Surat:</label>
+                                <select id="sr-aliran" required class="xp-input cursor-pointer font-bold text-[#4169E1] border-[#4169E1] text-xs sm:text-sm" onchange="toggleTarikhLabel()" title="Pilih aliran keluar atau masuk">
+                                    <option value="Dokumen / Surat Keluar" class="font-bold">Dokumen / Surat Keluar</option>
+                                    <option value="Dokumen / Surat Masuk" class="font-bold">Dokumen / Surat Masuk</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1.5 sm:gap-2">
+                                <label class="text-xs sm:text-sm font-bold text-black">Klasifikasi Dokumen:</label>
+                                <select id="sr-klasifikasi" required class="xp-input cursor-pointer font-bold text-xs sm:text-sm" title="Pilih status keselamatan dokumen">
+                                    <option value="Biasa" class="font-bold text-green-700">Biasa</option>
+                                    <option value="Sulit" class="font-bold text-red-700">Sulit</option>
+                                    <option value="Terperingkat" class="font-bold text-purple-700">Terperingkat</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1.5 sm:gap-2">
+                                <label class="text-xs sm:text-sm font-bold text-black">Tarikh Surat / Dokumen:</label>
+                                <input type="date" id="sr-tarikh-dokumen" required class="xp-input font-bold text-xs sm:text-sm" title="Tarikh yang tertera pada dokumen surat">
+                            </div>
+                            <div class="flex flex-col gap-1.5 sm:gap-2">
+                                <label class="text-xs sm:text-sm font-bold text-black" id="label-tarikh-edar">Tarikh Edaran Dibuat:</label>
+                                <input type="date" id="sr-tarikh-edar" required class="xp-input font-bold text-xs sm:text-sm" title="Tarikh tindakan/edaran direkodkan">
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs sm:text-sm font-bold text-black">Tajuk Dokumen / Perkara Utama:</label>
+                            <input type="text" id="sr-tajuk" required class="xp-input text-xs sm:text-sm font-bold" placeholder="Sila masukkan tajuk penuh surat..." title="Tajuk atau maklumat penting surat">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-xs sm:text-sm font-bold text-black">Jenis Dokumen:</label>
+                                <select id="sr-jenis" required class="xp-input cursor-pointer text-xs sm:text-sm font-bold" onchange="document.getElementById('sr-lain-div').classList.toggle('hidden', this.value !== '4')" title="Pilih kategori jenis format surat">
+                                    <option value="1" class="font-bold">Surat Rasmi</option>
+                                    <option value="2" class="font-bold">Memo Dalaman</option>
+                                    <option value="3" class="font-bold">Minit Mesyuarat</option>
+                                    <option value="4" class="font-bold">Lain-lain Format</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1.5 hidden" id="sr-lain-div">
+                                <label class="text-xs sm:text-sm font-bold text-black">Nyatakan Jenis (Jika Lain-lain):</label>
+                                <input type="text" id="sr-lain" class="xp-input border-blue-400 text-xs sm:text-sm font-bold" placeholder="Cth: Borang Cuti, Kertas Kerja" title="Nyatakan jenis khusus secara manual">
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-xs sm:text-sm font-bold text-black">Kategori Daftar:</label>
+                                <select id="sr-kategori" required class="xp-input cursor-pointer font-bold text-xs sm:text-sm" onchange="toggleDestinasiSurat()" title="Pilih kategori rekod simpanan">
+                                    <option value="Edaran Dalaman" class="font-bold">Edaran Dalaman</option>
+                                    <option value="Surat Keluar Luar (Luar Agensi)" class="font-bold">Surat Keluar Luar (Luar Agensi)</option>
+                                    <option value="Disimpan ke dalam fail" class="font-bold">Disimpan ke dalam fail</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex flex-col gap-1.5 md:col-span-2">
+                                <label class="text-xs sm:text-sm font-bold text-black" id="label-destinasi">Destinasi Penghantaran Dalaman (Boleh Pilih Lebih Dari Satu):</label>
+                                
+                                <div id="sr-destinasi-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-blue-50 p-3 sm:p-4 rounded-lg border-2 border-[#4169E1] max-h-40 sm:max-h-48 overflow-y-auto shadow-inner">
+                                    <!-- Checkbox Destinasi Dijana Oleh JS -->
+                                </div>
+                                
+                                <div id="sr-destinasi-luar-container" class="hidden">
+                                    <input type="text" id="sr-destinasi-luar" class="xp-input border-[#4169E1] text-xs sm:text-sm font-bold" placeholder="Cth: Kementerian Kewangan Malaysia, Jabatan Peguam Negara" title="Nyatakan agensi/destinasi luar yang dituju">
+                                </div>
+                                
+                                <div id="sr-destinasi-fail-msg" class="hidden text-xs sm:text-sm text-green-800 font-bold bg-green-100 p-3 rounded-lg border border-green-300">
+                                    <i data-lucide="archive" class="w-4 h-4 inline mr-1 mb-0.5"></i> Dokumen ini hanya akan direkodkan dan disimpan di dalam fail bahagian anda sahaja. Tiada edaran dilakukan.
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-1.5 md:col-span-2">
+                                <label class="text-xs sm:text-sm font-bold text-black">Nota Tambahan / Arahan (Pilihan):</label>
+                                <textarea id="sr-nota" rows="3" class="xp-input resize-none text-xs sm:text-sm font-bold" placeholder="Tinggalkan pesanan kepada penerima di sini..." title="Nota bantuan atau arahan khusus kepada pihak penerima"></textarea>
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-4 sm:pt-5 border-t-2 border-[#a9a9a9] mt-3 sm:mt-4">
+                            <button type="submit" class="xp-button font-bold text-white bg-[#4169E1] border-[#27408B] px-6 sm:px-8 py-2 sm:py-3 text-xs sm:text-sm shadow-md hover:bg-[#0040cc] w-full sm:w-auto justify-center" title="Sahkan pendaftaran dan hantar sistem"><i data-lucide="send" class="w-4 h-4 sm:w-5 sm:h-5"></i> Daftar & Hantar Dokumen</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        const harini = new Date().toISOString().split('T')[0];
+        document.getElementById('sr-tarikh-dokumen').value = harini;
+        document.getElementById('sr-tarikh-edar').value = harini;
+        
+        populateSuratDestinasiDropdown();
+        toggleDestinasiSurat(); // Pastikan paparan default betul
+    }
+
+    function populateSuratDestinasiDropdown() {
+        const container = document.getElementById('sr-destinasi-container');
+        if(container) {
+            let html = '';
+            
+            const depts = users.filter(u => u.departmentName !== currentDept && u.id !== 'superadmin');
+            depts.forEach(u => {
+                html += `
+                    <label class="flex items-center gap-2 sm:gap-3 cursor-pointer p-2 hover:bg-blue-200 rounded border border-transparent hover:border-blue-400 transition-colors" title="Hantar surat ke bahagian ${u.departmentName}">
+                        <input type="checkbox" name="destinasi" value="${u.departmentName}" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded cursor-pointer">
+                        <span class="text-[11px] sm:text-sm font-bold text-black">${u.departmentName}</span>
+                    </label>
+                `;
+            });
+            container.innerHTML = html;
+        }
+    }
+
+    window.handleDaftarSurat = async function(e) {
+        e.preventDefault();
+        const tajuk = document.getElementById('sr-tajuk').value;
+        const aliran = document.getElementById('sr-aliran').value;
+        const selJenis = document.getElementById('sr-jenis');
+        let jenis = selJenis.options[selJenis.selectedIndex].text;
+        if(selJenis.value === '4') jenis = "Lain-lain: " + document.getElementById('sr-lain').value;
+        const kategori = document.getElementById('sr-kategori').value;
+        const klasifikasi = document.getElementById('sr-klasifikasi').value;
+        const nota = document.getElementById('sr-nota').value;
+        const tarikhDokumen = document.getElementById('sr-tarikh-dokumen').value;
+        const tarikhEdar = document.getElementById('sr-tarikh-edar').value;
+
+        let destinasiArray = [];
+        
+        if (kategori === 'Surat Keluar Luar (Luar Agensi)') {
+            const destinasiLuar = document.getElementById('sr-destinasi-luar').value.trim();
+            if(!destinasiLuar) {
+                showToast("Sila nyatakan destinasi luar terlebih dahulu!", true);
+                return;
+            }
+            destinasiArray.push(destinasiLuar);
+        } else if (kategori === 'Disimpan ke dalam fail') {
+            destinasiArray.push('Simpanan Fail');
+        } else {
+            const cbDestinasi = document.querySelectorAll('input[name="destinasi"]:checked');
+            destinasiArray = Array.from(cbDestinasi).map(cb => cb.value);
+
+            if(destinasiArray.length === 0) {
+                showToast("Sila tandakan sekurang-kurangnya satu Destinasi Penghantaran!", true);
+                return;
+            }
+        }
+
+        const year = new Date().getFullYear();
+        const noRuj = `SRS-${year}-${String(suratCounter++).padStart(4, '0')}`;
+        
+        let createdDocs = [];
+
+        destinasiArray.forEach((destinasi, index) => {
+            const newDoc = {
+                id: Date.now().toString() + index, 
+                noRuj: noRuj, 
+                tajuk: tajuk,
+                aliran: aliran, 
+                jenis: jenis, 
+                kategori: kategori,
+                klasifikasi: klasifikasi,
+                tarikhDokumen: tarikhDokumen,
+                tarikhEdar: tarikhEdar,
+                tarikhTerima: aliran === 'Dokumen / Surat Masuk' ? tarikhEdar : null,
+                pendaftar: currentDept, 
+                lokasiSemasa: destinasi, 
+                status: destinasi === 'Simpanan Fail' ? 'Selesai' : 'Dihantar', 
+                tarikhDaftar: new Date().toISOString(), 
+                timeline: []
+            };
+
+            newDoc.timeline.push({ tarikh: new Date().toISOString(), tindakan: 'Didaftarkan', oleh: currentDept, catatan: `Dokumen didaftarkan sebagai ${kategori} (${klasifikasi}).` });
+            
+            if (destinasi === 'Simpanan Fail') {
+                newDoc.timeline.push({ tarikh: new Date().toISOString(), tindakan: 'Selesai & Direkodkan', oleh: currentDept, catatan: nota || "Disimpan ke dalam fail rekod bahagian." });
+            } else {
+                newDoc.timeline.push({ tarikh: new Date().toISOString(), tindakan: 'Dihantar', oleh: currentDept, kepada: destinasi, catatan: nota || "Sila ambil maklum dan sahkan penerimaan." });
+            }
+
+            documents.push(newDoc);
+            createdDocs.push(newDoc);
+        });
+
+        if (window.dbAPI) {
+            for(const doc of createdDocs) {
+                await window.dbAPI.saveDocument(doc);
+            }
+        }
+        
+        showToast(`Dokumen ${noRuj} berjaya didaftar & dihantar ke ${destinasiArray.length} destinasi!`);
+        updateBadges();
+        changeView('surat-jejak');
+        setTimeout(() => paparkanJejakGroupById(createdDocs[0].id), 100);
+    }
+
+  </script>
+</body>
+</html>
